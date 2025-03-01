@@ -1,0 +1,27 @@
+Checks: > 
+  -*,
+  readability-*,
+  modernize-*,
+  performance-*,
+  bugprone-*,
+  cppcoreguidelines-*,
+  google-*,
+  llvm-*,
+  misc-*,
+  hicpp-*,
+  -readability-identifier-length,
+  -modernize-use-trailing-return-type
+  
+WarningsAsErrors: 
+  -modernize-use-auto
+  -modernize-use-nullptr
+
+HeaderFilterRegex: '.*'
+
+CheckOptions:
+  - key: llvm-header-guard
+    value: 'false'
+  - key: 'clang-diagnostic-pragma-once-outside-header'
+    value: 'false'
+
+FormatStyle: .clang-format
