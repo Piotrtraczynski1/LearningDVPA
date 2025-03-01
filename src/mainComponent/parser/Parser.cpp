@@ -12,9 +12,9 @@ constexpr uint8_t callId{0};
 constexpr uint8_t returnId{1};
 constexpr uint8_t localId{2};
 
-std::vector<Parser::Symbol> Parser::parseString(std::string &word)
+common::Word Parser::parseString(std::string &word)
 {
-    std::vector<Symbol> parsedWord;
+    common::Word parsedWord;
     for (const auto symbol : word)
     {
         switch (alphabet[std::string{symbol}].second)

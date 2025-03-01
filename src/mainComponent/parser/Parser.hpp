@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../../common/VPA.hpp"
+#include "../../common/Word.hpp"
 #include "../../common/transition/Argument.hpp"
 #include "../../common/transition/CoArgument.hpp"
 
@@ -18,13 +19,9 @@ class Parser
     using json = nlohmann::json;
     template <typename T> using Argument = common::transition::Argument<T>;
     using CoArgument = common::transition::CoArgument;
-
-    using Symbol = std::variant<common::symbol::CallSymbol, common::symbol::ReturnSymbol,
-                                common::symbol::LocalSymbol>;
-
 public:
     std::shared_ptr<common::VPA> readVPA(std::string &path);
-    std::vector<Symbol> parseString(std::string &word);
+    std::vector<common::Symbol> parseString(std::string &word);
 
 private:
     void readData(std::string &path);

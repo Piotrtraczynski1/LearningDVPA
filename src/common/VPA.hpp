@@ -4,6 +4,7 @@
 #include <variant>
 #include <vector>
 
+#include "Word.hpp"
 #include "symbol/Symbols.hpp"
 #include "transition/Transition.hpp"
 
@@ -14,8 +15,6 @@ namespace common
 {
 class VPA
 {
-    using Symbol = std::variant<symbol::CallSymbol, symbol::ReturnSymbol, symbol::LocalSymbol>;
-
     std::stack<symbol::StackSymbol> stack; // TODO make own stack!!!!
 
 public:
