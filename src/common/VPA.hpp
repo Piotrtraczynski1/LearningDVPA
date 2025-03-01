@@ -15,14 +15,11 @@ namespace common
 {
 class VPA
 {
-    std::stack<symbol::StackSymbol> stack; // TODO make own stack!!!!
+    Stack stack;
 
 public:
     VPA(transition::Transition &transition, transition::State initial)
-        : delta{transition}, initialState{initial}
-    {
-        stack.push(symbol::StackSymbol::BOTTOM);
-    };
+        : delta{transition}, initialState{initial} {};
 
     bool checkWord(std::vector<Symbol> &word)
     {
@@ -59,6 +56,12 @@ public:
                 transition::Argument<symbol::LocalSymbol> localArg{
                     std::get<symbol::LocalSymbol>(letter), stack.top(), state};
                 state = delta(localArg);
+                break;
+            }
+            case 3:
+            {
+                std::cout << "control" << std::endl;
+                stack = std::get<Stack>(letter);
                 break;
             }
             }

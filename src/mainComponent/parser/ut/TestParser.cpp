@@ -3,9 +3,11 @@
 #include <stdexcept>
 #include <string>
 
+#include "../../../common/Stack.cpp"
 #include "../../../common/transition/Transition.cpp"
 #include "../Parser.cpp"
 
+using namespace common;
 using namespace common::symbol;
 using namespace common::transition;
 
@@ -13,8 +15,6 @@ namespace mainComponent::parser
 {
 class TestParser : public ::testing::Test
 {
-    using Symbol = std::variant<CallSymbol, ReturnSymbol, LocalSymbol>;
-
 public:
     void SetUp() override
     {
@@ -63,24 +63,21 @@ TEST_F(TestParser, default8) { EXPECT_THROW(sut->checkWord(word8), std::out_of_r
 TEST_F(TestParser, default9)
 {
     std::string testWord{"(())"};
-    std::vector<std::variant<CallSymbol, ReturnSymbol, LocalSymbol>> word{
-        parser.parseString(testWord)};
+    Word word{parser.parseString(testWord)};
     EXPECT_EQ(sut->checkWord(word), true);
 };
 
 TEST_F(TestParser, default10)
 {
     std::string testWord{"a()a((a)b)b((()))baab(b)b(a)"};
-    std::vector<std::variant<CallSymbol, ReturnSymbol, LocalSymbol>> word{
-        parser.parseString(testWord)};
+    Word word{parser.parseString(testWord)};
     EXPECT_EQ(sut->checkWord(word), true);
 };
 
 TEST_F(TestParser, default11)
 {
     std::string testWord{"a()a((a)b)b((()))baab(b)b(a)("};
-    std::vector<std::variant<CallSymbol, ReturnSymbol, LocalSymbol>> word{
-        parser.parseString(testWord)};
+    Word word{parser.parseString(testWord)};
     EXPECT_EQ(sut->checkWord(word), false);
 };
 } // namespace mainComponent::parser
