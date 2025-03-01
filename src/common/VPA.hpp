@@ -34,6 +34,8 @@ public:
             {
             case 0:
             {
+                std::cout << "call: " << std::get<symbol::CallSymbol>(letter) << ", " << stack.top()
+                          << ", " << state.identifier << std::endl;
                 transition::Argument<symbol::CallSymbol> callArg{
                     std::get<symbol::CallSymbol>(letter), stack.top(), state};
                 transition::CoArgument coArg = delta(callArg);
@@ -43,6 +45,8 @@ public:
             }
             case 1:
             {
+                std::cout << "return: " << std::get<symbol::ReturnSymbol>(letter) << ", "
+                          << stack.top() << ", " << state.identifier << std::endl;
                 transition::Argument<symbol::ReturnSymbol> returnArg{
                     std::get<symbol::ReturnSymbol>(letter), stack.top(), state};
                 state = delta(returnArg);
@@ -52,6 +56,7 @@ public:
             }
             case 2:
             {
+                std::cout << "local" << std::endl;
                 transition::Argument<symbol::LocalSymbol> localArg{
                     std::get<symbol::LocalSymbol>(letter), stack.top(), state};
                 state = delta(localArg);
@@ -60,6 +65,15 @@ public:
             }
         }
         return state.isAccepted;
+    }
+
+    VPA &operator=(const VPA &vpa)
+    {
+        delta = vpa.delta;
+        state = vpa.state;
+        initialState = vpa.initialState;
+        stack = vpa.stack;
+        return *this;
     }
 
 private:

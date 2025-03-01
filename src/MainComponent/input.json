@@ -1,6 +1,0 @@
-{
-    "States": ["q0", "q1"],
-    "Calls": ["c1", "c2"],
-    "Locals": ["l1", "l2"],
-    "Returns": []
-}

@@ -24,3 +24,6 @@ Clang-tidy:
         "--config-file=.clang-tidy"
     ]
 }
+
+Parser:
+- sudo apt install nlohmann-json3-dev
