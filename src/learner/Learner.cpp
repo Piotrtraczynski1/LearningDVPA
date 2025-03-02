@@ -1,3 +1,5 @@
+#include <iostream> //tmp
+
 #include "Learner.hpp"
 
 namespace learner
@@ -22,8 +24,7 @@ void Learner::run()
 
 template <typename Symbol> // To chyba w miare git iddea jest taka, że jak nie znajdziemy to
                            // dodajemy nowy stan :)
-                           uint16_t Learner::findEquivalentState(uint16_t stateIndex, Symbol sym,
-                                                                 uint16_t stackIndex)
+uint16_t Learner::findEquivalentState(uint16_t stateIndex, Symbol sym, uint16_t stackIndex)
 {
     common::Word suffix{common::ControlWord{common::symbol::StackSymbol{stackIndex}}, Symbol{sym}};
     common::Word candidate{selectors[stateIndex] + suffix};

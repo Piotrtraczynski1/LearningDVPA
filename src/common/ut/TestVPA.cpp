@@ -7,7 +7,7 @@
 #include "../Word.cpp"
 #include "../transition/Transition.cpp"
 
-#include "../VPA.hpp"
+#include "../VPA.cpp"
 
 using namespace common::symbol;
 

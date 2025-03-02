@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../../../common/Stack.cpp"
+#include "../../../common/VPA.cpp"
 #include "../../../common/transition/Transition.cpp"
 #include "../Parser.cpp"
 
