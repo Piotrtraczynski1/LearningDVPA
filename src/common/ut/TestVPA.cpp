@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "../Stack.cpp"
+#include "../Word.cpp"
 #include "../transition/Transition.cpp"
 
 #include "../VPA.hpp"

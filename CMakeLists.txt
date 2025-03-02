@@ -8,9 +8,9 @@ set(CMAKE_CXX_COMPILER "g++")
 
 add_subdirectory(src)
 
-add_executable(run src/main.cpp)
+add_executable(run src/mainComponent/main.cpp)
 
-target_link_libraries(run PRIVATE format)
+target_link_libraries(run PRIVATE common teacher learner)
 
 option(BUILD_TESTS "Build tests" OFF)
 

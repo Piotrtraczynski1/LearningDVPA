@@ -20,4 +20,5 @@ void Stack::pop()
 }
 
 void Stack::push(symbol::StackSymbol symbol) { stack.push(symbol); }
+size_t Stack::size() { return stack.size(); }
 } // namespace common

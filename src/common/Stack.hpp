@@ -21,8 +21,11 @@ public:
         }
     }
 
+    bool operator!=(const Stack &s) { return stack != s.stack; }
+
     symbol::StackSymbol top();
     void pop();
     void push(symbol::StackSymbol symbol);
+    size_t size();
 };
 } // namespace common
