@@ -1,8 +1,16 @@
-#include "Stack.hpp"
+#include "common/Stack.hpp"
 
 namespace common
 {
-symbol::StackSymbol Stack::top()
+Stack::Stack(std::initializer_list<symbol::StackSymbol> initList)
+{
+    for (auto it = initList.begin(); it != initList.end(); ++it)
+    {
+        stack.push(*it);
+    }
+}
+
+symbol::StackSymbol Stack::top() const
 {
     if (stack.empty())
     {
@@ -20,5 +28,6 @@ void Stack::pop()
 }
 
 void Stack::push(symbol::StackSymbol symbol) { stack.push(symbol); }
-size_t Stack::size() { return stack.size(); }
+size_t Stack::size() const { return stack.size(); }
+
 } // namespace common

@@ -2,9 +2,9 @@
 
 #include <map>
 
-#include "../symbol/Symbols.hpp"
-#include "Argument.hpp"
-#include "CoArgument.hpp"
+#include "common/symbol/Symbols.hpp"
+#include "common/transition/Argument.hpp"
+#include "common/transition/CoArgument.hpp"
 
 namespace common::transition
 {
@@ -26,5 +26,7 @@ public:
     CoArgument operator()(Argument<symbol::CallSymbol> arg);
     State operator()(Argument<symbol::ReturnSymbol> arg);
     State operator()(Argument<symbol::LocalSymbol> arg);
+
+    void print();
 };
 } // namespace common::transition

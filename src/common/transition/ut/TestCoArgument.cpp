@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../CoArgument.hpp"
+#include "common/transition/CoArgument.hpp"
 
 namespace common::transition
 {

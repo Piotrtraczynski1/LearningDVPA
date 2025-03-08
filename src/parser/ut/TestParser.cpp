@@ -3,10 +3,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "../../../common/Stack.cpp"
-#include "../../../common/VPA.cpp"
-#include "../../../common/transition/Transition.cpp"
-#include "../Parser.cpp"
+#include "common/Stack.cpp"
+#include "common/VPA.cpp"
+#include "common/transition/Transition.cpp"
+#include "parser/Parser.cpp"
 
 using namespace common;
 using namespace common::symbol;

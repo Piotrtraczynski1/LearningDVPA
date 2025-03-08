@@ -1,0 +1,55 @@
+{
+    "States": [
+        {
+            "name": "q0",
+            "accepting": true
+        },
+        {
+            "name": "q1",
+            "accepting": false
+        },
+        {
+            "name": "q2",
+            "accepting": false
+        }
+    ],
+    "StackSymbols": [],
+    "Calls": [],
+    "Returns": [],
+    "Locals": [
+        "a"
+    ],
+    "Initial_state": "q0",
+    "Transition": [
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "a",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "q1"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "a",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "q2"
+            }
+        },
+        {
+            "from": {
+                "state": "q2",
+                "symbol": "a",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "q0"
+            }
+        }
+    ]
+}

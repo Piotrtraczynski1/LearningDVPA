@@ -1,86 +1,81 @@
 #include <iostream>
 
-#include "../common/VPA.hpp"
-#include "Teacher.hpp"
+#include "common/VPA.hpp"
+#include "teacher/Teacher.hpp"
+#include "utils/log.hpp"
 
 namespace teacher
 {
-void Teacher::printSymbol(const common::Symbol sym) const
+bool Teacher::membershipQuery(const common::Word &word) const
 {
-    switch (sym.index())
-    {
-    case 0:
-    {
-        std::cout << "CallSymbol{" << std::get<common::symbol::CallSymbol>(sym) << "}, ";
-        break;
-    }
-    case 1:
-    {
-        std::cout << "ReturnSymbol{" << std::get<common::symbol::ReturnSymbol>(sym) << "}, ";
-        break;
-    }
-    case 2:
-    {
-        std::cout << "LocalSymbol{" << std::get<common::symbol::LocalSymbol>(sym) << "}, ";
-        break;
-    }
-    case 3:
-    {
-        common::Stack s = std::get<common::Stack>(sym);
-        std::cout << "ControlWord: ";
-        while (not(s.size() == 0))
-        {
-            std::cout << s.top() << ", ";
-            s.pop();
-        }
-        break;
-    }
-    }
-    std::cout << std::endl;
-}
-
-bool Teacher::membershipQuery(common::Word word) const
-{
-    std::cout << "membershipQuery word:\n";
-    for (auto symbol : word)
-    {
-        printSymbol(symbol);
-    }
-    bool ans;
-    std::cin >> ans;
+    bool ans = vpa->checkWord(word);
     return ans;
 }
 
-common::Stack Teacher::stackContentQuery(common::Word word) const
+const common::Stack &Teacher::stackContentQuery(const common::Word &word) const
 {
-    std::cout << "stackContentQuery word:\n";
-    for (auto symbol : word)
-    {
-        printSymbol(symbol);
-    }
-    common::Stack ans;
-
-    while (true)
-    {
-        char in;
-        std::cin >> in;
-        if (in == 'Q')
-        {
-            return ans;
-        }
-        ans.push(common::symbol::StackSymbol{static_cast<uint16_t>(in - '0')});
-    }
+    vpa->checkWord(word);
+    return vpa->stack;
 }
 
-std::shared_ptr<common::Word> Teacher::equivalenceQuery(common::VPA vpa) const
+std::shared_ptr<common::Word>
+Teacher::equivalenceQuery(const std::shared_ptr<common::VPA> hypothesis) const
 {
-    static bool isFirstQuery{true};
+    LOG("[Teacher]: equivalenceQuery\n");
+    // input2.json
+    common::Word w1{common::symbol::CallSymbol{0}, common::symbol::ReturnSymbol{0}};
+    common::Word w2{common::symbol::LocalSymbol{0}};
+    common::Word w3{
+        common::symbol::LocalSymbol{0}, common::symbol::CallSymbol{0},
+        common::symbol::ReturnSymbol{0}};
 
-    if (isFirstQuery)
+    if (vpa->checkWord(w1) != hypothesis->checkWord(w1))
     {
-        return std::make_shared<common::Word>(
-            common::Word{common::symbol::CallSymbol{1}, common::symbol::ReturnSymbol{1}});
+        return std::make_shared<common::Word>(w1);
     }
-    return nullptr;
+    if (vpa->checkWord(w2) != hypothesis->checkWord(w2))
+    {
+        return std::make_shared<common::Word>(w2);
+    }
+    if (vpa->checkWord(w3) != hypothesis->checkWord(w3))
+    {
+        return std::make_shared<common::Word>(w3);
+    }
+
+    /* // input onlyLocals.json
+using Ls = common::symbol::LocalSymbol;
+common::Word w1{Ls{0}};
+common::Word w2{Ls{0}, Ls{0}};
+common::Word w3{Ls{0}, Ls{0}, Ls{0}};
+common::Word w4{Ls{0}, Ls{0}, Ls{0}, Ls{0}};
+common::Word w5{Ls{0}, Ls{0}, Ls{0}, Ls{0}, Ls{0}};
+common::Word w6{Ls{0}, Ls{0}, Ls{0}, Ls{0}, Ls{0}, Ls{0}};
+if (vpa->checkWord(w1) != hypothesis.checkWord(w1))
+{
+return std::make_shared<common::Word>(w1);
+}
+if (vpa->checkWord(w2) != hypothesis.checkWord(w2))
+{
+LOG("[TEACHER]: testWord2: vpa=%d, hypothesis=%d", vpa->checkWord(w2),
+hypothesis.checkWord(w2));
+return std::make_shared<common::Word>(w2);
+}
+if (vpa->checkWord(w3) != hypothesis.checkWord(w3))
+{
+return std::make_shared<common::Word>(w3);
+}
+if (vpa->checkWord(w4) != hypothesis.checkWord(w4))
+{
+return std::make_shared<common::Word>(w4);
+}
+if (vpa->checkWord(w5) != hypothesis.checkWord(w5))
+{
+return std::make_shared<common::Word>(w5);
+}
+if (vpa->checkWord(w6) != hypothesis.checkWord(w6))
+{
+return std::make_shared<common::Word>(w6);
+}*/
+    return std::make_shared<common::Word>(common::Word{});
 }
 } // namespace teacher

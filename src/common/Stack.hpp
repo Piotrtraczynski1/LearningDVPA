@@ -2,7 +2,7 @@
 
 #include <stack>
 
-#include "symbol/Symbols.hpp"
+#include "common/symbol/Symbols.hpp"
 
 namespace common
 {
@@ -12,20 +12,12 @@ class Stack
 
 public:
     Stack() = default;
-    Stack(std::stack<symbol::StackSymbol> &s) : stack(s) {} // TODO: do not copy the stack
-    Stack(std::initializer_list<symbol::StackSymbol> initList)
-    {
-        for (auto it = initList.begin(); it != initList.end(); ++it)
-        {
-            stack.push(*it);
-        }
-    }
+    Stack(std::initializer_list<symbol::StackSymbol> initList);
+    bool operator!=(const Stack &s) const { return stack != s.stack; };
 
-    bool operator!=(const Stack &s) { return stack != s.stack; }
-
-    symbol::StackSymbol top();
+    symbol::StackSymbol top() const;
     void pop();
     void push(symbol::StackSymbol symbol);
-    size_t size();
+    size_t size() const;
 };
 } // namespace common

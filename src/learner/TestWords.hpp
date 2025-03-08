@@ -5,11 +5,12 @@
 
 namespace learner
 {
-// This class holds single-reset words
+// This class contains single-reset words
 class TestWords
 {
     uint16_t numOfWords{1};
-    common::Word testWords[utils::MaxWordLength];
+    common::Word testWords[utils::MaxNumOfAutomataStates] = {
+        common::Word{common::Stack{common::symbol::StackSymbol::BOTTOM}}};
 
 public:
     void addWord(common::Word s)
@@ -20,6 +21,6 @@ public:
 
     uint16_t size() const { return numOfWords; }
 
-    common::Word &operator[](uint16_t it) { return testWords[it]; }
+    const common::Word &operator[](const uint16_t it) const { return testWords[it]; }
 };
 } // namespace learner

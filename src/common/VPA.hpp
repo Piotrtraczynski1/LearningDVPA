@@ -4,7 +4,7 @@
 #include <variant>
 #include <vector>
 
-#include "Word.hpp"
+#include "common/Word.hpp"
 #include "symbol/Symbols.hpp"
 #include "transition/Transition.hpp"
 
@@ -12,21 +12,29 @@ namespace common
 {
 class VPA
 {
-    Stack stack;
-
 public:
+    Stack stack; // move to private
+
     VPA(transition::Transition &transition, transition::State initial)
         : delta{transition}, initialState{initial} {};
 
-    bool checkWord(std::vector<Symbol> &word);
+    bool checkWord(const Word &word);
 
     VPA &operator=(const VPA &vpa);
 
+    void print() const
+    {
+        delta.print();
+    }
+
 private:
+    void setInitialState()
+    {
+        state = initialState;
+    }
+
     transition::Transition &delta;
     transition::State state;
     transition::State initialState;
-
-    void setInitialState() { state = initialState; }
 };
 } // namespace common

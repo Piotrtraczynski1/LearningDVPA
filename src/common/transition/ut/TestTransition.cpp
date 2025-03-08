@@ -2,7 +2,7 @@
 #include <map>
 #include <stdexcept>
 
-#include "../Transition.cpp"
+#include "common/transition/Transition.cpp"
 
 using namespace common::symbol;
 

@@ -4,5 +4,5 @@
 
 namespace utils
 {
-constexpr uint16_t MaxWordLength{1024};
+constexpr uint16_t MaxNumOfAutomataStates{1024};
 } // namespace utils

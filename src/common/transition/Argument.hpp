@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../symbol/Symbols.hpp"
-#include "State.hpp"
+#include "common/symbol/Symbols.hpp"
+#include "common/transition/State.hpp"
 
 namespace common::transition
 {

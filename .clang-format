@@ -1,7 +1,7 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
-UseTab: Never   # Możesz dać "ForIndentation", jeśli chcesz tylko do wcięć
-NamespaceIndentation: None  # Nie dodaje wcięcia dla namespace
+UseTab: Never
+NamespaceIndentation: None
 BreakBeforeBraces: Allman
 BraceWrapping:
   AfterClass: true
@@ -11,5 +11,9 @@ BraceWrapping:
   AfterEnum: true
   AfterControlStatement: false
   IndentBraces: false
-AccessModifierOffset: -4  # Brak wcięcia dla public/private/protected
-ColumnLimit: 100  # Maksymalna szerokość linii
+AccessModifierOffset: -4
+ColumnLimit: 100
+AlignAfterOpenBracket: AlwaysBreak
+AllowShortFunctionsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: true
+

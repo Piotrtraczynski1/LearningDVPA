@@ -1,17 +1,18 @@
 #pragma once
 
-#include "../common/Word.hpp"
-#include "../common/transition/State.hpp"
-#include "../utils/Constants.hpp"
+#include "common/Word.hpp"
+#include "common/transition/State.hpp"
+#include "utils/Constants.hpp"
 
 namespace learner
 {
-// This class hold standard letters
+// This class contains standard words
 class Selectors
 {
     uint16_t numOfSelectors{1};
-    common::Word selectors[utils::MaxWordLength];
-    common::transition::State states[utils::MaxWordLength] = {common::transition::State{0, true}};
+    common::Word selectors[utils::MaxNumOfAutomataStates];
+    common::transition::State states[utils::MaxNumOfAutomataStates] = {
+        common::transition::State{0, true}};
 
 public:
     void addSelector(common::Word s, bool isAccepting)
@@ -22,7 +23,10 @@ public:
     }
 
     uint16_t size() const { return numOfSelectors; }
-    common::transition::State getState(uint16_t stateIndex) { return states[stateIndex]; }
-    common::Word &operator[](uint16_t it) { return selectors[it]; }
+    const common::transition::State getState(uint16_t stateIndex) const
+    {
+        return states[stateIndex];
+    }
+    const common::Word &operator[](const uint16_t it) const { return selectors[it]; }
 };
 } // namespace learner

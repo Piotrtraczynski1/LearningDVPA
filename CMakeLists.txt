@@ -6,14 +6,16 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_CXX_COMPILER "g++")
 
-add_subdirectory(src)
-
-add_executable(run src/mainComponent/main.cpp)
-
-target_link_libraries(run PRIVATE common teacher learner)
-
-option(BUILD_TESTS "Build tests" OFF)
+include_directories(${CMAKE_SOURCE_DIR}/src)
 
 if(BUILD_TESTS)
     enable_testing()
 endif()
+
+add_subdirectory(src)
+
+add_executable(run src/main.cpp)
+
+target_link_libraries(run PRIVATE common teacher learner parser)
+
+option(BUILD_TESTS "Build tests" OFF)

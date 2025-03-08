@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../State.hpp"
+#include "common/transition/State.hpp"
 
 namespace common::transition
 {

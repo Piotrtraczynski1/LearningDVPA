@@ -3,9 +3,8 @@
 #include <map>
 #include <stdexcept>
 
-#include "Parser.hpp"
+#include "parser/Parser.hpp"
 
-// TODO: refactor
 namespace mainComponent::parser
 {
 constexpr uint8_t callId{0};
@@ -50,49 +49,48 @@ std::shared_ptr<common::VPA> Parser::readVPA(std::string &path)
     readAlphabetSymbol("Returns", returnId);
     readAlphabetSymbol("Locals", localId);
 
+    numOfCallSymbols = jsonData["Calls"].size();
+    numOfReturnSymbols = jsonData["Returns"].size();
+    numOfLocalSymbols = jsonData["Locals"].size();
+    numOfStackSymbols = jsonData["StackSymbols"].size();
+
     readStates();
     readStackSymbols();
 
     readTransition();
 
-    tran = common::transition::Transition{callT, returnT, localT};
+    transition = common::transition::Transition{callT, returnT, localT};
     common::transition::State initialState{states[jsonData["Initial_state"]]};
-    return std::make_shared<common::VPA>(tran, initialState);
+    return std::make_shared<common::VPA>(transition, initialState);
 }
 
-void Parser::addCallTransition(json &tran)
+template <typename Symbol>
+Parser::Argument<Symbol> Parser::makeArgument(json &tran)
 {
     std::string symbol{tran["from"]["symbol"]};
     std::string state{tran["from"]["state"]};
     std::string stackSymbol{tran["from"]["stackSymbol"]};
 
-    Argument<common::symbol::CallSymbol> arg{common::symbol::CallSymbol{alphabet[symbol].first},
-                                             stackSymbols[stackSymbol], states[state]};
+    Argument<Symbol> arg{Symbol{alphabet[symbol].first}, stackSymbols[stackSymbol], states[state]};
 
+    return arg;
+}
+
+void Parser::addCallTransition(json &tran)
+{
+    Argument<common::symbol::CallSymbol> arg{makeArgument<common::symbol::CallSymbol>(tran)};
     callT[arg] = CoArgument{stackSymbols[tran["to"]["stackSymbol"]], states[tran["to"]["state"]]};
 }
 
 void Parser::addReturnTransition(json &tran)
 {
-    std::string symbol{tran["from"]["symbol"]};
-    std::string state{tran["from"]["state"]};
-    std::string stackSymbol{tran["from"]["stackSymbol"]};
-
-    Argument<common::symbol::ReturnSymbol> arg{common::symbol::ReturnSymbol{alphabet[symbol].first},
-                                               stackSymbols[stackSymbol], states[state]};
-
+    Argument<common::symbol::ReturnSymbol> arg{makeArgument<common::symbol::ReturnSymbol>(tran)};
     returnT[arg] = states[tran["to"]["state"]];
 }
 
 void Parser::addLocalTransition(json &tran)
 {
-    std::string symbol{tran["from"]["symbol"]};
-    std::string state{tran["from"]["state"]};
-    std::string stackSymbol{tran["from"]["stackSymbol"]};
-
-    Argument<common::symbol::LocalSymbol> arg{common::symbol::LocalSymbol{alphabet[symbol].first},
-                                              stackSymbols[stackSymbol], states[state]};
-
+    Argument<common::symbol::LocalSymbol> arg{makeArgument<common::symbol::LocalSymbol>(tran)};
     localT[arg] = states[tran["to"]["state"]];
 }
 

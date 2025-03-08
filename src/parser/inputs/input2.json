@@ -1,0 +1,311 @@
+{
+    "States": [
+        {
+            "name": "q0",
+            "accepting": true
+        },
+        {
+            "name": "q1",
+            "accepting": false
+        },
+        {
+            "name": "FALSE",
+            "accepting": false
+        }
+    ],
+    "StackSymbols": [
+        "s1",
+        "s2"
+    ],
+    "Calls": [
+        "("
+    ],
+    "Returns": [
+        ")"
+    ],
+    "Locals": [
+        "a"
+    ],
+    "Initial_state": "q0",
+    "Transition": [
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "(",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "q1",
+                "stackSymbol": "s1"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "(",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "FALSE",
+                "stackSymbol": "s1"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "(",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "FALSE",
+                "stackSymbol": "s1"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "(",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "FALSE",
+                "stackSymbol": "s2"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "(",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "q1",
+                "stackSymbol": "s2"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "(",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "q1",
+                "stackSymbol": "s2"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "a",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "q0"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "a",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "q0"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": "a",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "q0"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "a",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "q1"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "a",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "q1"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": "a",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "q1"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": ")",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": ")",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "q0",
+                "symbol": ")",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": ")",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": ")",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "q0"
+            }
+        },
+        {
+            "from": {
+                "state": "q1",
+                "symbol": ")",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "q1"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": "(",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "FALSE",
+                "stackSymbol": "s1"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": "(",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "FALSE",
+                "stackSymbol": "s1"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": "(",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "FALSE",
+                "stackSymbol": "s1"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": "a",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": "a",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": "a",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": ")",
+                "stackSymbol": "BOTTOM"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": ")",
+                "stackSymbol": "s1"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        },
+        {
+            "from": {
+                "state": "FALSE",
+                "symbol": ")",
+                "stackSymbol": "s2"
+            },
+            "to": {
+                "state": "FALSE"
+            }
+        }
+    ]
+}

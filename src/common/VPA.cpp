@@ -1,11 +1,8 @@
-#include "VPA.hpp"
-
-// tmp:
-#include <iostream>
+#include "common/VPA.hpp"
 
 namespace common
-{ // TODO: Refactor
-bool VPA::checkWord(std::vector<Symbol> &word)
+{
+bool VPA::checkWord(const Word &word)
 {
     setInitialState();
     for (auto letter : word)
@@ -14,10 +11,9 @@ bool VPA::checkWord(std::vector<Symbol> &word)
         {
         case 0:
         {
-            std::cout << "call: " << std::get<symbol::CallSymbol>(letter) << ", " << stack.top()
-                      << ", " << state.identifier << std::endl;
             transition::Argument<symbol::CallSymbol> callArg{std::get<symbol::CallSymbol>(letter),
                                                              stack.top(), state};
+
             transition::CoArgument coArg = delta(callArg);
             state = coArg.state;
             stack.push(coArg.stackSymbol);
@@ -25,10 +21,9 @@ bool VPA::checkWord(std::vector<Symbol> &word)
         }
         case 1:
         {
-            std::cout << "return: " << std::get<symbol::ReturnSymbol>(letter) << ", " << stack.top()
-                      << ", " << state.identifier << std::endl;
             transition::Argument<symbol::ReturnSymbol> returnArg{
                 std::get<symbol::ReturnSymbol>(letter), stack.top(), state};
+
             state = delta(returnArg);
             if (stack.top() != symbol::StackSymbol::BOTTOM)
                 stack.pop();
@@ -36,15 +31,14 @@ bool VPA::checkWord(std::vector<Symbol> &word)
         }
         case 2:
         {
-            std::cout << "local" << std::endl;
             transition::Argument<symbol::LocalSymbol> localArg{
                 std::get<symbol::LocalSymbol>(letter), stack.top(), state};
+
             state = delta(localArg);
             break;
         }
         case 3:
         {
-            std::cout << "control" << std::endl;
             stack = std::get<Stack>(letter);
             break;
         }

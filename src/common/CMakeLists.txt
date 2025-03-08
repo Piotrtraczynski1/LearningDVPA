@@ -1,3 +1,7 @@
+if(BUILD_TESTS)
+    add_subdirectory(ut)
+endif()
+
 add_subdirectory(transition)
 
 add_library(common STATIC
@@ -6,9 +10,6 @@ add_library(common STATIC
     Word.cpp
 )
 
-target_link_libraries(common PRIVATE transition)
+target_include_directories(common PRIVATE ${CMAKE_SOURCE_DIR})
 
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(ut)
-endif()
+target_link_libraries(common PRIVATE transition)

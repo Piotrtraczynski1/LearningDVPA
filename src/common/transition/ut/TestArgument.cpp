@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../Argument.hpp"
+#include "common/transition/Argument.hpp"
 
 using namespace common::symbol;
 
