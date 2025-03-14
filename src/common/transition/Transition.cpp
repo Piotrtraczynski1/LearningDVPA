@@ -4,47 +4,149 @@
 
 namespace common::transition
 {
-CoArgument Transition::operator()(Argument<symbol::CallSymbol> arg)
+Transition::Transition()
 {
-    return callT.at(arg);
+    clear();
 }
 
-State Transition::operator()(Argument<symbol::LocalSymbol> arg)
+void Transition::clear()
 {
-    return localT.at(arg);
+    std::fill(
+        &callT[0][0], &callT[0][0] + utils::MaxNumOfAutomataStates * utils::MaxNumOfLetters,
+        CoArgument{State::INVALID, symbol::StackSymbol::INVALID});
+
+    std::fill(
+        &returnT[0][0][0],
+        &returnT[0][0][0] +
+            utils::MaxNumOfAutomataStates * utils::MaxNumOfStackSymbols * utils::MaxNumOfLetters,
+        State::INVALID);
+
+    std::fill(
+        &localT[0][0], &localT[0][0] + utils::MaxNumOfAutomataStates * utils::MaxNumOfLetters,
+        State::INVALID);
 }
 
-State Transition::operator()(Argument<symbol::ReturnSymbol> arg)
+void Transition::add(State s1, symbol::CallSymbol c, State s2, symbol::StackSymbol stackSymbol)
 {
-    return returnT.at(arg);
+    callT[s1][c] = CoArgument{s2, stackSymbol};
 }
 
-void Transition::print()
+void Transition::add(State s1, symbol::LocalSymbol l, State s2)
 {
-    std::cout << "transition: [alphabetSymbol, stackSymbol, state.identifier] = [state.identifier, "
-                 "'stackSymbol']\n";
-    std::cout << "CallTranstions: " << callT.size() << std::endl;
-    for (const auto &call : callT)
+    localT[s1][l] = s2;
+}
+
+void Transition::add(State s1, symbol::StackSymbol stackSymbol, symbol::ReturnSymbol r, State s2)
+{
+    returnT[s1][stackSymbol][r] = s2;
+}
+
+CoArgument Transition::operator()(State s, symbol::CallSymbol c)
+{
+    return callT[s][c];
+}
+
+State Transition::operator()(State s, symbol::LocalSymbol l)
+{
+    return localT[s][l];
+}
+
+State Transition::operator()(State s, symbol::StackSymbol stackSymbol, symbol::ReturnSymbol r)
+{
+    return returnT[s][stackSymbol][r];
+}
+
+void Transition::print(std::ostream &os) const
+{
+    os << "transition: [state, 'stackSymbol', alphabetSymbol] = [state, "
+          "'stackSymbol']\n";
+    os << "CallTransitions: " << std::endl;
+    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
     {
-        std::cout << "[" << call.first.alphabetSymbol << ", " << call.first.stackSymbol << ", "
-                  << call.first.state.identifier << "] = [" << call.second.state.identifier << ", "
-                  << call.second.stackSymbol << "]" << std::endl;
+        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        {
+            if (callT[state][letter].state != State::INVALID)
+            {
+                os << "[" << state << ", " << letter << "] = [" << callT[state][letter].state
+                   << ", " << callT[state][letter].stackSymbol << "]" << std::endl;
+            }
+        }
     }
 
-    std::cout << "ReturnTransitions: \n";
-    for (const auto &ret : returnT)
+    os << "ReturnTransitions: " << std::endl;
+    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
     {
-        std::cout << "[" << ret.first.alphabetSymbol << ", " << ret.first.stackSymbol << ", "
-                  << ret.first.state.identifier << "] = [" << ret.second.identifier << "]"
-                  << std::endl;
+        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        {
+            for (uint16_t stack = 0; stack < utils::MaxNumOfStackSymbols; stack++)
+            {
+                if (returnT[state][stack][letter] != State::INVALID)
+                {
+                    os << "[" << state << ", " << stack << ", " << letter << "] = ["
+                       << returnT[state][stack][letter] << "]" << std::endl;
+                }
+            }
+        }
     }
 
-    std::cout << "LocalTransitions: \n";
-    for (const auto &loc : localT)
+    os << "LocalTransitions: " << std::endl;
+    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
     {
-        std::cout << "[" << loc.first.alphabetSymbol << ", " << loc.first.stackSymbol << ", "
-                  << loc.first.state.identifier << "] = [" << loc.second.identifier << "]"
-                  << std::endl;
+        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        {
+            if (localT[state][letter] != State::INVALID)
+            {
+                os << "[" << state << ", " << letter << "] = [" << localT[state][letter] << "]"
+                   << std::endl;
+            }
+        }
+    }
+}
+
+void Transition::printUt(std::ostream &os) const
+{
+    os << "//CallTransitions: " << std::endl;
+    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    {
+        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        {
+            if (callT[state][letter].state != State::INVALID)
+            {
+                os << "transition->add(State{" << state << "}, CS{" << letter << "}, State{"
+                   << callT[state][letter].state << "}, StackSymbol{"
+                   << callT[state][letter].stackSymbol << "});" << std::endl;
+            }
+        }
+    }
+
+    os << "\n//ReturnTransitions: " << std::endl;
+    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    {
+        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        {
+            for (uint16_t stack = 0; stack < utils::MaxNumOfStackSymbols; stack++)
+            {
+                if (returnT[state][stack][letter] != State::INVALID)
+                {
+                    os << "transition->add(State{" << state << "}, StackSymbol{" << stack
+                       << "}, RS{" << letter << "}, State{" << returnT[state][stack][letter]
+                       << "});" << std::endl;
+                }
+            }
+        }
+    }
+
+    os << "\n//LocalTransitions: " << std::endl;
+    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    {
+        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        {
+            if (localT[state][letter] != State::INVALID)
+            {
+                os << "transition->add(State{" << state << "}, LS{" << letter << "}, State{"
+                   << localT[state][letter] << "});" << std::endl;
+            }
+        }
     }
 }
 } // namespace common::transition

@@ -8,11 +8,11 @@ namespace common::transition
 struct CoArgument
 {
 public:
-    symbol::StackSymbol stackSymbol;
     State state;
+    symbol::StackSymbol stackSymbol;
 
-    CoArgument() = default; // Remove this constructor
-    CoArgument(symbol::StackSymbol ss, State s) : stackSymbol{ss}, state{s} {};
+    CoArgument() = default;
+    CoArgument(State s, symbol::StackSymbol ss) : state{s}, stackSymbol{ss} {};
 
     bool operator==(const CoArgument &coArg) const
     {

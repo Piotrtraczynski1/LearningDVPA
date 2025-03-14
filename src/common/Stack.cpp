@@ -27,7 +27,20 @@ void Stack::pop()
     }
 }
 
-void Stack::push(symbol::StackSymbol symbol) { stack.push(symbol); }
-size_t Stack::size() const { return stack.size(); }
+void Stack::push(symbol::StackSymbol symbol)
+{
+    stack.push(symbol);
+}
+
+size_t Stack::size() const
+{
+    return stack.size();
+}
+
+std::ostream &operator<<(std::ostream &os, const Stack &stack)
+{
+    os << "{.size = " << stack.size() << " .top() = " << stack.top() << "}";
+    return os;
+}
 
 } // namespace common

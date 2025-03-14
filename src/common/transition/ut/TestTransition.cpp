@@ -13,51 +13,54 @@ class TestTransition : public ::testing::Test
 public:
     void SetUp() override
     {
-        callT[argCall] = coArgCall;
-        returnT[argReturn] = returnState;
-        localT[argLocaL] = localState;
-
-        sut = Transition(callT, returnT, localT);
+        sut = std::make_unique<Transition>();
+        sut->add(initialState, callSymbol, callState, StackSymbol{2});
+        sut->add(initialState, StackSymbol{1}, returnSymbol, returnState);
+        sut->add(initialState, localSymbol, localState);
     }
 
-    std::map<Argument<symbol::CallSymbol>, CoArgument> callT;
-    std::map<Argument<symbol::ReturnSymbol>, State> returnT;
-    std::map<Argument<symbol::LocalSymbol>, State> localT;
+    State initialState{1};
+    State callState{2};
+    State returnState{3};
+    State localState{4};
 
-    State initialState{1, true};
-    State callState{2, true};
-    State returnState{3, false};
-    State localState{4, true};
+    CallSymbol callSymbol{1};
+    ReturnSymbol returnSymbol{1};
+    LocalSymbol localSymbol{1};
 
-    Argument<CallSymbol> argCall{CallSymbol{1}, StackSymbol{1}, initialState};
-    CoArgument coArgCall{StackSymbol{2}, callState};
-    Argument<ReturnSymbol> argReturn{ReturnSymbol{1}, StackSymbol{1}, initialState};
-    Argument<LocalSymbol> argLocaL{LocalSymbol{1}, StackSymbol{1}, initialState};
+    CoArgument coArgCall{callState, StackSymbol{2}};
 
-    Transition sut;
+    std::unique_ptr<Transition> sut;
 };
 
-TEST_F(TestTransition, CallSymbolArgumentFound) { EXPECT_EQ(sut(argCall), coArgCall); }
+TEST_F(TestTransition, CallSymbolArgumentFound)
+{
+    EXPECT_EQ((*sut)(initialState, callSymbol), coArgCall);
+}
 
 TEST_F(TestTransition, CallSymbolArgumentNotFound)
 {
-    Argument<symbol::CallSymbol> invalidArg(CallSymbol{0}, StackSymbol{0}, State{0, false});
-    EXPECT_THROW(sut(invalidArg), std::out_of_range);
+    CoArgument invalid{State::INVALID, StackSymbol::INVALID};
+    EXPECT_EQ((*sut)(State{0}, CallSymbol{0}), invalid);
 }
 
-TEST_F(TestTransition, ReturnSymbolArgumentFound) { EXPECT_EQ(sut(argReturn), returnState); }
+TEST_F(TestTransition, ReturnSymbolArgumentFound)
+{
+    EXPECT_EQ((*sut)(initialState, StackSymbol{1}, returnSymbol), returnState);
+}
 
 TEST_F(TestTransition, ReturnSymbolArgumentNotFound)
 {
-    Argument<symbol::ReturnSymbol> invalidArg(ReturnSymbol{0}, StackSymbol{0}, State{0, false});
-    EXPECT_THROW(sut(invalidArg), std::out_of_range);
+    EXPECT_EQ((*sut)(initialState, StackSymbol{5}, ReturnSymbol{0}), State::INVALID);
 }
 
-TEST_F(TestTransition, LocalSymbolArgumentFound) { EXPECT_EQ(sut(argLocaL), localState); }
+TEST_F(TestTransition, LocalSymbolArgumentFound)
+{
+    EXPECT_EQ((*sut)(initialState, localSymbol), localState);
+}
 
 TEST_F(TestTransition, LocalSymbolArgumentNotFound)
 {
-    Argument<symbol::LocalSymbol> invalidArg(LocalSymbol{0}, StackSymbol{0}, State{0, false});
-    EXPECT_THROW(sut(invalidArg), std::out_of_range);
+    EXPECT_EQ((*sut)(initialState, LocalSymbol{5}), State::INVALID);
 }
 } // namespace common::transition

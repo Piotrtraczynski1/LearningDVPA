@@ -1,7 +1,19 @@
 #include "common/VPA.hpp"
+#include "utils/log.hpp"
 
 namespace common
 {
+VPA::VPA(
+    transition::Transition &transition, transition::State initial,
+    const std::vector<uint16_t> &states, uint16_t numStates)
+    : delta{transition}, initialState{initial}, acceptingStates{}, numOfStates{numStates}
+{
+    for (const auto state : states)
+    {
+        acceptingStates[state] = true;
+    }
+}
+
 bool VPA::checkWord(const Word &word)
 {
     setInitialState();
@@ -11,30 +23,20 @@ bool VPA::checkWord(const Word &word)
         {
         case 0:
         {
-            transition::Argument<symbol::CallSymbol> callArg{std::get<symbol::CallSymbol>(letter),
-                                                             stack.top(), state};
-
-            transition::CoArgument coArg = delta(callArg);
+            transition::CoArgument coArg = delta(state, std::get<symbol::CallSymbol>(letter));
             state = coArg.state;
             stack.push(coArg.stackSymbol);
             break;
         }
         case 1:
         {
-            transition::Argument<symbol::ReturnSymbol> returnArg{
-                std::get<symbol::ReturnSymbol>(letter), stack.top(), state};
-
-            state = delta(returnArg);
-            if (stack.top() != symbol::StackSymbol::BOTTOM)
-                stack.pop();
+            state = delta(state, stack.top(), std::get<symbol::ReturnSymbol>(letter));
+            stack.pop();
             break;
         }
         case 2:
         {
-            transition::Argument<symbol::LocalSymbol> localArg{
-                std::get<symbol::LocalSymbol>(letter), stack.top(), state};
-
-            state = delta(localArg);
+            state = delta(state, std::get<symbol::LocalSymbol>(letter));
             break;
         }
         case 3:
@@ -43,8 +45,14 @@ bool VPA::checkWord(const Word &word)
             break;
         }
         }
+
+        if (state == transition::State::INVALID)
+        {
+            return false;
+        }
     }
-    return state.isAccepted;
+
+    return acceptingStates[state];
 }
 
 VPA &VPA::operator=(const VPA &vpa)

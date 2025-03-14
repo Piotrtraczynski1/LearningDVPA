@@ -61,7 +61,7 @@ std::shared_ptr<common::VPA> Parser::readVPA(std::string &path)
 
     transition = common::transition::Transition{callT, returnT, localT};
     common::transition::State initialState{states[jsonData["Initial_state"]]};
-    return std::make_shared<common::VPA>(transition, initialState);
+    return std::make_shared<common::VPA>(transition, initialState, acceptingStates, numOfStates);
 }
 
 template <typename Symbol>
@@ -122,7 +122,7 @@ void Parser::readTransition()
 
 void Parser::readStackSymbols()
 {
-    uint16_t it = 0;
+    uint16_t it = 1;
     for (auto &stackS : jsonData["StackSymbols"])
     {
         stackSymbols[stackS] = common::symbol::StackSymbol{it};
@@ -133,10 +133,15 @@ void Parser::readStackSymbols()
 
 void Parser::readStates()
 {
+    numOfStates = jsonData["States"].size();
     uint16_t it = 0;
     for (auto &state : jsonData["States"])
     {
-        states[state["name"]] = common::transition::State{it, state["accepting"]};
+        states[state["name"]] = common::transition::State{it};
+        if (state["accepting"])
+        {
+            acceptingStates.push_back(it);
+        }
         it++;
     }
 }

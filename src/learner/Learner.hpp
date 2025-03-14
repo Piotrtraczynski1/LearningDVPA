@@ -4,18 +4,16 @@
 
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
+#include "learner/AutomataGenerator.hpp"
 #include "learner/Selectors.hpp"
 #include "learner/TestWords.hpp"
-
 #include "teacher/Teacher.hpp"
+#include "utils/log.hpp"
 
 namespace learner
 {
 class Learner
 {
-    teacher::Teacher oracle;
-    Selectors selectors;
-    TestWords testWords;
     std::shared_ptr<common::VPA> hypothesis;
 
     const uint16_t numOfCalls;
@@ -23,30 +21,34 @@ class Learner
     const uint16_t numOfReturns;
     const uint16_t numOfStackSymbols;
 
-    std::map<
-        common::transition::Argument<common::symbol::CallSymbol>, common::transition::CoArgument>
-        callT;
-    std::map<common::transition::Argument<common::symbol::ReturnSymbol>, common::transition::State>
-        returnT;
-    std::map<common::transition::Argument<common::symbol::LocalSymbol>, common::transition::State>
-        localT;
+    teacher::Teacher &oracle;
+    std::shared_ptr<Selectors> selectors;
+    std::shared_ptr<TestWords> testWords;
 
-    std::vector<common::transition::State> states;
+    AutomataGenerator generator;
 
 public:
     Learner(
-        teacher::Teacher teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL,
+        teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL,
         uint16_t numOfS)
         : oracle{teacher}, numOfCalls{numOfC}, numOfReturns{numOfR}, numOfLocals{numOfL},
-          numOfStackSymbols{numOfS} {};
+          numOfStackSymbols{numOfS}, selectors{std::make_shared<Selectors>()},
+          testWords{std::make_shared<TestWords>()},
+          generator{oracle,       selectors,   testWords,        numOfCalls,
+                    numOfReturns, numOfLocals, numOfStackSymbols}
+    {
+        IMP("Learner built numOfCalls: %u, numOfLocals: %u, numOfReturns: %u, numOfStackSymbols: "
+            "%u",
+            numOfCalls, numOfLocals, numOfReturns, numOfStackSymbols);
+    };
     std::shared_ptr<common::VPA> run();
 
 private:
-    void generateAutomata();
-    bool areDistinguishable(const common::Word &a, const common::Word &b) const;
-    bool isRightCongruence(const common::Word &a, const common::Word &b) const;
     void handleCounterExample(std::shared_ptr<common::Word> counterExample);
-    uint16_t findEquivalentState(const common::Word word);
-    bool isAppropriateSplit(const common::Word &word) const;
+    void
+    handleStackContentDiverges(const common::Word &v, const common::Word &a, const common::Word &w);
+    void
+    handleSuffixesMismatch(const common::Word &v, const common::Word &a, const common::Word &w);
+    void addNewSelectorIfNeeded(const common::Word &selector);
 };
 } // namespace learner

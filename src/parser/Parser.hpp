@@ -9,7 +9,6 @@
 
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
-#include "common/transition/Argument.hpp"
 #include "common/transition/CoArgument.hpp"
 
 namespace mainComponent::parser
@@ -18,7 +17,6 @@ class Parser
 {
     using json = nlohmann::json;
     template <typename T>
-    using Argument = common::transition::Argument<T>;
     using CoArgument = common::transition::CoArgument;
 
 public:
@@ -29,6 +27,7 @@ public:
     uint16_t numOfReturnSymbols;
     uint16_t numOfLocalSymbols;
     uint16_t numOfStackSymbols;
+    uint16_t numOfStates;
 
 private:
     void readData(std::string &path);
@@ -52,5 +51,6 @@ private:
     std::map<Argument<common::symbol::ReturnSymbol>, common::transition::State> returnT;
     std::map<Argument<common::symbol::LocalSymbol>, common::transition::State> localT;
     common::transition::Transition transition;
+    std::vector<uint16_t> acceptingStates{};
 };
 } // namespace mainComponent::parser

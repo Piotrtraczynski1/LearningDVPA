@@ -18,37 +18,33 @@ class TestVPA : public ::testing::Test
 public:
     void SetUp() override
     {
-        callT[Argument<CallSymbol>{CallSymbol{1}, StackSymbol::BOTTOM, initialState}] =
-            CoArgument{StackSymbol{1}, secondState};
-        callT[Argument<CallSymbol>{CallSymbol{1}, StackSymbol{1}, secondState}] =
-            CoArgument{StackSymbol{2}, secondState};
-        callT[Argument<CallSymbol>{CallSymbol{1}, StackSymbol{2}, secondState}] =
-            CoArgument{StackSymbol{2}, secondState};
+        transition = new Transition{};
 
-        localT[Argument<LocalSymbol>{LocalSymbol{1}, StackSymbol::BOTTOM, initialState}] =
-            initialState;
-        localT[Argument<LocalSymbol>{LocalSymbol{1}, StackSymbol{1}, secondState}] = secondState;
-        localT[Argument<LocalSymbol>{LocalSymbol{1}, StackSymbol{2}, secondState}] = secondState;
+        transition->add(initialState, callSymbol, secondState, stackSymbol_1);
+        transition->add(secondState, callSymbol, secondState, stackSymbol_2);
 
-        localT[Argument<LocalSymbol>{LocalSymbol{2}, StackSymbol::BOTTOM, initialState}] =
-            initialState;
-        localT[Argument<LocalSymbol>{LocalSymbol{2}, StackSymbol{1}, secondState}] = secondState;
-        localT[Argument<LocalSymbol>{LocalSymbol{2}, StackSymbol{2}, secondState}] = secondState;
+        transition->add(initialState, localSymbol_1, initialState);
+        transition->add(secondState, localSymbol_1, secondState);
 
-        returnT[Argument<ReturnSymbol>{ReturnSymbol{1}, StackSymbol{1}, secondState}] =
-            initialState;
-        returnT[Argument<ReturnSymbol>{ReturnSymbol{1}, StackSymbol{2}, secondState}] = secondState;
+        transition->add(initialState, localSymbol_2, initialState);
+        transition->add(secondState, localSymbol_2, secondState);
 
-        transition = new Transition{callT, returnT, localT};
-        sut = new VPA{*transition, initialState};
+        transition->add(secondState, stackSymbol_1, returnSymbol, initialState);
+        transition->add(secondState, stackSymbol_2, returnSymbol, secondState);
+
+        sut = new VPA{*transition, initialState, {1}, 2};
     }
 
-    State initialState{1, true};
-    State secondState{2, false};
+    State initialState{1};
+    State secondState{2};
 
-    std::map<Argument<symbol::CallSymbol>, CoArgument> callT;
-    std::map<Argument<symbol::ReturnSymbol>, State> returnT;
-    std::map<Argument<symbol::LocalSymbol>, State> localT;
+    CallSymbol callSymbol{1};
+    LocalSymbol localSymbol_1{1};
+    LocalSymbol localSymbol_2{2};
+    ReturnSymbol returnSymbol{1};
+
+    StackSymbol stackSymbol_1{1};
+    StackSymbol stackSymbol_2{2};
 
     VPA *sut;
     Transition *transition;
@@ -80,18 +76,49 @@ public:
     Word word10{CallSymbol{1}, Stack{StackSymbol{2}}, ReturnSymbol{1}};
 };
 
-TEST_F(TestVPA, default1) { EXPECT_EQ(sut->checkWord(word1), true); }
-TEST_F(TestVPA, default2) { EXPECT_EQ(sut->checkWord(word2), true); }
-TEST_F(TestVPA, default3) { EXPECT_EQ(sut->checkWord(word3), true); }
+TEST_F(TestVPA, default1)
+{
+    EXPECT_EQ(sut->checkWord(word1), true);
+}
+TEST_F(TestVPA, default2)
+{
+    EXPECT_EQ(sut->checkWord(word2), true);
+}
+TEST_F(TestVPA, default3)
+{
+    EXPECT_EQ(sut->checkWord(word3), true);
+}
 
-TEST_F(TestVPA, default4) { EXPECT_EQ(sut->checkWord(word4), false); }
-TEST_F(TestVPA, default5) { EXPECT_EQ(sut->checkWord(word5), false); }
+TEST_F(TestVPA, default4)
+{
+    EXPECT_EQ(sut->checkWord(word4), false);
+}
+TEST_F(TestVPA, default5)
+{
+    EXPECT_EQ(sut->checkWord(word5), false);
+}
 
-TEST_F(TestVPA, default6) { EXPECT_THROW(sut->checkWord(word6), std::out_of_range); }
-TEST_F(TestVPA, default7) { EXPECT_THROW(sut->checkWord(word7), std::out_of_range); }
-TEST_F(TestVPA, default8) { EXPECT_THROW(sut->checkWord(word8), std::out_of_range); }
+TEST_F(TestVPA, default6)
+{
+    EXPECT_EQ(sut->checkWord(word6), false);
+}
 
-TEST_F(TestVPA, default9) { EXPECT_EQ(sut->checkWord(word9), true); }
-TEST_F(TestVPA, default10) { EXPECT_EQ(sut->checkWord(word10), false); }
+TEST_F(TestVPA, default7)
+{
+    EXPECT_EQ(sut->checkWord(word7), false);
+}
+TEST_F(TestVPA, default8)
+{
+    EXPECT_EQ(sut->checkWord(word8), false);
+}
+
+TEST_F(TestVPA, default9)
+{
+    EXPECT_EQ(sut->checkWord(word9), true);
+}
+TEST_F(TestVPA, default10)
+{
+    EXPECT_EQ(sut->checkWord(word10), false);
+}
 
 } // namespace common::transition

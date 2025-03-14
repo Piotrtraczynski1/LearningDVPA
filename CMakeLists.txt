@@ -6,6 +6,24 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_CXX_COMPILER "g++")
 
+option(ENABLE_HARD_DIAGNOSTICS "Enable ASan/UBSan and libstdc++ debug checks" OFF)
+
+if (ENABLE_HARD_DIAGNOSTICS)
+    add_compile_options(
+        -O0 -g
+        -fsanitize=address,undefined
+        -fno-omit-frame-pointer
+    )
+    add_link_options(
+        -fsanitize=address,undefined
+        -fno-omit-frame-pointer
+    )
+    add_compile_definitions(
+        _GLIBCXX_DEBUG
+        _GLIBCXX_ASSERTIONS
+    )
+endif()
+
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 if(BUILD_TESTS)
@@ -16,6 +34,6 @@ add_subdirectory(src)
 
 add_executable(run src/main.cpp)
 
-target_link_libraries(run PRIVATE common teacher learner parser)
+target_link_libraries(run PRIVATE common teacher learner utils generator) #parser
 
 option(BUILD_TESTS "Build tests" OFF)

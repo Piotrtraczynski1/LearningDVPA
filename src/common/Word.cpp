@@ -44,7 +44,7 @@ std::ostream &operator<<(std::ostream &os, const Symbol &symbol)
     }
     case 3:
     {
-        os << "CW";
+        os << "CW-" << std::get<Stack>(symbol);
         break;
     }
     }
