@@ -8,4 +8,4 @@ add_library(learner STATIC
 )
 
 target_link_libraries(learner PRIVATE common)
-target_link_libraries(learner PRIVATE teacher)
+target_link_libraries(learner PRIVATE teacher) 

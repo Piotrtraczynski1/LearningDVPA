@@ -17,10 +17,10 @@ namespace common::transition
 class Transition
 {
     friend class teacher::Converter;
-    CoArgument callT[utils::MaxNumOfAutomataStates][utils::MaxNumOfLetters];
-    State returnT[utils::MaxNumOfAutomataStates][utils::MaxNumOfStackSymbols]
-                 [utils::MaxNumOfLetters];
-    State localT[utils::MaxNumOfAutomataStates][utils::MaxNumOfLetters];
+    CoArgument callT[utils::MaxNumOfCombinedAutomatonStates][utils::MaxNumOfLetters];
+    State returnT[utils::MaxNumOfCombinedAutomatonStates][utils::MaxNumOfCombinedStackSymbols]
+                 [utils::MaxNumOfCombinedAutomatonLetters];
+    State localT[utils::MaxNumOfCombinedAutomatonStates][utils::MaxNumOfLetters];
 
 public:
     Transition();

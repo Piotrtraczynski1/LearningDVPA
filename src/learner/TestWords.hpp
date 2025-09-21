@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../common/Word.hpp"
-#include "../utils/Constants.hpp"
+#include "common/Word.hpp"
+#include "utils/Constants.hpp"
 
 namespace learner
 {
@@ -9,7 +9,8 @@ namespace learner
 class TestWords
 {
     uint16_t numOfWords{1};
-    common::Word testWords[utils::MaxNumOfAutomataStates] = {common::Word{common::Stack{}}};
+    common::Word testWords[utils::MaxNumOfCombinedAutomatonStates] = {
+        common::Word{common::Stack{}}};
 
 public:
     void addWord(common::Word s)

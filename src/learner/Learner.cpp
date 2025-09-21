@@ -1,10 +1,22 @@
-#include <iostream> //tmp
+#include <iostream>
 
 #include "learner/Learner.hpp"
 #include "utils/TimeMarker.hpp"
 
 namespace learner
 {
+
+Learner::Learner(
+    teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL, uint16_t numOfS)
+    : oracle{teacher}, numOfCalls{numOfC}, numOfReturns{numOfR}, numOfLocals{numOfL},
+      numOfStackSymbols{numOfS}, selectors{std::make_shared<Selectors>()},
+      testWords{std::make_shared<TestWords>()},
+      generator{oracle,       selectors,   testWords,        numOfCalls,
+                numOfReturns, numOfLocals, numOfStackSymbols}
+{
+    setInitialWord();
+};
+
 std::shared_ptr<common::VPA> Learner::run()
 {
     TIME_MARKER("Learner::run");
@@ -14,7 +26,6 @@ std::shared_ptr<common::VPA> Learner::run()
     while (true)
     {
         hypothesis = generator.generate();
-
         counterExample = oracle.equivalenceQuery(hypothesis);
 
         if (counterExample->empty())
@@ -22,6 +33,7 @@ std::shared_ptr<common::VPA> Learner::run()
             IMP("[Learner]: VPA found");
             return hypothesis;
         }
+
         handleCounterExample(counterExample);
     }
 }
@@ -29,7 +41,7 @@ std::shared_ptr<common::VPA> Learner::run()
 void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
 {
     TIME_MARKER("handleCounterExample");
-    std::cout << "[Learner]: CounterExample: " << *counterExample << std::endl;
+    std::cout << "\033[32m[Learner]: CounterExample: " << *counterExample << "\033[0m" << std::endl;
 
     for (uint16_t i = 0; i < counterExample->size(); i++)
     {
@@ -40,7 +52,7 @@ void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
         hypothesis->checkWord(v + a);
         if (oracle.stackContentQuery(v + a) != hypothesis->stack)
         {
-            handleStackContentDiverges(v, a, w);
+            handleStackContentDiverges(v + a, a, w);
             return;
         }
 
@@ -95,13 +107,13 @@ void Learner::handleStackContentDiverges(
             return;
         }
     }
-    ERR("ERROR");
-    exit(1);
+
+    ERR("Word partition in handleStackContentDiverges not found!");
+    exit(2);
 }
 
 void Learner::addNewSelectorIfNeeded(const common::Word &selector)
 {
-    // TODO
-    selectors->addSelector(selector, oracle.membershipQuery(selector));
+    generator.findOrAddSuccessor(selector);
 }
 } // namespace learner

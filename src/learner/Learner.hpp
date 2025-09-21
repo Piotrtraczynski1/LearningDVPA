@@ -30,17 +30,7 @@ class Learner
 public:
     Learner(
         teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL,
-        uint16_t numOfS)
-        : oracle{teacher}, numOfCalls{numOfC}, numOfReturns{numOfR}, numOfLocals{numOfL},
-          numOfStackSymbols{numOfS}, selectors{std::make_shared<Selectors>()},
-          testWords{std::make_shared<TestWords>()},
-          generator{oracle,       selectors,   testWords,        numOfCalls,
-                    numOfReturns, numOfLocals, numOfStackSymbols}
-    {
-        IMP("Learner built numOfCalls: %u, numOfLocals: %u, numOfReturns: %u, numOfStackSymbols: "
-            "%u",
-            numOfCalls, numOfLocals, numOfReturns, numOfStackSymbols);
-    };
+        uint16_t numOfS);
     std::shared_ptr<common::VPA> run();
 
 private:
@@ -50,5 +40,11 @@ private:
     void
     handleSuffixesMismatch(const common::Word &v, const common::Word &a, const common::Word &w);
     void addNewSelectorIfNeeded(const common::Word &selector);
+
+    void setInitialWord()
+    {
+        auto isAccepting{oracle.membershipQuery(common::Word{})};
+        selectors->addSelector(common::Word{}, isAccepting);
+    }
 };
 } // namespace learner

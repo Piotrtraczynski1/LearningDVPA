@@ -22,22 +22,32 @@ class VPA
     friend class teacher::Converter;
 
 public:
-    Stack stack;             // move to private
-    transition::State state; // move to private
-    std::array<bool, utils::MaxNumOfAutomataStates> acceptingStates;
+    Stack stack;
+    transition::State state;
+    std::array<bool, utils::MaxNumOfCombinedAutomatonStates> acceptingStates;
 
     VPA(transition::Transition &transition, transition::State initial,
-        const std::vector<uint16_t> &states, uint16_t numStates);
+        const std::vector<uint16_t> &accStates, uint16_t numStates);
 
     bool checkWord(const Word &word);
 
     VPA &operator=(const VPA &vpa);
 
+    transition::State getSink() const
+    {
+        return sink;
+    }
+
+    uint16_t getNumOfStates() const
+    {
+        return numOfStates;
+    }
+
     void print(std::ostream &os = std::cout) const
     {
         os << "initial state: " << initialState << "\n";
         os << "accepting states: ";
-        for (int i = 0; i < utils::MaxNumOfAutomataStates; i++)
+        for (int i = 0; i < utils::MaxNumOfCombinedAutomatonStates; i++)
         {
             if (acceptingStates[i])
                 os << ", " << i;
@@ -58,7 +68,7 @@ public:
         os << "transition = std::make_shared<Transition>();\n\n";
         delta.printUt(os);
 
-        os << "init()" << std::endl;
+        os << "init();" << std::endl;
     }
 
 private:
@@ -70,6 +80,7 @@ private:
 
     transition::Transition &delta;
     transition::State initialState;
+    transition::State sink;
 
     uint16_t numOfStates;
 };

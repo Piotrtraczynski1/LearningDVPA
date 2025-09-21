@@ -49,7 +49,7 @@ public:
     VPA *sut;
     Transition *transition;
 
-    // poprawne nawiasowania:
+    // expect true
     Word word1{CallSymbol{1}, ReturnSymbol{1}};
     Word word2{CallSymbol{1},   CallSymbol{1},   CallSymbol{1}, ReturnSymbol{1},
                ReturnSymbol{1}, ReturnSymbol{1}, CallSymbol{1}, ReturnSymbol{1},
@@ -58,12 +58,12 @@ public:
     Word word3{LocalSymbol{1},  LocalSymbol{2}, CallSymbol{1}, LocalSymbol{1},
                ReturnSymbol{1}, LocalSymbol{2}, LocalSymbol{1}};
 
-    // niepoprawne nawiasowania:
+    // expect false
     Word word4{LocalSymbol{1}, LocalSymbol{2}, CallSymbol{1}};
     Word word5{LocalSymbol{1}, LocalSymbol{2},  CallSymbol{1},  CallSymbol{1},
                CallSymbol{1},  ReturnSymbol{1}, ReturnSymbol{1}};
 
-    // Wyjatek
+    // unknown symbol
     Word word6{CallSymbol{2}};
     Word word7{LocalSymbol{1},  LocalSymbol{2}, CallSymbol{1},
                ReturnSymbol{1}, LocalSymbol{2}, ReturnSymbol{1}};

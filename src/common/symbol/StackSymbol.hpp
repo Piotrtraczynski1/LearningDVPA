@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/Constants.hpp"
 #include <cstdint>
 
 namespace common::symbol
@@ -7,6 +8,6 @@ namespace common::symbol
 enum StackSymbol : uint16_t
 {
     BOTTOM = 0,
-    INVALID = 0xffff
+    INVALID = utils::MaxNumOfCombinedStackSymbols - 1
 };
 } // namespace common::symbol

@@ -2,7 +2,7 @@
 
 #include <chrono>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 
 struct MarkerInfo
 {
@@ -12,21 +12,21 @@ struct MarkerInfo
 
 class MeasurementDataBase
 {
-    static std::map<std::string, MarkerInfo> markers;
+    static std::unordered_map<std::string, MarkerInfo> markers;
 
 public:
-    static void update(const std::string &name, uint64_t duration);
+    static void update(const std::string_view &name, uint64_t duration);
 
     static void printInfo();
 };
 
 class Measurment
 {
-    std::chrono::time_point<std::chrono::high_resolution_clock> starTime;
-    std::string name;
+    std::chrono::steady_clock::time_point starTime;
+    std::string_view name;
 
 public:
-    Measurment(std::string n);
+    Measurment(std::string_view n);
     ~Measurment();
 };
 

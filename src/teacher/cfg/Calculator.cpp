@@ -17,9 +17,9 @@ NonTerminal makeNonTerminal(
     const common::transition::State q1, const common::symbol::StackSymbol s,
     const common::transition::State q2)
 {
-    uint64_t firstStateId = static_cast<uint64_t>(q1 + 1) << 34;
-    uint64_t stackId = static_cast<uint64_t>(s + 1) << 17;
-    uint64_t secondStateId = static_cast<uint64_t>(q2 + 1);
+    const uint64_t firstStateId = static_cast<uint64_t>(q1 + 1) << 34;
+    const uint64_t stackId = static_cast<uint64_t>(s + 1) << 17;
+    const uint64_t secondStateId = static_cast<uint64_t>(q2 + 1);
 
     return cfg::NonTerminal{firstStateId + stackId + secondStateId};
 }

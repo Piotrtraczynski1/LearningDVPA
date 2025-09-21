@@ -1,9 +1,14 @@
-#include "generator/Generator.hpp"
+#include "generator/RandomGenerator.hpp"
 #include "common/transition/State.hpp"
 
 namespace generator
 {
-std::shared_ptr<common::VPA> Generator::run()
+bool RandomGenerator::generatorSpecificCheck(std::shared_ptr<common::VPA> hypothesis)
+{
+    return hypothesis->getNumOfStates() <= numOfStates + 1; // +1 for explicit sink state
+}
+
+std::shared_ptr<common::VPA> RandomGenerator::run()
 {
     generateTransition();
     auto acceptingStates{selectAcceptingStates()};
@@ -11,7 +16,7 @@ std::shared_ptr<common::VPA> Generator::run()
     return std::make_shared<common::VPA>(*transition, initialState, acceptingStates, numOfStates);
 }
 
-void Generator::generateTransition()
+void RandomGenerator::generateTransition()
 {
     transition->clear();
 
@@ -24,10 +29,14 @@ void Generator::generateTransition()
     }
 }
 
-void Generator::addCalls(common::transition::State state)
+void RandomGenerator::addCalls(common::transition::State state)
 {
     for (uint16_t call = 0; call < numOfCalls; call++)
     {
+        if (skipTransition())
+        {
+            continue;
+        }
         common::transition::State dest{static_cast<uint16_t>(rand() % numOfStates)};
         common::symbol::StackSymbol stackSymbol{
             static_cast<uint16_t>((rand() % (numOfStackSymbols - 1)) + 1)};
@@ -36,22 +45,30 @@ void Generator::addCalls(common::transition::State state)
     }
 }
 
-void Generator::addLocals(common::transition::State state)
+void RandomGenerator::addLocals(common::transition::State state)
 {
     for (uint16_t local = 0; local < numOfLocals; local++)
     {
+        if (skipTransition())
+        {
+            continue;
+        }
         common::transition::State dest{static_cast<uint16_t>(rand() % numOfStates)};
 
         transition->add(state, common::symbol::LocalSymbol{local}, dest);
     }
 }
 
-void Generator::addReturns(common::transition::State state)
+void RandomGenerator::addReturns(common::transition::State state)
 {
     for (uint16_t ret = 0; ret < numOfReturns; ret++)
     {
         for (uint16_t stackSymbolId = 0; stackSymbolId < numOfStackSymbols; stackSymbolId++)
         {
+            if (skipTransition())
+            {
+                continue;
+            }
             common::transition::State dest{static_cast<uint16_t>(rand() % numOfStates)};
             common::symbol::StackSymbol stackSymbol{stackSymbolId};
 
@@ -60,11 +77,15 @@ void Generator::addReturns(common::transition::State state)
     }
 }
 
-std::vector<uint16_t> Generator::selectAcceptingStates()
+bool RandomGenerator::skipTransition()
+{
+    return ((static_cast<double>(rand()) / RAND_MAX) >= density);
+}
+
+std::vector<uint16_t> RandomGenerator::selectAcceptingStates()
 {
     std::vector<uint16_t> acceptingStates{};
-    acceptingStates.push_back(0);
-    for (uint16_t i = 1; i < numOfStates; i++)
+    for (uint16_t i = 0; i < numOfStates; i++)
     {
         if (rand() % 3 == 0)
         {

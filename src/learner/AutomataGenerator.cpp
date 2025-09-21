@@ -7,8 +7,8 @@ namespace learner
 {
 std::shared_ptr<common::VPA> AutomataGenerator::generate()
 {
-    TIME_MARKER("generateAutomata");
-    LOG("[AutomataGenerator]: Generating Automata");
+    TIME_MARKER("generateAutomaton");
+    LOG("[AutomataGenerator]: Generating Automaton");
 
     clearGenerator();
     buildTransition();
@@ -88,10 +88,12 @@ void AutomataGenerator::considerReturn(
     {
         if (not isConfigurationAchievable(selectorIndex, common::symbol::StackSymbol{stackIndex}))
         {
-            return;
+            successor = 0; // all undefined transitions are directed to the first state
         }
-
-        successor = addSelector(candidate);
+        else
+        {
+            successor = addSelector(candidate);
+        }
     }
 
     transition.add(

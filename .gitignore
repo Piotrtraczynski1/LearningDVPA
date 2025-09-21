@@ -1,5 +1,4 @@
 /.vscode
 /build
 /build-debug
-src/generator/failedTests
-out.txt
+out.log

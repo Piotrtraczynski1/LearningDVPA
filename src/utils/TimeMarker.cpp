@@ -1,18 +1,14 @@
 #include "utils/TimeMarker.hpp"
 
-std::map<std::string, MarkerInfo> MeasurementDataBase::markers;
+std::unordered_map<std::string, MarkerInfo> MeasurementDataBase::markers;
 
-void MeasurementDataBase::update(const std::string &name, uint64_t duration)
+void MeasurementDataBase::update(const std::string_view &name, uint64_t duration)
 {
-    if (markers.find(name) == markers.end())
+    auto [it, inserted] = markers.try_emplace(std::string(name), MarkerInfo{duration, 1});
+    if (not inserted)
     {
-        markers[name] = MarkerInfo{duration, 1};
-    }
-    else
-    {
-        auto &marker = markers[name];
-        marker.time += duration;
-        marker.executions++;
+        it->second.time += duration;
+        it->second.executions++;
     }
 }
 
@@ -35,15 +31,15 @@ void MeasurementDataBase::printInfo()
     std::cout << "===================================================\n";
 }
 
-Measurment::Measurment(std::string n)
+Measurment::Measurment(std::string_view n)
 {
     name = n;
-    starTime = std::chrono::high_resolution_clock::now();
+    starTime = std::chrono::steady_clock::now();
 }
 
 Measurment::~Measurment()
 {
-    auto endTime = std::chrono::high_resolution_clock::now();
+    auto endTime = std::chrono::steady_clock::now();
     auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(endTime - starTime).count();
     MeasurementDataBase::update(name, duration);

@@ -2,51 +2,46 @@
 
 #include <cstdint>
 #include <memory>
-#include <vector>
 
-// move with constructor to cpp
-#include <ctime>
-#include <random>
-
-#include "common/Stack.hpp"
 #include "common/VPA.hpp"
-#include "common/Word.hpp"
-#include "common/symbol/Symbols.hpp"
 #include "common/transition/Transition.hpp"
 
 namespace generator
 {
 class Generator
 {
-    const uint16_t numOfStates;
-    const uint16_t numOfCalls;
-    const uint16_t numOfLocals;
-    const uint16_t numOfReturns;
-    const uint16_t numOfStackSymbols;
-    const uint16_t parameter;
+protected:
+    uint16_t numOfStates;
+    uint16_t numOfCalls;
+    uint16_t numOfLocals;
+    uint16_t numOfReturns;
+    uint16_t numOfStackSymbols;
+    double density;
 
-    // To be removed, when VPA holds pointer to transition
     std::shared_ptr<common::transition::Transition> transition;
 
 public:
-    Generator(
+    virtual ~Generator() = default;
+    Generator() = default;
+
+    void setConfig(
         const uint16_t numOfStates_, const uint16_t numOfCalls_, const uint16_t numOfLocals_,
-        const uint16_t numOfReturns_, const uint16_t numOfStackSymbols_,
-        const uint16_t parameter_ = 1)
-        : numOfStates{numOfStates_}, numOfCalls{numOfCalls_}, numOfLocals{numOfLocals_},
-          numOfReturns{numOfReturns_}, numOfStackSymbols{numOfStackSymbols_}, parameter{parameter_}
+        const uint16_t numOfReturns_, const uint16_t numOfStackSymbols_, const double density_)
     {
+        numOfStates = numOfStates_;
+        numOfCalls = numOfCalls_;
+        numOfLocals = numOfLocals_;
+        numOfReturns = numOfReturns_;
+        numOfStackSymbols = numOfStackSymbols_;
+        density = density_;
+
         transition = std::make_shared<common::transition::Transition>();
-        std::srand(std::time(nullptr));
-    };
+    }
 
-    std::shared_ptr<common::VPA> run();
-
-    void generateTransition();
-    std::vector<uint16_t> selectAcceptingStates();
-
-    void addCalls(common::transition::State state);
-    void addLocals(common::transition::State state);
-    void addReturns(common::transition::State state);
+    virtual std::shared_ptr<common::VPA> run() = 0;
+    virtual bool generatorSpecificCheck(std::shared_ptr<common::VPA> hypothesis)
+    {
+        return true;
+    }
 };
 } // namespace generator

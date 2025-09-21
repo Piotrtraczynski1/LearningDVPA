@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_set>
 
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
@@ -41,23 +42,34 @@ private:
     std::pair<common::transition::State, common::transition::State>
     convertCombinedStateIntoStates(uint16_t state) const;
 
+    void insertNonTerminalIfNeeded(const cfg::NonTerminal nonTerminal);
+    std::tuple<common::transition::State, common::symbol::StackSymbol, common::transition::State>
+    decodeNonTerminal(const cfg::NonTerminal nonTerminal);
+    std::tuple<size_t, size_t> calculateEstimatedCfgSize();
+
+    void addCommonProjections(const VPA &vpa);
     void addCallProjections(
         const common::transition::CoArgument (&callT)[utils::MaxNumOfLetters],
-        const uint16_t numOfStates, const common::transition::State state,
-        const common::symbol::StackSymbol stackSymbol);
+        const cfg::NonTerminal nonTerminal, const common::transition::State state,
+        const common::symbol::StackSymbol stackSymbol, const common::transition::State state2);
     void addReturnProjections(
-        const common::transition::State (&returnT)[utils::MaxNumOfLetters],
-        const uint16_t numOfStates, const common::transition::State state,
-        const common::symbol::StackSymbol stackSymbol);
+        const common::transition::State (&returnT)[utils::MaxNumOfCombinedAutomatonLetters],
+        const cfg::NonTerminal nonTerminal, const common::transition::State state,
+        const common::symbol::StackSymbol stackSymbol, const common::transition::State state2);
     void addLocalProjections(
         const common::transition::State (&localT)[utils::MaxNumOfLetters],
-        const uint16_t numOfStates, const common::transition::State state,
-        const common::symbol::StackSymbol stackSymbol);
-    void addCommonProjections(const VPA &vpa);
+        const cfg::NonTerminal nonTerminal, const common::transition::State state,
+        const common::symbol::StackSymbol stackSymbol, const common::transition::State state2);
 
     uint16_t numOfCalls;
     uint16_t numOfReturns;
     uint16_t numOfLocals;
     uint16_t numOfStackSymbols;
+
+    uint16_t combinedVpaNumOfStates;
+    uint16_t combinedVpaNumOfStackSymbols;
+
+    std::unordered_set<cfg::NonTerminal> seenNonTerminals{};
+    std::queue<cfg::NonTerminal> nonTerminalsQueue{};
 };
 } // namespace teacher

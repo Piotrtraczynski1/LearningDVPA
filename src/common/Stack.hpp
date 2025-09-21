@@ -16,13 +16,12 @@ public:
     Stack(std::initializer_list<symbol::StackSymbol> initList);
     bool operator!=(const Stack &s) const
     {
-        return stack != s.stack;
+        return not(*this == s);
     };
 
-    // dummy operator
     bool operator==(const Stack &s1) const
     {
-        return true;
+        return stack == s1.stack;
     }
 
     symbol::StackSymbol top() const;

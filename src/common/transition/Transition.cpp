@@ -12,17 +12,20 @@ Transition::Transition()
 void Transition::clear()
 {
     std::fill(
-        &callT[0][0], &callT[0][0] + utils::MaxNumOfAutomataStates * utils::MaxNumOfLetters,
+        &callT[0][0],
+        &callT[0][0] + utils::MaxNumOfCombinedAutomatonStates * utils::MaxNumOfLetters,
         CoArgument{State::INVALID, symbol::StackSymbol::INVALID});
 
     std::fill(
         &returnT[0][0][0],
-        &returnT[0][0][0] +
-            utils::MaxNumOfAutomataStates * utils::MaxNumOfStackSymbols * utils::MaxNumOfLetters,
+        &returnT[0][0][0] + utils::MaxNumOfCombinedAutomatonStates *
+                                utils::MaxNumOfCombinedStackSymbols *
+                                utils::MaxNumOfCombinedAutomatonLetters,
         State::INVALID);
 
     std::fill(
-        &localT[0][0], &localT[0][0] + utils::MaxNumOfAutomataStates * utils::MaxNumOfLetters,
+        &localT[0][0],
+        &localT[0][0] + utils::MaxNumOfCombinedAutomatonStates * utils::MaxNumOfLetters,
         State::INVALID);
 }
 
@@ -61,7 +64,7 @@ void Transition::print(std::ostream &os) const
     os << "transition: [state, 'stackSymbol', alphabetSymbol] = [state, "
           "'stackSymbol']\n";
     os << "CallTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
     {
         for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
         {
@@ -74,11 +77,11 @@ void Transition::print(std::ostream &os) const
     }
 
     os << "ReturnTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
     {
         for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
         {
-            for (uint16_t stack = 0; stack < utils::MaxNumOfStackSymbols; stack++)
+            for (uint16_t stack = 0; stack < utils::MaxNumOfCombinedStackSymbols; stack++)
             {
                 if (returnT[state][stack][letter] != State::INVALID)
                 {
@@ -90,7 +93,7 @@ void Transition::print(std::ostream &os) const
     }
 
     os << "LocalTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
     {
         for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
         {
@@ -106,7 +109,7 @@ void Transition::print(std::ostream &os) const
 void Transition::printUt(std::ostream &os) const
 {
     os << "//CallTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
     {
         for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
         {
@@ -120,11 +123,11 @@ void Transition::printUt(std::ostream &os) const
     }
 
     os << "\n//ReturnTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
     {
         for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
         {
-            for (uint16_t stack = 0; stack < utils::MaxNumOfStackSymbols; stack++)
+            for (uint16_t stack = 0; stack < utils::MaxNumOfCombinedStackSymbols; stack++)
             {
                 if (returnT[state][stack][letter] != State::INVALID)
                 {
@@ -137,7 +140,7 @@ void Transition::printUt(std::ostream &os) const
     }
 
     os << "\n//LocalTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfAutomataStates; state++)
+    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
     {
         for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
         {

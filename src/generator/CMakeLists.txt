@@ -1,6 +1,7 @@
 add_library(generator STATIC
-    Generator.cpp
-    Tester.cpp
+    RandomGenerator.cpp
+    XMLGenerator.cpp
 )
 
 target_link_libraries(generator PRIVATE common utils common learner teacher)
+ 

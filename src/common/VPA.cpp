@@ -5,10 +5,11 @@ namespace common
 {
 VPA::VPA(
     transition::Transition &transition, transition::State initial,
-    const std::vector<uint16_t> &states, uint16_t numStates)
+    const std::vector<uint16_t> &accStates, uint16_t numStates)
     : delta{transition}, initialState{initial}, acceptingStates{}, numOfStates{numStates}
 {
-    for (const auto state : states)
+    sink = transition::State{numStates};
+    for (const auto state : accStates)
     {
         acceptingStates[state] = true;
     }
@@ -48,7 +49,7 @@ bool VPA::checkWord(const Word &word)
 
         if (state == transition::State::INVALID)
         {
-            return false;
+            state = sink;
         }
     }
 

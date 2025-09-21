@@ -17,65 +17,7 @@ using namespace teacher::cfg;
 
 namespace teacher
 {
-TEST(Converter, convertVpaToCfg)
-{
-    State initialState{0};
-    State s2{1};
-
-    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
-
-    transition->add(initialState, CallSymbol{0}, s2, StackSymbol{1});
-    transition->add(s2, StackSymbol{1}, ReturnSymbol{1}, initialState);
-
-    common::VPA vpa{*transition, initialState, {0}, 2};
-
-    Converter sut{std::make_shared<common::VPA>(vpa), 1, 1, 0, 2};
-    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(vpa)};
-
-    auto cfgOutput{cfg->isEmpty()};
-
-    ASSERT_TRUE((*cfgOutput).has_value());
-}
-
-TEST(Converter, convertVpaToCfgV2)
-{
-    State initialState{0};
-    State s1{1};
-
-    CallSymbol callSymbol{0};
-    LocalSymbol localSymbol_0{0};
-    LocalSymbol localSymbol_1{1};
-    ReturnSymbol returnSymbol{0};
-
-    StackSymbol stackSymbol_1{1};
-    StackSymbol stackSymbol_2{2};
-
-    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
-
-    transition->add(initialState, callSymbol, s1, stackSymbol_1);
-    transition->add(s1, callSymbol, s1, stackSymbol_2);
-
-    transition->add(initialState, localSymbol_0, initialState);
-    transition->add(s1, localSymbol_0, s1);
-
-    transition->add(initialState, localSymbol_1, initialState);
-    transition->add(s1, localSymbol_1, s1);
-
-    transition->add(s1, stackSymbol_1, returnSymbol, initialState);
-    transition->add(s1, stackSymbol_2, returnSymbol, s1);
-
-    common::VPA vpa{*transition, initialState, {0}, 2};
-
-    Converter sut{std::make_shared<common::VPA>(vpa), 1, 1, 2, 3};
-
-    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(vpa)};
-
-    auto cfgOutput{cfg->isEmpty()};
-
-    ASSERT_TRUE((*cfgOutput).has_value());
-}
-
-TEST(Converter, combineVpa)
+TEST(Converter, combineVpaAndConvertVpaToCfg)
 {
     State initialState{0};
     State s1{1}, s2{2};
@@ -133,5 +75,201 @@ TEST(Converter, combineVpa)
     EXPECT_TRUE(combinedVpa.checkWord(belongingWord));
     EXPECT_FALSE(combinedVpa.checkWord(bothTrue));
     EXPECT_FALSE(combinedVpa.checkWord(bothFalse));
+
+    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    auto cfgOutput{cfg->isEmpty()};
+    ASSERT_TRUE((*cfgOutput).has_value());
+}
+
+TEST(Converter, combineVpaAndConvertVpaToCfg2)
+{
+    State initialState{0};
+    State s0{0}, s1{1}, s2{2}, s3{3};
+
+    CallSymbol c0{0};
+    ReturnSymbol r0{0}, r1{1};
+
+    StackSymbol ssB{0}, ss{1};
+
+    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
+
+    transition->add(initialState, c0, s1, ss);
+    transition->add(s1, c0, initialState, ss);
+    transition->add(s2, c0, s3, ss);
+    transition->add(s3, c0, s3, ss);
+
+    transition->add(initialState, ssB, r0, s0);
+    transition->add(initialState, ss, r1, s3);
+    transition->add(s1, ssB, r0, s2);
+    transition->add(s1, ss, r1, s1);
+    transition->add(s2, ssB, r0, s0);
+    transition->add(s2, ss, r1, s0);
+    transition->add(s3, ssB, r0, s0);
+    transition->add(s3, ss, r1, s0);
+
+    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
+
+    secondTransition->add(initialState, c0, initialState, ss);
+    secondTransition->add(initialState, ssB, r0, initialState);
+
+    common::VPA vpa{*transition, initialState, {0, 1}, 4};
+    common::VPA hypothesis{*secondTransition, initialState, {0}, 1};
+
+    Converter sut{std::make_shared<common::VPA>(vpa), 1, 2, 0, 2};
+
+    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+
+    common::Word expectTrue{c0, c0, c0, c0, c0, r1};
+
+    EXPECT_TRUE(combinedVpa.checkWord(expectTrue));
+
+    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    auto cfgOutput{cfg->isEmpty()};
+    ASSERT_TRUE((*cfgOutput).has_value());
+}
+
+TEST(Converter, combineVpaAndConvertVpaToCfg3)
+{
+    using CS = common::symbol::CallSymbol;
+    using RS = common::symbol::ReturnSymbol;
+
+    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
+
+    uint16_t numOfStates = 4;
+    auto acceptingStates = std::vector<uint16_t>{0, 1};
+    uint16_t numOfStackSymbols = 2;
+    uint16_t numOfCalls = 1;
+    uint16_t numOfReturns = 1;
+    uint16_t numOfLocals = 0;
+    transition = std::make_shared<Transition>();
+
+    // CallTransitions:
+    transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
+    transition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+    transition->add(State{2}, CS{0}, State{1}, StackSymbol{1});
+    transition->add(State{3}, CS{0}, State{2}, StackSymbol{1});
+
+    // ReturnTransitions:
+    transition->add(State{0}, StackSymbol{0}, RS{0}, State{0});
+    transition->add(State{0}, StackSymbol{1}, RS{0}, State{0});
+    transition->add(State{1}, StackSymbol{0}, RS{0}, State{0});
+    transition->add(State{1}, StackSymbol{1}, RS{0}, State{3});
+    transition->add(State{2}, StackSymbol{0}, RS{0}, State{1});
+    transition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
+    transition->add(State{3}, StackSymbol{0}, RS{0}, State{2});
+    transition->add(State{3}, StackSymbol{1}, RS{0}, State{0});
+
+    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
+
+    // CallTransitions:
+    secondTransition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
+    secondTransition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+    secondTransition->add(State{2}, CS{0}, State{0}, StackSymbol{1});
+
+    // ReturnTransitions:
+    secondTransition->add(State{0}, StackSymbol{0}, RS{0}, State{0});
+    secondTransition->add(State{0}, StackSymbol{1}, RS{0}, State{0});
+    secondTransition->add(State{1}, StackSymbol{0}, RS{0}, State{1});
+    secondTransition->add(State{1}, StackSymbol{1}, RS{0}, State{0});
+    secondTransition->add(State{2}, StackSymbol{0}, RS{0}, State{0});
+    secondTransition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
+
+    common::VPA vpa{*transition, State{0}, acceptingStates, numOfStates};
+    common::VPA hypothesis{*secondTransition, State{0}, {0}, 3};
+
+    Converter sut{std::make_shared<common::VPA>(vpa), 1, 1, 0, 2};
+
+    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+
+    common::Word expectFalse{CS{0}, RS{0}, RS{0}, RS{0}};
+
+    EXPECT_TRUE(vpa.checkWord(expectFalse));
+    EXPECT_TRUE(hypothesis.checkWord(expectFalse));
+    EXPECT_FALSE(combinedVpa.checkWord(expectFalse));
+
+    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    auto cfgOutput{cfg->isEmpty()};
+    ASSERT_TRUE((*cfgOutput).has_value());
+}
+
+TEST(Converter, combineVpaAndConvertVpaToCfg4)
+{
+    using CS = common::symbol::CallSymbol;
+    using RS = common::symbol::ReturnSymbol;
+    using LS = common::symbol::LocalSymbol;
+
+    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
+
+    uint16_t numOfStates = 5;
+    auto acceptingStates = std::vector<uint16_t>{0, 3};
+    uint16_t numOfStackSymbols = 2;
+    uint16_t numOfCalls = 1;
+    uint16_t numOfReturns = 1;
+    uint16_t numOfLocals = 1;
+    transition = std::make_shared<Transition>();
+
+    // CallTransitions:
+    transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
+    transition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+    transition->add(State{2}, CS{0}, State{4}, StackSymbol{1});
+    transition->add(State{3}, CS{0}, State{3}, StackSymbol{1});
+    transition->add(State{4}, CS{0}, State{4}, StackSymbol{1});
+
+    // ReturnTransitions:
+    transition->add(State{0}, StackSymbol{0}, RS{0}, State{1});
+    transition->add(State{1}, StackSymbol{0}, RS{0}, State{1});
+    transition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+    transition->add(State{2}, StackSymbol{0}, RS{0}, State{3});
+    transition->add(State{2}, StackSymbol{1}, RS{0}, State{1});
+    transition->add(State{3}, StackSymbol{0}, RS{0}, State{3});
+    transition->add(State{3}, StackSymbol{1}, RS{0}, State{3});
+    transition->add(State{4}, StackSymbol{0}, RS{0}, State{1});
+    transition->add(State{4}, StackSymbol{1}, RS{0}, State{4});
+
+    // LocalTransitions:
+    transition->add(State{0}, LS{0}, State{1});
+    transition->add(State{1}, LS{0}, State{1});
+    transition->add(State{2}, LS{0}, State{4});
+    transition->add(State{3}, LS{0}, State{3});
+    transition->add(State{4}, LS{0}, State{2});
+
+    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
+
+    // CallTransitions:
+    secondTransition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
+    secondTransition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+    secondTransition->add(State{2}, CS{0}, State{2}, StackSymbol{1});
+
+    // ReturnTransitions:
+    secondTransition->add(State{0}, StackSymbol{0}, RS{0}, State{1});
+    secondTransition->add(State{0}, StackSymbol{1}, RS{0}, State{1});
+    secondTransition->add(State{1}, StackSymbol{0}, RS{0}, State{1});
+    secondTransition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+    secondTransition->add(State{2}, StackSymbol{0}, RS{0}, State{0});
+    secondTransition->add(State{2}, StackSymbol{1}, RS{0}, State{1});
+
+    // LocalTransitions:
+    secondTransition->add(State{0}, LS{0}, State{1});
+    secondTransition->add(State{1}, LS{0}, State{1});
+    secondTransition->add(State{2}, LS{0}, State{2});
+
+    common::VPA vpa{*transition, State{0}, acceptingStates, numOfStates};
+    common::VPA hypothesis{*secondTransition, State{0}, {0}, 3};
+
+    Converter sut{
+        std::make_shared<common::VPA>(vpa), numOfCalls, numOfReturns, numOfLocals,
+        numOfStackSymbols};
+
+    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+
+    common::Word expectTrue{CS{0}, CS{0}, CS{0}, RS{0}, RS{0}, RS{0}, LS{0}, RS{0}};
+
+    EXPECT_TRUE(vpa.checkWord(expectTrue));
+    EXPECT_FALSE(hypothesis.checkWord(expectTrue));
+    EXPECT_TRUE(combinedVpa.checkWord(expectTrue));
+
+    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    auto cfgOutput{cfg->isEmpty()};
+    ASSERT_TRUE((*cfgOutput).has_value());
 }
 } // namespace teacher

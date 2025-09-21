@@ -33,6 +33,7 @@ public:
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
 
         selectors = std::make_shared<Selectors>();
+        selectors->addSelector(common::Word{}, true);
         testWords = std::make_shared<TestWords>();
 
         sut = new AutomataGenerator(
@@ -182,6 +183,7 @@ TEST_F(TestAutomataGenerator1, automataSimulationStep2)
     EXPECT_EQ(automata->checkWord(common::Word{cs}), false);
 
     common::Word expectedCounterExample{cs, cs, cs, rs, rs, rs, ls, rs};
+
     EXPECT_EQ(counterExample, expectedCounterExample);
     EXPECT_NE(automata->checkWord(counterExample), vpa->checkWord(counterExample));
 }

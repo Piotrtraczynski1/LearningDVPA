@@ -27,7 +27,7 @@ class AutomataGenerator
 
     common::transition::Transition transition;
 
-    common::Word witnesses[utils::MaxNumOfAutomataStates] = {};
+    common::Word witnesses[utils::MaxNumOfAutomatonStates] = {};
 
 public:
     AutomataGenerator(
@@ -38,9 +38,6 @@ public:
           numOfReturns{returns}, numOfLocals{locals}, numOfStackSymbols{stackSymbols}
     {
         witnesses[0] = common::Word{};
-        IMP("AutomataGenerator built numOfCalls: %u, numOfReturns: %u, numOfLocals: %u, "
-            "numOfStackSymbols: %u",
-            numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
     };
 
     std::shared_ptr<common::VPA> generate();
@@ -48,6 +45,8 @@ public:
     uint16_t findEquivalentSelector(const common::Word &word);
     uint16_t findEquivalentSelector(
         const uint16_t selectorIndex, const uint16_t stackIndex, const uint16_t symbolIndex);
+
+    uint16_t findOrAddSuccessor(const common::Word &candidate);
 
 private:
     void clearGenerator();
@@ -58,7 +57,6 @@ private:
     void considerReturn(
         const uint16_t selectorIndex, const uint16_t symbolIndex, const uint16_t stackIndex);
 
-    uint16_t findOrAddSuccessor(const common::Word &candidate);
     void
     setWitness(const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix);
     template <typename T, typename K>

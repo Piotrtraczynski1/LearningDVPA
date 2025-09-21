@@ -12,11 +12,10 @@ namespace learner
 // This class contains standard words
 class Selectors
 {
-    uint16_t numOfSelectors{1};
-    common::Word selectors[utils::MaxNumOfAutomataStates] = {{}};
-    common::transition::State states[utils::MaxNumOfAutomataStates] = {
-        common::transition::State{0}};
-    std::vector<uint16_t> acceptingWords{0}; // TODO
+    uint16_t numOfSelectors{0};
+    common::Word selectors[utils::MaxNumOfAutomatonStates] = {};
+    common::transition::State states[utils::MaxNumOfAutomatonStates] = {};
+    std::vector<uint16_t> acceptingWords{};
 
 public:
     static constexpr uint16_t INVALID_INDEX{std::numeric_limits<uint16_t>::max()};
