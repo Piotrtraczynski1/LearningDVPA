@@ -28,13 +28,13 @@ static void test(benchmark::State &state)
         auto hce = MeasurementDataBase::getMarkerInfo("handleCounterExample");
         auto gen = MeasurementDataBase::getMarkerInfo("generateAutomaton");
 
-        state.counters["handleCE_us"] = (double)hce.time;
-        state.counters["handleCE_calls"] = (double)hce.executions;
-        state.counters["handleCE_avg_us"] = (double)hce.time / hce.executions;
+        state.counters["handleCE_us"] = hce.time;
+        state.counters["handleCE_calls"] = hce.executions;
+        state.counters["handleCE_avg_us"] = hce.time / hce.executions;
 
-        state.counters["genAuto_us"] = (double)gen.time;
-        state.counters["genAuto_calls"] = (double)gen.executions;
-        state.counters["genAuto_avg_us"] = (double)gen.time / gen.executions;
+        state.counters["genAuto_us"] = gen.time;
+        state.counters["genAuto_calls"] = gen.executions;
+        state.counters["genAuto_avg_us"] = gen.time / gen.executions;
     }
 }
 
