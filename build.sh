@@ -19,6 +19,18 @@ build_code() {
     cd ..
 }
 
+build_benchmark() {
+    BUILD_DIR="build-bench"
+
+    mkdir -p "$BUILD_DIR"
+    cd "$BUILD_DIR"
+
+    cmake -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=ON $EXTRA_FLAGS ..
+    cmake --build . --target run_bench
+
+    cd ..
+}
+
 build_and_run_tests() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
@@ -52,9 +64,9 @@ build_and_run_single_test() {
 }
 
 main() {
-    mkdir -p "$BUILD_DIR"
-
-    if [[ "${1-}" == "test" ]]; then
+    if [[ "${1-}" == "-bench" ]]; then
+        build_benchmark
+    elif [[ "${1-}" == "test" ]]; then
         if [[ "${2-}" == "-t" ]]; then
             build_and_run_single_test "${3-}"
         else

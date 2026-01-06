@@ -2,7 +2,7 @@
 
 std::unordered_map<std::string, MarkerInfo> MeasurementDataBase::markers;
 
-void MeasurementDataBase::update(const std::string_view &name, uint64_t duration)
+void MeasurementDataBase::update(const std::string_view name, uint64_t duration)
 {
     auto [it, inserted] = markers.try_emplace(std::string(name), MarkerInfo{duration, 1});
     if (not inserted)
@@ -31,7 +31,17 @@ void MeasurementDataBase::printInfo()
     std::cout << "===================================================\n";
 }
 
-Measurment::Measurment(std::string_view n)
+void MeasurementDataBase::reset()
+{
+    markers.clear();
+}
+
+MarkerInfo MeasurementDataBase::getMarkerInfo(const std::string_view name)
+{
+    return markers[std::string(name)];
+}
+
+Measurment::Measurment(const std::string_view n)
 {
     name = n;
     starTime = std::chrono::steady_clock::now();
