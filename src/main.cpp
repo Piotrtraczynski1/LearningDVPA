@@ -5,6 +5,7 @@
 #include "TesterParameters.hpp"
 #include "generator/RandomGenerator.hpp"
 #include "generator/XMLGenerator.hpp"
+#include "generator/eCDAGenerator.hpp"
 
 namespace
 {
@@ -27,11 +28,19 @@ void runXMLGenerator()
     tester.run();
 }
 
+void runeCDAGenerator()
+{
+    Tester tester{
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::eCDAGenerator()),
+        eCDATestParameters};
+    tester.run();
+}
+
 int main()
 {
     // std::srand(std::time(0));
     std::srand(1);
-    runRandomGenerator();
+    runeCDAGenerator();
 
     return 0;
 }

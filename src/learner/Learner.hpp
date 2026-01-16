@@ -6,6 +6,8 @@
 #include "common/Word.hpp"
 #include "learner/AutomataGenerator.hpp"
 #include "learner/Selectors.hpp"
+#include "learner/Srs.hpp"
+#include "learner/SrsChecker.hpp"
 #include "learner/TestWords.hpp"
 #include "teacher/Teacher.hpp"
 #include "utils/log.hpp"
@@ -26,11 +28,12 @@ class Learner
     std::shared_ptr<TestWords> testWords;
 
     AutomataGenerator generator;
+    SrsChecker srsChecker;
 
 public:
     Learner(
         teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL,
-        uint16_t numOfS);
+        uint16_t numOfS, Srs srs = {});
     std::shared_ptr<common::VPA> run();
 
 private:

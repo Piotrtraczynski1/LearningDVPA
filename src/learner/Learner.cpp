@@ -7,12 +7,14 @@ namespace learner
 {
 
 Learner::Learner(
-    teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL, uint16_t numOfS)
+    teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL, uint16_t numOfS,
+    Srs srs)
     : oracle{teacher}, numOfCalls{numOfC}, numOfReturns{numOfR}, numOfLocals{numOfL},
       numOfStackSymbols{numOfS}, selectors{std::make_shared<Selectors>()},
       testWords{std::make_shared<TestWords>()},
       generator{oracle,       selectors,   testWords,        numOfCalls,
-                numOfReturns, numOfLocals, numOfStackSymbols}
+                numOfReturns, numOfLocals, numOfStackSymbols},
+      srsChecker{selectors, testWords, srs, teacher}
 {
     setInitialWord();
 };
@@ -26,7 +28,12 @@ std::shared_ptr<common::VPA> Learner::run()
     while (true)
     {
         hypothesis = generator.generate();
-        counterExample = oracle.equivalenceQuery(hypothesis);
+
+        counterExample = std::make_shared<common::Word>(srsChecker.check(hypothesis));
+        if (counterExample->empty())
+        {
+            counterExample = oracle.equivalenceQuery(hypothesis);
+        }
 
         if (counterExample->empty())
         {
@@ -35,6 +42,21 @@ std::shared_ptr<common::VPA> Learner::run()
         }
 
         handleCounterExample(counterExample);
+
+        /*
+        std::cout << "========== SELECTORS =============\n";
+        for (uint16_t it = 0; it < selectors->size(); it++)
+        {
+            std::cout << it << ": " << (*selectors)[it] << "\n";
+        }
+        std::cout << "==================================\n";
+        std::cout << "========= TEST WRODS =============\n";
+        for (uint16_t it = 0; it < testWords->size(); it++)
+        {
+            std::cout << it << ": " << (*testWords)[it] << "\n";
+        }
+        std::cout << "==================================\n";
+        */
     }
 }
 

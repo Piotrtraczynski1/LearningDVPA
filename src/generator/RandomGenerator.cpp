@@ -77,17 +77,12 @@ void RandomGenerator::addReturns(common::transition::State state)
     }
 }
 
-bool RandomGenerator::skipTransition()
-{
-    return ((static_cast<double>(rand()) / RAND_MAX) >= density);
-}
-
 std::vector<uint16_t> RandomGenerator::selectAcceptingStates()
 {
     std::vector<uint16_t> acceptingStates{};
     for (uint16_t i = 0; i < numOfStates; i++)
     {
-        if (rand() % 3 == 0)
+        if (shouldAccept())
         {
             acceptingStates.push_back(i);
         }

@@ -7,6 +7,7 @@
 #include "common/Word.cpp"
 #include "common/transition/Transition.cpp"
 #include "learner/AutomataGenerator.cpp"
+#include "learner/SrsChecker.cpp"
 #include "teacher/Converter.cpp"
 #include "teacher/Teacher.cpp"
 #include "teacher/cfg/Calculator.cpp"
@@ -29,14 +30,14 @@ namespace learner
 class TestLearner : public ::testing::Test
 {
 public:
-    void init()
+    void init(Srs srs = {})
     {
         vpa = std::make_shared<VPA>(*transition, initial, acceptingStates, numOfStates);
         converter = std::make_shared<teacher::Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
 
-        sut = new Learner(*oracle, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
+        sut = new Learner(*oracle, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols, srs);
     }
 
     std::vector<uint16_t> acceptingStates{};
@@ -841,6 +842,100 @@ public:
 };
 
 TEST_F(TestLearner10, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+}
+
+class TestLearnerWithSrs : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 6;
+        acceptingStates = std::vector<uint16_t>{0, 2, 5};
+        numOfStackSymbols = 3;
+        numOfCalls = 2;
+        numOfReturns = 2;
+        numOfLocals = 2;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
+        transition->add(State{0}, CS{1}, State{1}, StackSymbol{1});
+        transition->add(State{1}, CS{0}, State{5}, StackSymbol{1});
+        transition->add(State{1}, CS{1}, State{3}, StackSymbol{2});
+        transition->add(State{2}, CS{0}, State{0}, StackSymbol{1});
+        transition->add(State{2}, CS{1}, State{5}, StackSymbol{1});
+        transition->add(State{3}, CS{0}, State{2}, StackSymbol{1});
+        transition->add(State{3}, CS{1}, State{5}, StackSymbol{1});
+        transition->add(State{4}, CS{0}, State{1}, StackSymbol{2});
+        transition->add(State{4}, CS{1}, State{4}, StackSymbol{1});
+        transition->add(State{5}, CS{0}, State{4}, StackSymbol{1});
+        transition->add(State{5}, CS{1}, State{3}, StackSymbol{2});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{4});
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{0}, StackSymbol{2}, RS{0}, State{5});
+        transition->add(State{0}, StackSymbol{0}, RS{1}, State{4});
+        transition->add(State{0}, StackSymbol{1}, RS{1}, State{5});
+        transition->add(State{0}, StackSymbol{2}, RS{1}, State{0});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{4});
+        transition->add(State{1}, StackSymbol{0}, RS{1}, State{5});
+        transition->add(State{1}, StackSymbol{1}, RS{1}, State{1});
+        transition->add(State{1}, StackSymbol{2}, RS{1}, State{2});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{0}, RS{1}, State{4});
+        transition->add(State{2}, StackSymbol{1}, RS{1}, State{4});
+        transition->add(State{2}, StackSymbol{2}, RS{1}, State{0});
+        transition->add(State{3}, StackSymbol{0}, RS{0}, State{4});
+        transition->add(State{3}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{3}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{3}, StackSymbol{0}, RS{1}, State{1});
+        transition->add(State{3}, StackSymbol{1}, RS{1}, State{3});
+        transition->add(State{3}, StackSymbol{2}, RS{1}, State{3});
+        transition->add(State{4}, StackSymbol{0}, RS{0}, State{0});
+        transition->add(State{4}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{4}, StackSymbol{2}, RS{0}, State{0});
+        transition->add(State{4}, StackSymbol{0}, RS{1}, State{4});
+        transition->add(State{4}, StackSymbol{1}, RS{1}, State{5});
+        transition->add(State{4}, StackSymbol{2}, RS{1}, State{3});
+        transition->add(State{5}, StackSymbol{0}, RS{0}, State{5});
+        transition->add(State{5}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{5}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{5}, StackSymbol{0}, RS{1}, State{2});
+        transition->add(State{5}, StackSymbol{1}, RS{1}, State{4});
+        transition->add(State{5}, StackSymbol{2}, RS{1}, State{4});
+
+        // LocalTransitions:
+        transition->add(State{0}, LS{0}, State{1});
+        transition->add(State{0}, LS{1}, State{0});
+        transition->add(State{1}, LS{0}, State{0});
+        transition->add(State{1}, LS{1}, State{1});
+        transition->add(State{2}, LS{0}, State{3});
+        transition->add(State{2}, LS{1}, State{2});
+        transition->add(State{3}, LS{0}, State{2});
+        transition->add(State{3}, LS{1}, State{3});
+        transition->add(State{4}, LS{0}, State{5});
+        transition->add(State{4}, LS{1}, State{4});
+        transition->add(State{5}, LS{0}, State{4});
+        transition->add(State{5}, LS{1}, State{5});
+
+        Srs srs{};
+        srs.push_back(SrsRule{{LS{0}, LS{1}, LS{0}}, {}});
+        srs.push_back(SrsRule{{LS{1}}, {}});
+        init(srs);
+    }
+};
+
+TEST_F(TestLearnerWithSrs, testLearner)
 {
     std::shared_ptr<VPA> hyp{sut->run()};
     common::Word ce{};

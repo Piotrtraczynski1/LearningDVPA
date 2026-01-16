@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cstdint>
 #include <memory>
-#include <vector>
 
 #include "common/VPA.hpp"
 #include "common/transition/Transition.hpp"
@@ -10,7 +8,7 @@
 
 namespace generator
 {
-class RandomGenerator : public Generator
+class kSEVPAGenerator : public Generator
 {
 public:
     using Generator::Generator;
@@ -19,11 +17,9 @@ public:
     bool generatorSpecificCheck(std::shared_ptr<common::VPA> hypothesis) override;
 
 private:
-    void generateTransition();
-    std::vector<uint16_t> selectAcceptingStates();
+    std::vector<uint16_t> acceptingStates{0};
+    common::transition::State initialState{0};
 
-    void addCalls(common::transition::State state);
-    void addLocals(common::transition::State state);
-    void addReturns(common::transition::State state);
+    void generateTransition();
 };
 } // namespace generator
