@@ -14,7 +14,7 @@ fi
 build_code() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DBUILD_TESTS=OFF $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF $EXTRA_FLAGS ..
     cmake --build .
     cd ..
 }
@@ -25,7 +25,7 @@ build_benchmark() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-    cmake -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=ON $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=ON $EXTRA_FLAGS ..
     cmake --build . --target run_bench
 
     cd ..
@@ -34,7 +34,7 @@ build_benchmark() {
 build_and_run_tests() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DBUILD_TESTS=ON $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $EXTRA_FLAGS ..
     cmake --build .
     ctest --output-on-failure
     cd ..
@@ -49,7 +49,7 @@ build_and_run_single_test() {
     TEST_NAME="$1"
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DBUILD_TESTS=ON $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $EXTRA_FLAGS ..
     cmake --build . --target "$TEST_NAME"
 
     TEST_EXEC=$(find . -type f -name "$TEST_NAME" -perm -111 | head -n1)

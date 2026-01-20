@@ -7,7 +7,7 @@ namespace learner
 {
 std::shared_ptr<common::VPA> AutomataGenerator::generate()
 {
-    TIME_MARKER("generateAutomaton");
+    TIME_MARKER("[AutomataGenerator]: generateAutomaton");
     LOG("[AutomataGenerator]: Generating Automaton");
 
     clearGenerator();

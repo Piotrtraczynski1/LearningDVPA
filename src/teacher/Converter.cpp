@@ -1,8 +1,5 @@
 #include "teacher/Converter.hpp"
 
-#include <cassert>
-#include <iostream>
-
 #include "teacher/cfg/Calculator.hpp"
 #include "utils/TimeMarker.hpp"
 #include "utils/log.hpp"
@@ -11,7 +8,7 @@ namespace teacher
 {
 VPA Converter::combineVPA(const VPA &secondVpa)
 {
-    TIME_MARKER("combineVPA");
+    TIME_MARKER("[Converter]: combineVPA");
     transition.clear();
 
     combinedVpaNumOfStates =
@@ -61,8 +58,9 @@ VPA Converter::combineVPA(const VPA &secondVpa)
 
 void Converter::insertNonTerminalIfNeeded(const cfg::NonTerminal nonTerminal)
 {
-    if (seenNonTerminals.insert(nonTerminal).second)
+    if (not seenNonTerminals[static_cast<uint32_t>(nonTerminal)])
     {
+        seenNonTerminals[static_cast<uint32_t>(nonTerminal)] = 1;
         nonTerminalsQueue.push(nonTerminal);
     }
 }
@@ -104,46 +102,32 @@ std::tuple<size_t, size_t> Converter::calculateEstimatedCfgSize()
          1) /
         4 * 3;
 
-    // return {estimatedNumberOfProjections, estimatedNonTerminals};
-    return {20000, 1000};
-}
-
-std::tuple<common::transition::State, common::symbol::StackSymbol, common::transition::State>
-Converter::decodeNonTerminal(const cfg::NonTerminal nonTerminal)
-{
-    uint64_t q1 = (nonTerminal / (1ULL << 34)) - 1;
-    uint64_t sId = ((nonTerminal % (1ULL << 34)) / (1ULL << 17)) - 1;
-    uint64_t q2 = (nonTerminal % (1ULL << 17)) - 1;
-    return {
-        common::transition::State{static_cast<uint16_t>(q1)},
-        common::symbol::StackSymbol{static_cast<uint16_t>(sId)},
-        common::transition::State{static_cast<uint16_t>(q2)}};
+    return {estimatedNumberOfProjections, estimatedNonTerminals};
 }
 
 std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA &vpa)
 {
-    TIME_MARKER("convertVpaToCfg");
+    TIME_MARKER("[Converter]: convertVpaToCfg");
     LOG("[Converter]: converting VPA to CFG");
 
     combinedVpaNumOfStates = vpa.numOfStates;
 
     const auto [estimatedNumberOfProjections, estimatedNonTerminals] = calculateEstimatedCfgSize();
     cfg = std::make_shared<cfg::Cfg>(estimatedNumberOfProjections, estimatedNonTerminals);
-    seenNonTerminals.clear();
-    seenNonTerminals.reserve(estimatedNonTerminals);
+    seenNonTerminals.reset();
 
     addCommonProjections(vpa);
-    while (!nonTerminalsQueue.empty())
+    while (not nonTerminalsQueue.empty())
     {
         const auto nonTerminal{nonTerminalsQueue.front()};
         nonTerminalsQueue.pop();
 
-        const auto [state1, stackSymbol, state2] = decodeNonTerminal(nonTerminal);
+        const auto [state1, stackSymbol, state2] = cfg::Calculator::decodeNonTerminal(nonTerminal);
 
-        addCallProjections(vpa.delta.callT[state1], nonTerminal, state1, stackSymbol, state2);
+        addCallProjections(vpa.delta.callT[state1], nonTerminal, stackSymbol, state2);
         addReturnProjections(
-            vpa.delta.returnT[state1][stackSymbol], nonTerminal, state1, stackSymbol, state2);
-        addLocalProjections(vpa.delta.localT[state1], nonTerminal, state1, stackSymbol, state2);
+            vpa.delta.returnT[state1][stackSymbol], nonTerminal, stackSymbol, state2);
+        addLocalProjections(vpa.delta.localT[state1], nonTerminal, stackSymbol, state2);
     }
 
     return cfg;
@@ -266,7 +250,6 @@ common::symbol::StackSymbol Converter::combineStackSymbols(uint16_t s1, uint16_t
 {
     if (s1 == common::symbol::StackSymbol::BOTTOM)
     {
-        assert(s2 == common::symbol::StackSymbol::BOTTOM);
         return common::symbol::StackSymbol::BOTTOM;
     }
 
@@ -281,37 +264,14 @@ bool Converter::isAcceptingState(uint16_t state, const VPA &secondVpa) const
     return vpa->acceptingStates.at(states.first) ^ secondVpa.acceptingStates.at(states.second);
 }
 
-void printNonTerminal(std::ostream &os, cfg::NonTerminal nt)
-{
-    if (nt == cfg::NonTerminal::START)
-    {
-        os << "{START}";
-        return;
-    }
-    uint64_t q1 = (nt / (1ULL << 34)) - 1;
-    uint64_t sId = ((nt % (1ULL << 34)) / (1ULL << 17)) - 1;
-    uint64_t q2 = (nt % (1ULL << 17)) - 1;
-
-    os << "{q1=" << q1 << ", sId=" << sId << ", q2=" << q2 << "}";
-}
-
-std::ostream &operator<<(std::ostream &os, const cfg::NonTerminal &nt)
-{
-    printNonTerminal(os, nt);
-    return os;
-}
-
 void Converter::addCallProjections(
     const common::transition::CoArgument (&callT)[utils::MaxNumOfLetters],
-    const cfg::NonTerminal nonTerminal, const common::transition::State state,
-    const common::symbol::StackSymbol stackSymbol, const common::transition::State state2)
+    const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
+    const common::transition::State state)
 {
     for (uint16_t callId = 0; callId < numOfCalls; callId++)
     {
-        cfg::Terminal terminal{
-            cfg::Calculator::convertSymbolToTerminal(common::symbol::CallSymbol{callId})};
-
-        common::transition::CoArgument coArg{callT[callId]};
+        const common::transition::CoArgument &coArg{callT[callId]};
 
         for (uint16_t stateId = 0; stateId < combinedVpaNumOfStates; stateId++)
         {
@@ -320,20 +280,23 @@ void Converter::addCallProjections(
             cfg::NonTerminal nonTerminal1{
                 cfg::Calculator::makeNonTerminal(coArg.state, coArg.stackSymbol, secondState)};
             cfg::NonTerminal nonTerminal2{
-                cfg::Calculator::makeNonTerminal(secondState, stackSymbol, state2)};
+                cfg::Calculator::makeNonTerminal(secondState, stackSymbol, state)};
 
             insertNonTerminalIfNeeded(nonTerminal1);
             insertNonTerminalIfNeeded(nonTerminal2);
 
-            cfg->addProjection(nonTerminal, terminal, nonTerminal1, nonTerminal2);
+            cfg->addProjection(
+                nonTerminal,
+                cfg::Calculator::convertSymbolToTerminal(common::symbol::CallSymbol{callId}),
+                nonTerminal1, nonTerminal2);
         }
     }
 }
 
 void Converter::addReturnProjections(
     const common::transition::State (&returnT)[utils::MaxNumOfCombinedAutomatonLetters],
-    const cfg::NonTerminal nonTerminal, const common::transition::State state,
-    const common::symbol::StackSymbol stackSymbol, const common::transition::State state2)
+    const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
+    const common::transition::State state)
 {
     for (uint16_t returnId = 0; returnId <= numOfReturns; returnId++) // <= for poping states
     {
@@ -341,21 +304,21 @@ void Converter::addReturnProjections(
         if (stackSymbol == symbol::StackSymbol::BOTTOM)
         {
             cfg::NonTerminal nonTerminal1{
-                cfg::Calculator::makeNonTerminal(returnT[returnSymbol], stackSymbol, state2)};
+                cfg::Calculator::makeNonTerminal(returnT[returnSymbol], stackSymbol, state)};
 
             insertNonTerminalIfNeeded(nonTerminal1);
 
             cfg->addProjection(
                 nonTerminal, cfg::Calculator::convertSymbolToTerminal(returnSymbol), nonTerminal1,
-                std::nullopt);
+                cfg::NonTerminal::INVALID);
         }
         else
         {
-            if (returnT[returnSymbol] == state2)
+            if (returnT[returnSymbol] == state)
             {
                 cfg->addProjection(
                     nonTerminal, cfg::Calculator::convertSymbolToTerminal(returnSymbol),
-                    std::nullopt, std::nullopt);
+                    cfg::NonTerminal::INVALID, cfg::NonTerminal::INVALID);
             }
         }
     }
@@ -363,21 +326,21 @@ void Converter::addReturnProjections(
 
 void Converter::addLocalProjections(
     const common::transition::State (&localT)[utils::MaxNumOfLetters],
-    const cfg::NonTerminal nonTerminal, const common::transition::State state,
-    const common::symbol::StackSymbol stackSymbol, const common::transition::State state2)
+    const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
+    const common::transition::State state)
 {
     for (uint16_t localId = 0; localId < numOfLocals; localId++)
     {
         common::symbol::LocalSymbol localSymbol{localId};
 
         const cfg::NonTerminal nonTerminal1{
-            cfg::Calculator::makeNonTerminal(localT[localSymbol], stackSymbol, state2)};
+            cfg::Calculator::makeNonTerminal(localT[localSymbol], stackSymbol, state)};
 
         insertNonTerminalIfNeeded(nonTerminal1);
 
         cfg->addProjection(
             nonTerminal, cfg::Calculator::convertSymbolToTerminal(localSymbol), nonTerminal1,
-            std::nullopt);
+            cfg::NonTerminal::INVALID);
     }
 }
 
@@ -392,19 +355,20 @@ void Converter::addCommonProjections(const VPA &vpa)
             const auto nonTerminal{cfg::Calculator::makeNonTerminal(
                 vpa.initialState, symbol::StackSymbol::BOTTOM, state)};
 
-            if (seenNonTerminals.insert(nonTerminal).second)
-            {
-                nonTerminalsQueue.push(nonTerminal);
-            }
+            insertNonTerminalIfNeeded(nonTerminal);
 
-            cfg->addProjection(cfg::NonTerminal::START, std::nullopt, nonTerminal, std::nullopt);
+            cfg->addProjection(
+                cfg::NonTerminal::START, cfg::Terminal::INVALID, nonTerminal,
+                cfg::NonTerminal::INVALID);
 
             for (uint16_t stackSymbol = 0; stackSymbol < combinedVpaNumOfStackSymbols;
                  stackSymbol++)
             {
                 symbol::StackSymbol ss{stackSymbol};
                 cfg::NonTerminal nonTerminal{cfg::Calculator::makeNonTerminal(state, ss, state)};
-                cfg->addProjection(nonTerminal, std::nullopt, std::nullopt, std::nullopt);
+                cfg->addProjection(
+                    nonTerminal, cfg::Terminal::INVALID, cfg::NonTerminal::INVALID,
+                    cfg::NonTerminal::INVALID);
             }
         }
     }

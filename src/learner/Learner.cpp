@@ -16,12 +16,12 @@ Learner::Learner(
                 numOfReturns, numOfLocals, numOfStackSymbols},
       srsChecker{selectors, testWords, srs, teacher}
 {
-    setInitialWord();
+    setInitialState();
 };
 
 std::shared_ptr<common::VPA> Learner::run()
 {
-    TIME_MARKER("Learner::run");
+    TIME_MARKER("[Learner]: Learner::run");
     std::shared_ptr<common::Word> counterExample;
 
     IMP("[Learner]: Learner running");
@@ -37,7 +37,7 @@ std::shared_ptr<common::VPA> Learner::run()
 
         if (counterExample->empty())
         {
-            IMP("[Learner]: VPA found");
+            IMP("[Learner]: VPA found numOfStates: %u", hypothesis->getNumOfStates());
             return hypothesis;
         }
 
@@ -62,7 +62,7 @@ std::shared_ptr<common::VPA> Learner::run()
 
 void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
 {
-    TIME_MARKER("handleCounterExample");
+    TIME_MARKER("[Learner]: handleCounterExample");
     std::cout << "\033[32m[Learner]: CounterExample: " << *counterExample << "\033[0m" << std::endl;
 
     for (uint16_t i = 0; i < counterExample->size(); i++)
@@ -89,7 +89,8 @@ void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
         }
     }
 
-    ERR("Counter example partition not found membershipQuery()=%d, hypothesis->checkWord()=%d",
+    ERR("[Learner]: Counter example partition not found membershipQuery()=%d, "
+        "hypothesis->checkWord()=%d",
         oracle.membershipQuery(*counterExample), hypothesis->checkWord(*counterExample));
     exit(1);
 }
@@ -130,7 +131,7 @@ void Learner::handleStackContentDiverges(
         }
     }
 
-    ERR("Word partition in handleStackContentDiverges not found!");
+    ERR("[Learner]: Word partition in handleStackContentDiverges not found!");
     exit(2);
 }
 

@@ -69,17 +69,17 @@ void Tester::runSupervisedTest()
         testOutput(res.hyp);
         break;
     case RunResultKind::Timeout:
-        ERR("TIMEOUT after %ld ms", res.elapsed.count());
+        ERR("[Tester]: TIMEOUT after %ld ms", res.elapsed.count());
         numOfHangouts++;
         saveFailedTestData("HANGOUT DETECTED!");
         break;
     case RunResultKind::ChildError:
-        ERR("Child exited early, after %ld ms", res.elapsed.count());
+        ERR("[Tester]: Child exited early, after %ld ms", res.elapsed.count());
         numOfChildErrors++;
         saveFailedTestData("CHILD ERROR!");
         break;
     case RunResultKind::HandleStackContentDiverages:
-        ERR("ERROR in StackContentDiverages, after %ld ms", res.elapsed.count());
+        ERR("[Tester]: ERROR in StackContentDiverages, after %ld ms", res.elapsed.count());
         numOfErrInHandleStackContent++;
         saveFailedTestData("StackContentDiverages ERROR!");
         break;
@@ -168,7 +168,7 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
 
     for (uint16_t i = 0; i < length; i++)
     {
-        uint16_t symbol{static_cast<uint16_t>(rand() % 3)};
+        uint8_t symbol{static_cast<uint8_t>(rand() % 3)};
 
         switch (symbol)
         {
@@ -194,7 +194,7 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
             }
             break;
         default:
-            ERR("Can not generate random word");
+            ERR("[Tester]: Can not generate random word");
         }
     }
 
@@ -203,10 +203,10 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
 
 void Tester::testOutput(const std::shared_ptr<common::VPA> hypothesis)
 {
-    TIME_MARKER("testOutput");
+    TIME_MARKER("[Tester]: testOutput");
     if (not generator->generatorSpecificCheck(hypothesis))
     {
-        ERR("Generator specific check failed!");
+        ERR("[Tester]: Generator specific check failed!");
         numOfGeneratorCheckFailed++;
         saveTestData(hypothesis, "GENERATOR SPECIFIC CHECK FAILED");
         return;
@@ -253,9 +253,9 @@ void Tester::setOutputFile()
         directoryPath + "output_" + std::to_string(numOfExecutedTests) + ".txt";
     outputFile.open(outputFilePath);
 
-    if (!outputFile)
+    if (not outputFile)
     {
-        ERR("Could not create file!");
+        ERR("[Tester]: Could not create file!");
         exit(1);
     }
 }

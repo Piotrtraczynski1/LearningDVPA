@@ -4,7 +4,8 @@
 
 namespace teacher::cfg
 {
-enum Terminal : uint64_t
+enum class Terminal : uint32_t
 {
+    INVALID = 0xffffffff
 };
 } // namespace teacher::cfg

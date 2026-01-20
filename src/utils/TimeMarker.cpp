@@ -1,3 +1,6 @@
+#include <iomanip>
+#include <iostream>
+
 #include "utils/TimeMarker.hpp"
 
 std::unordered_map<std::string, MarkerInfo> MeasurementDataBase::markers;
@@ -23,10 +26,12 @@ void MeasurementDataBase::printInfo()
         auto seconds = micros / (1000 * 1000);
         micros %= (1000 * 1000);
         auto millis = micros / 1000;
-        std::cout << "Marker " << marker.first << ", total duration: " << minutes << "m:" << seconds
-                  << "s:" << millis << "ms"
-                  << " (" << marker.second.time << " [micro])"
-                  << " , total executions: " << marker.second.executions << "\n";
+
+        std::cout << "Marker " << std::left << std::setw(40) << marker.first << " | " << std::right
+                  << std::setw(4) << minutes << "m:" << std::setw(3) << seconds
+                  << "s:" << std::setw(4) << millis << "ms"
+                  << " | " << std::setw(12) << marker.second.time << " us"
+                  << " | total executions: " << std::setw(10) << marker.second.executions << "\n";
     }
     std::cout << "===================================================\n";
 }

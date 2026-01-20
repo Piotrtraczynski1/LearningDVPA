@@ -47,7 +47,7 @@ Teacher::equivalenceQuery(const std::shared_ptr<common::VPA> hypothesis) const
         }
     }
 
-    ERR("CFG output is incorrect!");
+    ERR("[Teacher]: CFG output is incorrect!");
     std::cout << *output << ", vpa: " << vpa->checkWord(*output)
               << ", hypothesis: " << hypothesis->checkWord(*output)
               << ", combined: " << combinedVpa.checkWord(*output) << std::endl;

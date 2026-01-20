@@ -44,7 +44,7 @@ private:
     handleSuffixesMismatch(const common::Word &v, const common::Word &a, const common::Word &w);
     void addNewSelectorIfNeeded(const common::Word &selector);
 
-    void setInitialWord()
+    void setInitialState()
     {
         auto isAccepting{oracle.membershipQuery(common::Word{})};
         selectors->addSelector(common::Word{}, isAccepting);

@@ -9,7 +9,7 @@
 
 namespace
 {
-constexpr uint16_t numOfTests{20};
+constexpr uint16_t numOfTests{1000};
 }
 
 void runRandomGenerator()
@@ -40,7 +40,7 @@ int main()
 {
     // std::srand(std::time(0));
     std::srand(1);
-    runeCDAGenerator();
+    runRandomGenerator();
 
     return 0;
 }

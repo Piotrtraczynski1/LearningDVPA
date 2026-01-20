@@ -27,7 +27,7 @@ class AutomataGenerator
 
     common::transition::Transition transition;
 
-    common::Word witnesses[utils::MaxNumOfAutomatonStates] = {};
+    common::Word witnesses[utils::MaxNumOfAutomatonStates + 1] = {};
 
 public:
     AutomataGenerator(

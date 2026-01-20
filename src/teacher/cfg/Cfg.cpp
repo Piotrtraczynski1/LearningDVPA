@@ -1,103 +1,174 @@
 #include "teacher/cfg/Cfg.hpp"
 #include "common/Word.hpp"
-#include "teacher/cfg/Calculator.hpp"
+#include "utils/Constants.hpp"
 #include "utils/TimeMarker.hpp"
 #include "utils/log.hpp"
 
 namespace teacher::cfg
 {
+Cfg::Cfg()
+{
+    nonTerminalIndexes.reset(new uint32_t[utils::MaxNumOfNonTerminals]());
+    insertDummyElements();
+}
+
 Cfg::Cfg(const size_t estimatedNumberOfProjections, const size_t estimatedNumberOfNonTerminals)
 {
-    projections.reserve(estimatedNumberOfProjections);
-    unresolved.reserve(estimatedNumberOfProjections);
+    unresolvedNonTerminalsPerProj.reserve(estimatedNumberOfProjections);
+    nonTerminalIndexPerProj.reserve(estimatedNumberOfProjections);
+    firstNonTerminalPerProj.reserve(estimatedNumberOfProjections);
+    secondNonTerminalPerProj.reserve(estimatedNumberOfProjections);
+    terminalValuePerProj.reserve(estimatedNumberOfProjections);
 
-    uses.reserve(estimatedNumberOfNonTerminals);
-    gen.reserve(estimatedNumberOfNonTerminals);
+    nonTerminalIndexes.reset(new uint32_t[utils::MaxNumOfNonTerminals]());
+    generativeNonTerminalsQueue.reserve(estimatedNumberOfNonTerminals);
+    isGenerative.reserve(estimatedNumberOfNonTerminals);
     witnesses.reserve(estimatedNumberOfNonTerminals);
-    nonTerminalIndexes.reserve(estimatedNumberOfNonTerminals);
+    numOfParentProjections.reserve(estimatedNumberOfNonTerminals);
+
+    insertDummyElements();
+}
+
+void Cfg::insertDummyElements()
+{
+    isGenerative.push_back(false);
+    witnesses.push_back(Witness{});
+    numOfParentProjections.push_back(0);
 }
 
 void Cfg::addProjection(
-    NonTerminal nonTerminal, std::optional<Terminal> terminal, std::optional<NonTerminal> n1,
-    std::optional<NonTerminal> n2)
+    const NonTerminal nonTerminal, const Terminal terminal, const NonTerminal n1,
+    const NonTerminal n2)
 {
-    projections.emplace_back(nonTerminal, terminal, n1, n2);
-
     const auto nonTerminalId = setNonTerminalIndex(nonTerminal);
+    nonTerminalIndexPerProj.push_back(nonTerminalId);
 
     uint8_t deps{0};
-    if (n1.has_value())
+    uint32_t n1Index{unknownIndex};
+    if (n1 != NonTerminal::INVALID)
     {
-        uses[setNonTerminalIndex(n1.value())].push_back(numOfProjections);
+        n1Index = setNonTerminalIndex(n1);
+        numOfParentProjections[n1Index]++;
         deps++;
     }
-    if (n2.has_value())
+    uint32_t n2Index{unknownIndex};
+    if (n2 != NonTerminal::INVALID)
     {
-        uses[setNonTerminalIndex(n2.value())].push_back(numOfProjections);
+        n2Index = setNonTerminalIndex(n2);
+        numOfParentProjections[n2Index]++;
         deps++;
     }
 
-    unresolved.push_back(deps);
+    firstNonTerminalPerProj.push_back(n1Index);
+    secondNonTerminalPerProj.push_back(n2Index);
+    terminalValuePerProj.push_back(terminal);
+    unresolvedNonTerminalsPerProj.push_back(deps);
 
-    if (deps == 0 and not gen[nonTerminalId])
+    if (deps == 0 and not isGenerative[nonTerminalId])
     {
-        gen[nonTerminalId] = true;
-        witnesses[nonTerminalId] = numOfProjections;
-        que.push(nonTerminalId);
+        isGenerative[nonTerminalId] = true;
+        witnesses[nonTerminalId] = {.terminal = terminal, .n1Index = n1Index, .n2Index = n2Index};
+        generativeNonTerminalsQueue.push_back(nonTerminalId);
     }
+
     numOfProjections++;
+
+    if (numOfProjections == unknownIndex)
+    {
+        ERR("[CFG]: Too many projections!");
+        exit(1);
+    }
 }
 
-uint64_t Cfg::setNonTerminalIndex(const NonTerminal nonTerminal)
+uint32_t Cfg::setNonTerminalIndex(const NonTerminal nonTerminal)
 {
-    auto it = nonTerminalIndexes.find(nonTerminal);
-    if (it != nonTerminalIndexes.end())
+    uint32_t &nonTerminalIndex = nonTerminalIndexes[static_cast<uint32_t>(nonTerminal)];
+
+    if (nonTerminalIndex != 0)
     {
-        return it->second;
+        return nonTerminalIndex;
     }
 
-    const uint64_t nonTerminalId{numOfNonTerminals};
-    numOfNonTerminals++;
+    nonTerminalIndex = numOfNonTerminals++;
+    insertDummyElements();
 
-    nonTerminalIndexes.emplace(nonTerminal, nonTerminalId);
-    gen.push_back(false);
-    witnesses.push_back(0);
-    uses.push_back({});
+    return nonTerminalIndex;
+}
 
-    return nonTerminalId;
+void Cfg::calculateParentProjections()
+{
+    TIME_MARKER("[CFG]: calculateParentProjections");
+
+    parentProjectionsOffsets.resize(numOfNonTerminals + 1);
+    parentProjectionsOffsets[0] = 0;
+
+    for (uint32_t i = 0; i < numOfNonTerminals; i++)
+    {
+        const uint64_t next = static_cast<uint64_t>(parentProjectionsOffsets[i]) +
+                              static_cast<uint64_t>(numOfParentProjections[i]);
+        parentProjectionsOffsets[i + 1] = next;
+    }
+
+    std::vector<uint32_t>().swap(numOfParentProjections);
+
+    parentProjections.assign(static_cast<size_t>(parentProjectionsOffsets[numOfNonTerminals]), 0);
+
+    std::vector<uint64_t> cursor{};
+    cursor.assign(parentProjectionsOffsets.begin(), parentProjectionsOffsets.end());
+
+    for (uint32_t proj = 0; proj < numOfProjections; proj++)
+    {
+        const uint32_t a = firstNonTerminalPerProj[proj];
+        if (a != unknownIndex)
+        {
+            parentProjections[static_cast<size_t>(cursor[a]++)] = proj;
+        }
+
+        const uint32_t b = secondNonTerminalPerProj[proj];
+        if (b != unknownIndex)
+        {
+            parentProjections[static_cast<size_t>(cursor[b]++)] = proj;
+        }
+    }
 }
 
 std::shared_ptr<Cfg::OutputType> Cfg::isEmpty()
 {
-    TIME_MARKER("CFG.isEmpty()");
+    TIME_MARKER("[CFG]: isEmpty");
     LOG("[CFG]: checking emptiness of CFG");
 
-    if (nonTerminalIndexes.count(NonTerminal::START) == 0)
-        return std::make_shared<OutputType>(std::nullopt);
+    calculateParentProjections();
 
-    while (not que.empty())
+    uint32_t queHead{0};
+    while (queHead < generativeNonTerminalsQueue.size())
     {
-        uint64_t id{que.front()};
-        que.pop();
-        for (uint64_t projection : uses[id])
+        uint32_t nonTerminal{generativeNonTerminalsQueue[queHead]};
+        queHead++;
+        for (uint64_t it = parentProjectionsOffsets[nonTerminal];
+             it < parentProjectionsOffsets[nonTerminal + 1]; it++)
         {
-            unresolved[projection]--;
-            if (unresolved[projection] == 0)
+            const uint32_t projection = parentProjections[it];
+            if (--unresolvedNonTerminalsPerProj[projection] == 0)
             {
-                uint64_t nonTerminalIndex = nonTerminalIndexes[projections[projection].arg];
-                if (!gen[nonTerminalIndex])
+                uint32_t nonTerminalIndex = nonTerminalIndexPerProj[projection];
+                if (not isGenerative[nonTerminalIndex])
                 {
-                    gen[nonTerminalIndex] = 1;
-                    witnesses[nonTerminalIndex] = projection;
-                    que.push(nonTerminalIndex);
+                    isGenerative[nonTerminalIndex] = true;
+                    witnesses[nonTerminalIndex] = {
+                        .terminal = terminalValuePerProj[projection],
+                        .n1Index = firstNonTerminalPerProj[projection],
+                        .n2Index = secondNonTerminalPerProj[projection]};
+                    generativeNonTerminalsQueue.push_back(nonTerminalIndex);
                 }
             }
         }
     }
 
-    uint64_t S = nonTerminalIndexes[NonTerminal::START];
-    if (!gen[S])
+    uint32_t S = nonTerminalIndexes[static_cast<uint32_t>(NonTerminal::START)];
+    if (not isGenerative[S])
+    {
         return std::make_shared<OutputType>(std::nullopt);
+    }
 
     std::vector<Terminal> example{};
     buildExample(example, S);
@@ -105,78 +176,20 @@ std::shared_ptr<Cfg::OutputType> Cfg::isEmpty()
     return std::make_shared<OutputType>(example);
 }
 
-namespace
+void Cfg::buildExample(std::vector<Terminal> &example, const uint32_t id)
 {
-std::ostream &operator<<(std::ostream &os, const std::optional<cfg::Terminal> &opt)
-{
-    if (opt.has_value())
+    const Witness &witness = witnesses[id];
+    if (witness.terminal != Terminal::INVALID)
     {
-        os << Calculator::convertTerminalToSymbol(opt.value());
-        return os;
+        example.push_back(witness.terminal);
     }
-
-    os << "null";
-    return os;
-}
-
-void printNonTerminal(std::ostream &os, cfg::NonTerminal nt)
-{
-    if (nt == cfg::NonTerminal::START)
+    if (witness.n1Index != unknownIndex)
     {
-        os << "{START}";
-        return;
+        buildExample(example, witness.n1Index);
     }
-    uint64_t q1 = (nt / (1ULL << 34)) - 1;
-    uint64_t sId = ((nt % (1ULL << 34)) / (1ULL << 17)) - 1;
-    uint64_t q2 = (nt % (1ULL << 17)) - 1;
-
-    os << "{q1=" << q1 << ", sId=" << sId << ", q2=" << q2 << "}";
-}
-
-std::ostream &operator<<(std::ostream &os, const std::optional<cfg::NonTerminal> &opt)
-{
-    if (opt.has_value())
+    if (witness.n2Index != unknownIndex)
     {
-        printNonTerminal(os, opt.value());
-        return os;
-    }
-
-    os << "null";
-    return os;
-}
-
-std::ostream &operator<<(std::ostream &os, const cfg::NonTerminal &nt)
-{
-    printNonTerminal(os, nt);
-    return os;
-}
-} // namespace
-
-void Cfg::buildExample(std::vector<Terminal> &example, const uint64_t id)
-{
-    const uint64_t projectionId = witnesses[id];
-    const auto &pr = projections[projectionId];
-    if (pr.terminal.has_value())
-    {
-        example.push_back(pr.terminal.value());
-    }
-    if (pr.n1.has_value())
-    {
-        buildExample(example, nonTerminalIndexes[pr.n1.value()]);
-    }
-    if (pr.n2.has_value())
-    {
-        buildExample(example, nonTerminalIndexes[pr.n2.value()]);
-    }
-}
-
-void Cfg::print(std::ostream &os)
-{
-    for (const auto &projection : projections)
-    {
-        os << "=== NonTerminal: " << projection.arg << std::endl;
-        os << "coArgu: terminal = " << projection.terminal << ", n1 = " << projection.n1
-           << ", n2 = " << projection.n2 << std::endl;
+        buildExample(example, witness.n2Index);
     }
 }
 } // namespace teacher::cfg

@@ -13,8 +13,8 @@ namespace learner
 class Selectors
 {
     uint16_t numOfSelectors{0};
-    common::Word selectors[utils::MaxNumOfAutomatonStates] = {};
-    common::transition::State states[utils::MaxNumOfAutomatonStates] = {};
+    common::Word selectors[utils::MaxNumOfAutomatonStates + 1] = {};
+    common::transition::State states[utils::MaxNumOfAutomatonStates + 1] = {};
     std::vector<uint16_t> acceptingWords{};
 
 public:

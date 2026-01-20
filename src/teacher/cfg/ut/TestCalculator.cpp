@@ -2,6 +2,7 @@
 
 #include "common/Stack.cpp"
 #include "common/Word.cpp"
+#include "utils/Constants.hpp"
 
 #include "teacher/cfg/Calculator.cpp"
 
@@ -21,11 +22,16 @@ std::vector<Terminal> convertWordToTerminals(common::Word &word)
 
 TEST(Calculator, convertCfgOutputToWord)
 {
-    common::Word word{common::symbol::CallSymbol{0},      common::symbol::CallSymbol{623},
-                      common::symbol::CallSymbol{0xffff}, common::symbol::ReturnSymbol{0},
-                      common::symbol::ReturnSymbol{42},   common::symbol::ReturnSymbol{0xffff},
-                      common::symbol::LocalSymbol{0},     common::symbol::LocalSymbol{1623},
-                      common::symbol::LocalSymbol{0xffff}};
+    common::Word word{
+        common::symbol::CallSymbol{0},
+        common::symbol::CallSymbol{5},
+        common::symbol::CallSymbol{utils::MaxNumOfLetters},
+        common::symbol::ReturnSymbol{0},
+        common::symbol::ReturnSymbol{3},
+        common::symbol::ReturnSymbol{utils::MaxNumOfLetters},
+        common::symbol::LocalSymbol{0},
+        common::symbol::LocalSymbol{utils::MaxNumOfLetters},
+        common::symbol::LocalSymbol{8}};
     std::optional<std::vector<Terminal>> cfgOutput{convertWordToTerminals(word)};
     EXPECT_EQ(word, *convertCfgOutputToWord(cfgOutput));
 }

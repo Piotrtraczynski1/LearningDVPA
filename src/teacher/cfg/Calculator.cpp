@@ -3,41 +3,50 @@
 #include <vector>
 
 #include "teacher/cfg/Calculator.hpp"
+#include "utils/Constants.hpp"
+#include "utils/log.hpp"
 
 namespace teacher::cfg::Calculator
 {
 
 namespace
 {
-constexpr uint64_t minCallSymbol = 1ULL << 34;
-constexpr uint64_t minRetrunSymbl = 1ULL << 17;
+constexpr uint32_t maxNumOfLetters{utils::MaxNumOfLetters + 2};
 } // namespace
 
 NonTerminal makeNonTerminal(
     const common::transition::State q1, const common::symbol::StackSymbol s,
     const common::transition::State q2)
 {
-    const uint64_t firstStateId = static_cast<uint64_t>(q1 + 1) << 34;
-    const uint64_t stackId = static_cast<uint64_t>(s + 1) << 17;
-    const uint64_t secondStateId = static_cast<uint64_t>(q2 + 1);
+    return NonTerminal{static_cast<uint32_t>((q1 * utils::S + s) * utils::Q + q2)};
+}
 
-    return cfg::NonTerminal{firstStateId + stackId + secondStateId};
+std::tuple<common::transition::State, common::symbol::StackSymbol, common::transition::State>
+decodeNonTerminal(const NonTerminal nt)
+{
+    const uint32_t id = static_cast<uint32_t>(nt);
+    const uint32_t tmp{id / utils::Q};
+
+    return {
+        common::transition::State{static_cast<uint16_t>(tmp / utils::S)},
+        common::symbol::StackSymbol{static_cast<uint16_t>(tmp % utils::S)},
+        common::transition::State{static_cast<uint16_t>(id % utils::Q)}};
 }
 
 common::Symbol convertTerminalToSymbol(const Terminal terminal)
 {
-    uint64_t val = static_cast<uint64_t>(terminal);
-    if (val >= minCallSymbol)
+    uint32_t val = static_cast<uint32_t>(terminal);
+    if (val >= maxNumOfLetters * maxNumOfLetters)
     {
-        val = (val >> 34) - 1;
-        return common::symbol::CallSymbol{static_cast<uint16_t>(val)};
+        val /= maxNumOfLetters * maxNumOfLetters;
+        return common::symbol::CallSymbol{static_cast<uint16_t>(val - 1)};
     }
-    if (val >= minRetrunSymbl)
+    if (val >= maxNumOfLetters)
     {
-        val = (val >> 17) - 1;
-        return common::symbol::ReturnSymbol{static_cast<uint16_t>(val)};
+        val /= maxNumOfLetters;
+        return common::symbol::ReturnSymbol{static_cast<uint16_t>(val - 1)};
     }
-    return common::symbol::LocalSymbol{static_cast<uint16_t>(val - 1)};
+    return common::symbol::LocalSymbol{static_cast<uint16_t>(val)};
 }
 
 Terminal convertSymbolToTerminal(const common::Symbol symbol)
@@ -47,25 +56,26 @@ Terminal convertSymbolToTerminal(const common::Symbol symbol)
     case 0:
     {
         auto callSymbol = std::get<common::symbol::CallSymbol>(symbol);
-        uint64_t terminal = static_cast<uint64_t>(callSymbol + 1) << 34;
+        uint32_t terminal =
+            static_cast<uint32_t>((callSymbol + 1) * maxNumOfLetters * maxNumOfLetters);
         return cfg::Terminal{terminal};
     }
     case 1:
     {
         auto returnSymbol = std::get<common::symbol::ReturnSymbol>(symbol);
-        uint64_t terminal = static_cast<uint64_t>(returnSymbol + 1) << 17;
+        uint32_t terminal = static_cast<uint32_t>((returnSymbol + 1) * maxNumOfLetters);
         return cfg::Terminal{terminal};
     }
     case 2:
     {
         auto localSymbol = std::get<common::symbol::LocalSymbol>(symbol);
-        uint64_t terminal = static_cast<uint64_t>(localSymbol + 1);
+        uint32_t terminal = static_cast<uint32_t>(localSymbol);
         return cfg::Terminal{terminal};
     }
     default:
     {
-        throw std::invalid_argument("Tring to conver control word");
-        return cfg::Terminal{0};
+        ERR("[Calculator]: Tring to convert control word");
+        return cfg::Terminal::INVALID;
     }
     }
 }
