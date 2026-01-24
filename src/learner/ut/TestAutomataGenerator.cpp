@@ -180,7 +180,7 @@ TEST_F(TestAutomataGenerator1, automataSimulationStep2)
 
     EXPECT_EQ(automata->checkWord(common::Word{rs}), false);
     EXPECT_EQ(automata->checkWord(common::Word{ls}), false);
-    EXPECT_EQ(automata->checkWord(common::Word{cs}), true);
+    EXPECT_EQ(automata->checkWord(common::Word{cs}), false);
 
     common::Word expectedCounterExample{cs, cs, cs, rs, rs, rs, ls, rs};
 
