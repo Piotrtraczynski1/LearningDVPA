@@ -1,0 +1,14 @@
+name: Test Project
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: |
+          chmod +x ./build.sh
+          ./build.sh test
