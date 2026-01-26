@@ -43,20 +43,18 @@ std::shared_ptr<common::VPA> Learner::run()
 
         handleCounterExample(counterExample);
 
-        /*
-        std::cout << "========== SELECTORS =============\n";
-        for (uint16_t it = 0; it < selectors->size(); it++)
-        {
-            std::cout << it << ": " << (*selectors)[it] << "\n";
-        }
-        std::cout << "==================================\n";
-        std::cout << "========= TEST WRODS =============\n";
-        for (uint16_t it = 0; it < testWords->size(); it++)
-        {
-            std::cout << it << ": " << (*testWords)[it] << "\n";
-        }
-        std::cout << "==================================\n";
-        */
+        // std::cout << "========== SELECTORS =============\n";
+        // for (uint16_t it = 0; it < selectors->size(); it++)
+        // {
+        //     std::cout << it << ": " << (*selectors)[it] << "\n";
+        // }
+        // std::cout << "==================================\n";
+        // std::cout << "========= TEST WRODS =============\n";
+        // for (uint16_t it = 0; it < testWords->size(); it++)
+        // {
+        //     std::cout << it << ": " << (*testWords)[it] << "\n";
+        // }
+        // std::cout << "==================================\n";
     }
 }
 
@@ -98,8 +96,8 @@ void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
 void Learner::handleSuffixesMismatch(
     const common::Word &v, const common::Word &a, const common::Word &w)
 {
-    testWords->addWord(common::Word{oracle.stackContentQuery(v + a)} + w);
     addNewSelectorIfNeeded(v + a);
+    testWords->addWord(common::Word{oracle.stackContentQuery(v + a)} + w);
 }
 
 void Learner::handleStackContentDiverges(
@@ -125,8 +123,8 @@ void Learner::handleStackContentDiverges(
         {
             common::symbol::StackSymbol bPrime{oracle.stackContentQuery(v1).top()}; // not needed
 
-            testWords->addWord(suffix);
             addNewSelectorIfNeeded(v1 + b);
+            testWords->addWord(suffix);
             return;
         }
     }

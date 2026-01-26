@@ -39,7 +39,14 @@ size_t Stack::size() const
 
 std::ostream &operator<<(std::ostream &os, const Stack &stack)
 {
-    os << "{.size = " << stack.size() << " .top() = " << stack.top() << "}";
+    Stack copy{stack};
+    os << "{";
+    while (copy.size() > 0)
+    {
+        os << copy.top() << ", ";
+        copy.pop();
+    }
+    os << "}";
     return os;
 }
 

@@ -29,6 +29,8 @@ class AutomataGenerator
 
     common::Word witnesses[utils::MaxNumOfAutomatonStates + 1] = {};
 
+    common::transition::State epsilonState{0};
+
 public:
     AutomataGenerator(
         teacher::Teacher &oracle, std::shared_ptr<Selectors> selectors,

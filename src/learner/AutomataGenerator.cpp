@@ -10,6 +10,8 @@ std::shared_ptr<common::VPA> AutomataGenerator::generate()
     TIME_MARKER("[AutomataGenerator]: generateAutomaton");
     LOG("[AutomataGenerator]: Generating Automaton");
 
+    epsilonState = common::transition::State(rand() % selectors->size());
+
     clearGenerator();
     buildTransition();
 
@@ -88,7 +90,10 @@ void AutomataGenerator::considerReturn(
     {
         if (not isConfigurationAchievable(selectorIndex, common::symbol::StackSymbol{stackIndex}))
         {
-            successor = 0; // all undefined transitions are directed to the first state
+            // TODO [workaround] It seems that always redirecting to the initial state may cause
+            // the algorithm to enter an infinite loop when a newly added test word should restrict
+            // this transition from state s to s' where s' is the initial state.
+            successor = epsilonState; // all undefined transitions are directed to the first state
         }
         else
         {

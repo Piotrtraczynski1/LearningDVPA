@@ -51,6 +51,11 @@ bool VPA::checkWord(const Word &word)
         {
             state = sink;
         }
+        if (stack.top() == common::symbol::StackSymbol::INVALID)
+        {
+            stack.pop();
+            stack.push(common::symbol::StackSymbol{1}); // TODO
+        }
     }
 
     return acceptingStates[state];

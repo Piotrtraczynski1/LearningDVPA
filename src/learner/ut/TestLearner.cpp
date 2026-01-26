@@ -208,6 +208,9 @@ TEST_F(TestLearner2, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLaearner0 : public TestLearner
@@ -253,6 +256,9 @@ TEST_F(TestLaearner0, automaton0)
 
     common::Word ce;
     EXPECT_TRUE(equalUpTo(result, 9, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(result->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << result->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLaearner1 : public TestLearner
@@ -300,6 +306,9 @@ TEST_F(TestLaearner1, automaton1)
 
     common::Word ce;
     EXPECT_TRUE(equalUpTo(result, 9, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(result->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << result->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearnerBalanced : public TestLearner
@@ -339,6 +348,9 @@ TEST_F(TestLearnerBalanced, learnsBalancedUpToLen6)
     common::Word test{rs, rs, rs, rs};
 
     EXPECT_TRUE(equalUpTo(hyp, 8, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner3 : public TestLearner
@@ -389,6 +401,9 @@ TEST_F(TestLearner3, testLearner)
     std::shared_ptr<VPA> hyp{sut->run()};
     common::Word ce{};
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner4 : public TestLearner
@@ -431,6 +446,9 @@ TEST_F(TestLearner4, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner5 : public TestLearner
@@ -473,6 +491,9 @@ TEST_F(TestLearner5, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner6 : public TestLearner
@@ -515,6 +536,9 @@ TEST_F(TestLearner6, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner7 : public TestLearner
@@ -566,6 +590,9 @@ TEST_F(TestLearner7, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner8 : public TestLearner
@@ -650,6 +677,9 @@ TEST_F(TestLearner8, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner9 : public TestLearner
@@ -757,6 +787,9 @@ TEST_F(TestLearner9, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearner10 : public TestLearner
@@ -847,6 +880,9 @@ TEST_F(TestLearner10, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
 
 class TestLearnerWithSrs : public TestLearner
@@ -941,5 +977,297 @@ TEST_F(TestLearnerWithSrs, testLearner)
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
 }
+
+class TestLearner11 : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 4;
+        acceptingStates = std::vector<uint16_t>{0, 1};
+        numOfStackSymbols = 4;
+        numOfCalls = 2;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{3}, StackSymbol{3});
+        transition->add(State{0}, CS{1}, State{3}, StackSymbol{2});
+        transition->add(State{1}, CS{0}, State{1}, StackSymbol{2});
+        transition->add(State{2}, CS{0}, State{0}, StackSymbol{2});
+        transition->add(State{2}, CS{1}, State{2}, StackSymbol{2});
+        transition->add(State{3}, CS{1}, State{2}, StackSymbol{3});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{0}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{3}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{3}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{0});
+        transition->add(State{2}, StackSymbol{3}, RS{0}, State{2});
+        transition->add(State{3}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{3}, StackSymbol{3}, RS{0}, State{3});
+
+        // LocalTransitions:
+        init();
+    }
+};
+
+TEST_F(TestLearner11, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
+
+class TestLearnerInfiniteLoopCompleteAutomaton : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 4;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 4;
+        numOfCalls = 2;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
+        transition->add(State{0}, CS{1}, State{1}, StackSymbol{2});
+        transition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+        transition->add(State{1}, CS{1}, State{1}, StackSymbol{3});
+        transition->add(State{2}, CS{0}, State{2}, StackSymbol{3});
+        transition->add(State{2}, CS{1}, State{1}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{1}, StackSymbol{3}, RS{0}, State{0});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
+
+        // earlier undefined:
+        transition->add(State{0}, StackSymbol{2}, RS{0}, State{3});
+        transition->add(State{0}, StackSymbol{3}, RS{0}, State{3});
+
+        transition->add(State{1}, StackSymbol{3}, RS{0}, State{3});
+
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{3});
+        transition->add(State{2}, StackSymbol{3}, RS{0}, State{3});
+
+        // LocalTransitions:
+        init();
+    }
+};
+
+TEST_F(TestLearnerInfiniteLoopCompleteAutomaton, testLearner)
+{
+    // common::Word word{
+    //     common::symbol::CallSymbol{1}, common::symbol::ReturnSymbol{0},
+    //     common::symbol::CallSymbol{0}, common::symbol::ReturnSymbol{0}};
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
+
+class TestLearnerInfiniteLoop : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 3;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 4;
+        numOfCalls = 2;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
+        transition->add(State{0}, CS{1}, State{1}, StackSymbol{2});
+        transition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+        transition->add(State{1}, CS{1}, State{1}, StackSymbol{3});
+        transition->add(State{2}, CS{0}, State{2}, StackSymbol{3});
+        transition->add(State{2}, CS{1}, State{1}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{1}, StackSymbol{3}, RS{0}, State{0});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
+
+        // LocalTransitions:
+        init();
+    }
+};
+
+TEST_F(TestLearnerInfiniteLoop, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
+
+class TestLearnerTooManyStates : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 4;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 3;
+        numOfCalls = 2;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{2}, StackSymbol{1});
+        transition->add(State{0}, CS{1}, State{0}, StackSymbol{1});
+        transition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+        transition->add(State{1}, CS{1}, State{1}, StackSymbol{1});
+        transition->add(State{2}, CS{0}, State{1}, StackSymbol{1});
+        transition->add(State{2}, CS{1}, State{1}, StackSymbol{1});
+        transition->add(State{3}, CS{0}, State{2}, StackSymbol{2});
+        transition->add(State{3}, CS{1}, State{0}, StackSymbol{2});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{3});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{3}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{3}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{3}, StackSymbol{2}, RS{0}, State{1});
+
+        // LocalTransitions:
+        init();
+    }
+};
+
+TEST_F(TestLearnerTooManyStates, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    // hyp->printUt();
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
+
+class TestLearnerTooManyStates2 : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        // srand(3);
+        // srand(1);
+        numOfStates = 6;
+        acceptingStates = std::vector<uint16_t>{0, 2, 3};
+        numOfStackSymbols = 6;
+        numOfCalls = 2;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{0}, StackSymbol{3});
+        transition->add(State{0}, CS{1}, State{0}, StackSymbol{2});
+        transition->add(State{1}, CS{0}, State{0}, StackSymbol{5});
+        transition->add(State{2}, CS{0}, State{3}, StackSymbol{1});
+        transition->add(State{2}, CS{1}, State{3}, StackSymbol{2});
+        transition->add(State{3}, CS{0}, State{3}, StackSymbol{5});
+        transition->add(State{3}, CS{1}, State{2}, StackSymbol{4});
+        transition->add(State{4}, CS{0}, State{3}, StackSymbol{2});
+        transition->add(State{4}, CS{1}, State{0}, StackSymbol{2});
+        transition->add(State{5}, CS{0}, State{2}, StackSymbol{5});
+        transition->add(State{5}, CS{1}, State{5}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{3}, RS{0}, State{3});
+        transition->add(State{0}, StackSymbol{4}, RS{0}, State{1});
+        transition->add(State{0}, StackSymbol{5}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{2});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{4});
+        transition->add(State{1}, StackSymbol{3}, RS{0}, State{5});
+        transition->add(State{1}, StackSymbol{4}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{5}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{0});
+        transition->add(State{2}, StackSymbol{3}, RS{0}, State{2});
+        transition->add(State{3}, StackSymbol{0}, RS{0}, State{4});
+        transition->add(State{3}, StackSymbol{1}, RS{0}, State{3});
+        transition->add(State{3}, StackSymbol{2}, RS{0}, State{2});
+        transition->add(State{3}, StackSymbol{3}, RS{0}, State{4});
+        transition->add(State{3}, StackSymbol{4}, RS{0}, State{3});
+        transition->add(State{3}, StackSymbol{5}, RS{0}, State{2});
+        transition->add(State{4}, StackSymbol{1}, RS{0}, State{4});
+        transition->add(State{4}, StackSymbol{2}, RS{0}, State{4});
+        transition->add(State{4}, StackSymbol{3}, RS{0}, State{5});
+        transition->add(State{4}, StackSymbol{4}, RS{0}, State{1});
+        transition->add(State{4}, StackSymbol{5}, RS{0}, State{0});
+        transition->add(State{5}, StackSymbol{0}, RS{0}, State{2});
+        transition->add(State{5}, StackSymbol{1}, RS{0}, State{3});
+        transition->add(State{5}, StackSymbol{2}, RS{0}, State{3});
+        transition->add(State{5}, StackSymbol{3}, RS{0}, State{1});
+
+        // LocalTransitions:
+        init();
+    }
+};
+/* TODO */
+/*
+TEST_F(TestLearnerTooManyStates2, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    // hyp->printUt();
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}*/
 } // namespace learner

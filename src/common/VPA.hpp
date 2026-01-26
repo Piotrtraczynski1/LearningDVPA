@@ -59,7 +59,13 @@ public:
     void printUt(std::ostream &os = std::cout) const
     {
         os << "numOfStates = " << numOfStates << ";\n";
-        os << "acceptingStates = std::vector<uint16_t>{};\n";
+        os << "acceptingStates = std::vector<uint16_t>{";
+        for (int i = 0; i < utils::MaxNumOfCombinedAutomatonStates; i++)
+        {
+            if (acceptingStates[i])
+                os << ", " << i;
+        }
+        os << "};\n";
         os << "numOfStackSymbols = ;\n";
         os << "numOfCalls = ;\n";
         os << "numOfReturns = ;\n";
