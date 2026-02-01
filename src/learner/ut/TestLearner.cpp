@@ -1256,18 +1256,15 @@ public:
         init();
     }
 };
-/* TODO */
-/*
+
 TEST_F(TestLearnerTooManyStates2, testLearner)
 {
     std::shared_ptr<VPA> hyp{sut->run()};
     common::Word ce{};
 
-    // hyp->printUt();
-
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
     EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
         << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
         << vpa->getNumOfStates() + 1;
-}*/
+}
 } // namespace learner

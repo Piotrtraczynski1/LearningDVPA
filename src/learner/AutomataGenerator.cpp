@@ -10,8 +10,6 @@ std::shared_ptr<common::VPA> AutomataGenerator::generate()
     TIME_MARKER("[AutomataGenerator]: generateAutomaton");
     LOG("[AutomataGenerator]: Generating Automaton");
 
-    epsilonState = common::transition::State(rand() % selectors->size());
-
     clearGenerator();
     buildTransition();
 
@@ -22,6 +20,7 @@ std::shared_ptr<common::VPA> AutomataGenerator::generate()
 void AutomataGenerator::clearGenerator()
 {
     transition.clear();
+    std::fill(&witnesses[0], &witnesses[0] + utils::MaxNumOfAutomatonStates + 1, common::Word{});
 }
 
 void AutomataGenerator::buildTransition()
@@ -81,22 +80,19 @@ void AutomataGenerator::considerLocal(const uint16_t selectorIndex, const uint16
 void AutomataGenerator::considerReturn(
     const uint16_t selectorIndex, const uint16_t symbolIndex, const uint16_t stackIndex)
 {
-    common::Word candidate{(*selectors)[selectorIndex]};
-    candidate += common::Word{common::symbol::ReturnSymbol{symbolIndex}};
-
     uint16_t successor{findEquivalentSelector(selectorIndex, stackIndex, symbolIndex)};
 
     if (successor == Selectors::INVALID_INDEX)
     {
         if (not isConfigurationAchievable(selectorIndex, common::symbol::StackSymbol{stackIndex}))
         {
-            // TODO [workaround] It seems that always redirecting to the initial state may cause
-            // the algorithm to enter an infinite loop when a newly added test word should restrict
-            // this transition from state s to s' where s' is the initial state.
-            successor = epsilonState; // all undefined transitions are directed to the first state
+            successor = forcedSelector[selectorIndex][stackIndex][symbolIndex];
         }
         else
         {
+            common::Word candidate{(*selectors)[selectorIndex]};
+            candidate += common::Word{common::symbol::ReturnSymbol{symbolIndex}};
+
             successor = addSelector(candidate);
         }
     }
@@ -120,12 +116,21 @@ uint16_t AutomataGenerator::findOrAddSuccessor(const common::Word &candidate)
     return successor;
 }
 
+void AutomataGenerator::addForcedSelector(
+    const uint16_t selectorIdx, const uint16_t stackIdx, const uint16_t returnSymbolIdx,
+    const uint16_t successor)
+{
+    forcedSelector[selectorIdx][stackIdx][returnSymbolIdx] = successor;
+}
+
 void AutomataGenerator::setWitness(
     const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix)
 {
     if (successor != 0 and witnesses[successor] == common::Word{})
     {
-        witnesses[successor] = witnesses[selectorIndex] + suffix;
+        // TODO: Why not selector??
+        // witnesses[successor] = witnesses[selectorIndex] + suffix;
+        witnesses[successor] = (*selectors)[successor];
     }
 }
 

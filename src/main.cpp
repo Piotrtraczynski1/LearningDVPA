@@ -9,7 +9,7 @@
 
 namespace
 {
-constexpr uint16_t numOfTests{1000};
+constexpr uint16_t numOfTests{5000};
 }
 
 void runRandomGenerator()

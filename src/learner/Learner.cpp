@@ -96,8 +96,8 @@ void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
 void Learner::handleSuffixesMismatch(
     const common::Word &v, const common::Word &a, const common::Word &w)
 {
-    addNewSelectorIfNeeded(v + a);
     testWords->addWord(common::Word{oracle.stackContentQuery(v + a)} + w);
+    addNewAndSetForcedSelectorIfNeeded(v, a);
 }
 
 void Learner::handleStackContentDiverges(
@@ -123,8 +123,8 @@ void Learner::handleStackContentDiverges(
         {
             common::symbol::StackSymbol bPrime{oracle.stackContentQuery(v1).top()}; // not needed
 
-            addNewSelectorIfNeeded(v1 + b);
             testWords->addWord(suffix);
+            addNewSelectorIfNeeded(v1 + b);
             return;
         }
     }
@@ -133,8 +133,20 @@ void Learner::handleStackContentDiverges(
     exit(2);
 }
 
-void Learner::addNewSelectorIfNeeded(const common::Word &selector)
+void Learner::addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const common::Word &a)
 {
-    generator.findOrAddSuccessor(selector);
+    const auto successor{addNewSelectorIfNeeded(v + a)};
+    if (a[0].index() == 1)
+    {
+        const auto returnSymbol{std::get<symbol::ReturnSymbol>(a[0])};
+        hypothesis->checkWord(v);
+        generator.addForcedSelector(
+            hypothesis->state, hypothesis->stack.top(), returnSymbol, successor);
+    }
+}
+
+uint16_t Learner::addNewSelectorIfNeeded(const common::Word &selector)
+{
+    return generator.findOrAddSuccessor(selector);
 }
 } // namespace learner

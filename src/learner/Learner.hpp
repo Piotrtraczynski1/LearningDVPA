@@ -42,7 +42,8 @@ private:
     handleStackContentDiverges(const common::Word &v, const common::Word &a, const common::Word &w);
     void
     handleSuffixesMismatch(const common::Word &v, const common::Word &a, const common::Word &w);
-    void addNewSelectorIfNeeded(const common::Word &selector);
+    void addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const common::Word &a);
+    uint16_t addNewSelectorIfNeeded(const common::Word &selector);
 
     void setInitialState()
     {

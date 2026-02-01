@@ -29,7 +29,8 @@ class AutomataGenerator
 
     common::Word witnesses[utils::MaxNumOfAutomatonStates + 1] = {};
 
-    common::transition::State epsilonState{0};
+    uint16_t forcedSelector[utils::MaxNumOfAutomatonStates][utils::MaxNumOfCombinedStackSymbols]
+                           [utils::MaxNumOfCombinedAutomatonLetters] = {};
 
 public:
     AutomataGenerator(
@@ -37,10 +38,7 @@ public:
         std::shared_ptr<TestWords> testWords, const uint16_t calls, const uint16_t returns,
         const uint16_t locals, const uint16_t stackSymbols)
         : oracle{oracle}, selectors{selectors}, testWords{testWords}, numOfCalls{calls},
-          numOfReturns{returns}, numOfLocals{locals}, numOfStackSymbols{stackSymbols}
-    {
-        witnesses[0] = common::Word{};
-    };
+          numOfReturns{returns}, numOfLocals{locals}, numOfStackSymbols{stackSymbols} {};
 
     std::shared_ptr<common::VPA> generate();
 
@@ -49,6 +47,9 @@ public:
         const uint16_t selectorIndex, const uint16_t stackIndex, const uint16_t symbolIndex);
 
     uint16_t findOrAddSuccessor(const common::Word &candidate);
+    void addForcedSelector(
+        const uint16_t selectorIdx, const uint16_t stackIdx, const uint16_t returnSymbolIdx,
+        const uint16_t successor);
 
 private:
     void clearGenerator();
