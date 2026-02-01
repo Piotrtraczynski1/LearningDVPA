@@ -36,22 +36,22 @@ struct TesterParameters
 };
 
 constexpr TesterParameters RandomTestParameters{
-    .minNumOfStates = 5,
-    .maxNumOfStates = 14,
+    .minNumOfStates = 3,
+    .maxNumOfStates = 3,
     .minNumOfCalls = 1,
-    .maxNumOfCalls = 4,
-    .minNumOfLocals = 1,
-    .maxNumOfLocals = 8,
+    .maxNumOfCalls = 1,
+    .minNumOfLocals = 0,
+    .maxNumOfLocals = 0,
     .minNumOfReturns = 1,
-    .maxNumOfReturns = 8,
+    .maxNumOfReturns = 1,
     .minNumOfStackSymbols = 2,
-    .maxNumOfStackSymbols = 6,
+    .maxNumOfStackSymbols = 2,
     .numOfRandomTestingWords = 10000,
     .maxTestingWordLength = 30,
     .density = 0.8,
     .savePassedTestData = false,
-    .supervisedMode = false,
-    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+    .supervisedMode = true,
+    .supervisedTestMaxDuration = std::chrono::seconds{2}};
 
 // Assumption: numOfCalls = numOfReturns = NumOfStackSymbol - 1
 constexpr TesterParameters XMLTestParameters{

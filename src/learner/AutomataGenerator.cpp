@@ -10,8 +10,6 @@ std::shared_ptr<common::VPA> AutomataGenerator::generate()
     TIME_MARKER("[AutomataGenerator]: generateAutomaton");
     LOG("[AutomataGenerator]: Generating Automaton");
 
-    epsilonState = common::transition::State(rand() % selectors->size());
-
     clearGenerator();
     buildTransition();
 
@@ -22,6 +20,7 @@ std::shared_ptr<common::VPA> AutomataGenerator::generate()
 void AutomataGenerator::clearGenerator()
 {
     transition.clear();
+    undefinedTransitions.clear();
 }
 
 void AutomataGenerator::buildTransition()
@@ -53,15 +52,13 @@ void AutomataGenerator::considerCall(const uint16_t selectorIndex, const uint16_
     common::Word candidate{(*selectors)[selectorIndex]};
     candidate += common::Word{common::symbol::CallSymbol{symbolIndex}};
 
-    uint16_t successor{findOrAddSuccessor(candidate)};
+    uint16_t successor{calculator.findOrAddSuccessor(candidate)};
 
     common::symbol::StackSymbol pushedStackSymbol{oracle.stackContentQuery(candidate).top()};
 
     transition.add(
         selectors->getState(selectorIndex), common::symbol::CallSymbol{symbolIndex},
         selectors->getState(successor), pushedStackSymbol);
-
-    setWitness(successor, selectorIndex, common::Word{common::symbol::CallSymbol{symbolIndex}});
 }
 
 void AutomataGenerator::considerLocal(const uint16_t selectorIndex, const uint16_t symbolIndex)
@@ -69,71 +66,57 @@ void AutomataGenerator::considerLocal(const uint16_t selectorIndex, const uint16
     common::Word candidate{(*selectors)[selectorIndex]};
     candidate += common::Word{common::symbol::LocalSymbol{symbolIndex}};
 
-    uint16_t successor{findOrAddSuccessor(candidate)};
+    uint16_t successor{calculator.findOrAddSuccessor(candidate)};
 
     transition.add(
         selectors->getState(selectorIndex), common::symbol::LocalSymbol{symbolIndex},
         selectors->getState(successor));
-
-    setWitness(successor, selectorIndex, common::Word{common::symbol::LocalSymbol{symbolIndex}});
 }
 
 void AutomataGenerator::considerReturn(
     const uint16_t selectorIndex, const uint16_t symbolIndex, const uint16_t stackIndex)
 {
-    common::Word candidate{(*selectors)[selectorIndex]};
-    candidate += common::Word{common::symbol::ReturnSymbol{symbolIndex}};
+    const auto [isAchievable, witness] =
+        isConfigurationAchievable(selectorIndex, common::symbol::StackSymbol{stackIndex});
 
+    if (not isAchievable)
+    {
+        std::cout << "For selector: " << selectorIndex << ", returnSymbol: " << symbolIndex
+                  << ", with stack: " << stackIndex << " configuration isn't achievable"
+                  << std::endl;
+
+        undefinedTransitions.insert(
+            UndefinedTransition{
+                .state = selectors->getState(selectorIndex),
+                .stackSymbol = common::symbol::StackSymbol{stackIndex},
+                .returnSymbol = common::symbol::ReturnSymbol{symbolIndex}});
+
+        transition.add(
+            selectors->getState(selectorIndex), common::symbol::StackSymbol{stackIndex},
+            common::symbol::ReturnSymbol{symbolIndex}, epsilonState);
+
+        return;
+    }
+
+    uint16_t successor{calculator.findOrAddSuccessor(
+        witness + common::Word{common::symbol::ReturnSymbol{symbolIndex}})};
+
+    /*
     uint16_t successor{findEquivalentSelector(selectorIndex, stackIndex, symbolIndex)};
-
+    */
     if (successor == Selectors::INVALID_INDEX)
     {
-        if (not isConfigurationAchievable(selectorIndex, common::symbol::StackSymbol{stackIndex}))
-        {
-            // TODO [workaround] It seems that always redirecting to the initial state may cause
-            // the algorithm to enter an infinite loop when a newly added test word should restrict
-            // this transition from state s to s' where s' is the initial state.
-            successor = epsilonState; // all undefined transitions are directed to the first state
-        }
-        else
-        {
-            successor = addSelector(candidate);
-        }
+        successor = calculator.addSelector(
+            witness + common::Word{common::symbol::ReturnSymbol{symbolIndex}});
     }
+
+    std::cout << "For selector: " << selectorIndex << ", returnSymbol: " << symbolIndex
+              << ", with stack: " << stackIndex << ", found witness: " << witness
+              << ", and successor: " << successor << std::endl;
 
     transition.add(
         selectors->getState(selectorIndex), common::symbol::StackSymbol{stackIndex},
         common::symbol::ReturnSymbol{symbolIndex}, selectors->getState(successor));
-
-    setWitness(successor, selectorIndex, common::Word{common::symbol::ReturnSymbol{symbolIndex}});
-}
-
-uint16_t AutomataGenerator::findOrAddSuccessor(const common::Word &candidate)
-{
-    uint16_t successor{findEquivalentSelector(candidate)};
-
-    if (successor == Selectors::INVALID_INDEX)
-    {
-        successor = addSelector(candidate);
-    }
-
-    return successor;
-}
-
-void AutomataGenerator::setWitness(
-    const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix)
-{
-    if (successor != 0 and witnesses[successor] == common::Word{})
-    {
-        witnesses[successor] = witnesses[selectorIndex] + suffix;
-    }
-}
-
-uint16_t AutomataGenerator::addSelector(const common::Word &selector)
-{
-    bool isAccepting{oracle.membershipQuery(selector)};
-    selectors->addSelector(selector, isAccepting);
-    return selectors->size() - 1;
 }
 
 uint16_t AutomataGenerator::findEquivalentSelector(
@@ -150,18 +133,6 @@ uint16_t AutomataGenerator::findEquivalentSelector(
     return Selectors::INVALID_INDEX;
 }
 
-uint16_t AutomataGenerator::findEquivalentSelector(const common::Word &word)
-{
-    for (uint16_t selector = 0; selector < selectors->size(); selector++)
-    {
-        if (isRightCongruence((*selectors)[selector], word))
-        {
-            return selector;
-        }
-    }
-    return Selectors::INVALID_INDEX;
-}
-
 bool AutomataGenerator::checkRightCongruenceWithEmptyControlLetters(
     const common::Word &a, const common::Word &b) const
 {
@@ -175,7 +146,7 @@ bool AutomataGenerator::checkRightCongruenceWithEmptyControlLetters(
         common::Word w{(*testWords)[i]};
         w.erase(w.begin());
 
-        if (areDistinguishable(a + w, b + (*testWords)[i]))
+        if (calculator.areDistinguishable(a + w, b + (*testWords)[i]))
         {
             return false;
         }
@@ -200,7 +171,7 @@ bool AutomataGenerator::checkRightCongruenceWithReturnLetter(
         b += common::symbol::ReturnSymbol{symbolIndex};
         b += word;
 
-        if (areDistinguishable(a + (*testWords)[i], b))
+        if (calculator.areDistinguishable(a + (*testWords)[i], b))
         {
             return false;
         }
@@ -225,36 +196,19 @@ bool AutomataGenerator::isRightCongruence(
     }
 }
 
-bool AutomataGenerator::isRightCongruence(const common::Word &a, const common::Word &b) const
-{
-    for (int i = 0; i < testWords->size(); i++)
-    {
-        if (areDistinguishable(a + (*testWords)[i], b + (*testWords)[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool AutomataGenerator::areDistinguishable(const common::Word &a, const common::Word &b) const
-{
-    if (oracle.membershipQuery(a) != oracle.membershipQuery(b))
-    {
-        return true;
-    }
-    if (oracle.stackContentQuery(a) != oracle.stackContentQuery(b))
-    {
-        return true;
-    }
-    return false;
-}
-
-bool AutomataGenerator::isConfigurationAchievable(
+std::pair<bool, common::Word> AutomataGenerator::isConfigurationAchievable(
     const uint16_t selectorIndex, const common::symbol::StackSymbol stackSymbol) const
 {
-    common::symbol::StackSymbol expectedStackTop{
-        oracle.stackContentQuery(witnesses[selectorIndex]).top()};
-    return expectedStackTop == stackSymbol;
+    const auto &additionalSelectors{selectors->getAdditionalSelectors()};
+    const auto &currentSelector{(*selectors)[selectorIndex]};
+
+    for (const auto &s : additionalSelectors)
+    {
+        if (s.second == stackSymbol and calculator.isRightCongruence(s.first, currentSelector))
+        {
+            return {true, s.first};
+        }
+    }
+    return {false, {}};
 }
 } // namespace learner

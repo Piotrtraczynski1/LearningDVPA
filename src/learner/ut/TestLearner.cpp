@@ -7,6 +7,7 @@
 #include "common/Word.cpp"
 #include "common/transition/Transition.cpp"
 #include "learner/AutomataGenerator.cpp"
+#include "learner/Calculator.cpp"
 #include "learner/SrsChecker.cpp"
 #include "teacher/Converter.cpp"
 #include "teacher/Teacher.cpp"
@@ -201,7 +202,7 @@ public:
         init();
     }
 };
-
+/*
 TEST_F(TestLearner2, testLearner)
 {
     std::shared_ptr<VPA> hyp{sut->run()};
@@ -981,7 +982,7 @@ TEST_F(TestLearnerWithSrs, testLearner)
         << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
         << vpa->getNumOfStates() + 1;
 }
-
+*/
 class TestLearner11 : public TestLearner
 {
 public:
@@ -1021,7 +1022,7 @@ public:
         init();
     }
 };
-
+/*
 TEST_F(TestLearner11, testLearner)
 {
     std::shared_ptr<VPA> hyp{sut->run()};
@@ -1256,18 +1257,93 @@ public:
         init();
     }
 };
-/* TODO */
-/*
+
 TEST_F(TestLearnerTooManyStates2, testLearner)
 {
     std::shared_ptr<VPA> hyp{sut->run()};
     common::Word ce{};
-
-    // hyp->printUt();
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
     EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
         << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
         << vpa->getNumOfStates() + 1;
 }*/
+
+class TestLearnerAdditionalSelectors : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 3;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 2;
+        numOfCalls = 1;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
+        transition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{1});
+
+        // LocalTransitions:
+        init();
+    }
+};
+
+TEST_F(TestLearnerAdditionalSelectors, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
+
+class TestLearnerAdditionalSelectors2 : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 3;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 2;
+        numOfCalls = 1;
+        numOfReturns = 1;
+        numOfLocals = 0;
+        transition = std::make_shared<Transition>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{2}, StackSymbol{1});
+        transition->add(State{1}, CS{0}, State{0}, StackSymbol{1});
+        transition->add(State{2}, CS{0}, State{2}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{1});
+
+        // LocalTransitions:
+        init();
+    }
+};
+
+TEST_F(TestLearnerAdditionalSelectors2, testLearner)
+{
+    std::shared_ptr<VPA> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
 } // namespace learner

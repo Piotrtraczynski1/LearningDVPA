@@ -4,6 +4,7 @@
 #include "common/VPA.cpp"
 #include "common/Word.cpp"
 #include "common/transition/Transition.cpp"
+#include "learner/Calculator.cpp"
 #include "teacher/Converter.cpp"
 #include "teacher/Teacher.cpp"
 #include "teacher/cfg/Calculator.cpp"
@@ -33,11 +34,12 @@ public:
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
 
         selectors = std::make_shared<Selectors>();
-        selectors->addSelector(common::Word{}, true);
+        selectors->addSelector(common::Word{}, true, common::symbol::StackSymbol::BOTTOM);
         testWords = std::make_shared<TestWords>();
+        calculator = std::make_shared<Calculator>(*oracle, selectors, testWords);
 
         sut = new AutomataGenerator(
-            *oracle, selectors, testWords, numOfCalls, numOfReturns, numOfLocals,
+            *oracle, *calculator, selectors, testWords, numOfCalls, numOfReturns, numOfLocals,
             numOfStackSymbols);
     }
 
@@ -59,6 +61,7 @@ public:
 
     std::shared_ptr<Selectors> selectors;
     std::shared_ptr<TestWords> testWords;
+    std::shared_ptr<Calculator> calculator;
 
     AutomataGenerator *sut;
 };
@@ -168,8 +171,8 @@ TEST_F(TestAutomataGenerator1, automataSimulationStep1)
 
 TEST_F(TestAutomataGenerator1, automataSimulationStep2)
 {
-    selectors->addSelector({cs}, false);
-    selectors->addSelector({cs, rs, cs, cs, rs, rs, ls, rs}, true);
+    selectors->addSelector({cs}, false, common::symbol::StackSymbol{1});
+    selectors->addSelector({cs, rs, cs, cs, rs, rs, ls, rs}, true, common::symbol::StackSymbol{1});
 
     std::shared_ptr<VPA> automata{sut->generate()};
 

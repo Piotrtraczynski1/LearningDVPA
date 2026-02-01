@@ -27,6 +27,15 @@ Teacher::equivalenceQuery(const std::shared_ptr<common::VPA> hypothesis) const
 {
     TIME_MARKER("[Teacher]: equivalenceQuery");
 
+    common::Word w{
+        common::symbol::CallSymbol{0}, common::symbol::ReturnSymbol{0},
+        common::symbol::CallSymbol{0}, common::symbol::ReturnSymbol{0}};
+
+    if (hypothesis->checkWord(w) != vpa->checkWord(w))
+    {
+        return std::make_shared<common::Word>(w);
+    }
+
     common::VPA combinedVpa{converter->combineVPA(*hypothesis)};
     std::shared_ptr<cfg::Cfg> cfg{converter->convertVpaToCfg(combinedVpa)};
     auto cfgOutput{cfg->isEmpty()};

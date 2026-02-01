@@ -5,10 +5,12 @@
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
 #include "learner/AutomataGenerator.hpp"
+#include "learner/Calculator.hpp"
 #include "learner/Selectors.hpp"
 #include "learner/Srs.hpp"
 #include "learner/SrsChecker.hpp"
 #include "learner/TestWords.hpp"
+#include "learner/UndefinedTransitions.hpp"
 #include "teacher/Teacher.hpp"
 #include "utils/log.hpp"
 
@@ -29,6 +31,8 @@ class Learner
 
     AutomataGenerator generator;
     SrsChecker srsChecker;
+    Calculator calculator;
+    UndefinedTransitions undefinedTransitions{};
 
 public:
     Learner(
@@ -42,12 +46,14 @@ private:
     handleStackContentDiverges(const common::Word &v, const common::Word &a, const common::Word &w);
     void
     handleSuffixesMismatch(const common::Word &v, const common::Word &a, const common::Word &w);
-    void addNewSelectorIfNeeded(const common::Word &selector);
+    void addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const common::Word &a);
+    uint16_t addNewSelectorIfNeeded(const common::Word &selector);
+    bool areAllTransitionsDefined(std::shared_ptr<common::Word> counterExample);
 
     void setInitialState()
     {
         auto isAccepting{oracle.membershipQuery(common::Word{})};
-        selectors->addSelector(common::Word{}, isAccepting);
+        selectors->addSelector(common::Word{}, isAccepting, common::symbol::StackSymbol::BOTTOM);
     }
 };
 } // namespace learner

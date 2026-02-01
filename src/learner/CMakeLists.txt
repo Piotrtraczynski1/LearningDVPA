@@ -6,6 +6,7 @@ add_library(learner STATIC
     Learner.cpp
     AutomataGenerator.cpp
     SrsChecker.cpp
+    Calculator.cpp
 )
 
 target_link_libraries(learner PRIVATE common)
