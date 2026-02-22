@@ -53,32 +53,52 @@ constexpr TesterParameters RandomTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
-// Assumption: numOfCalls = numOfReturns = NumOfStackSymbol - 1
-constexpr TesterParameters XMLTestParameters{
-    .minNumOfStates = 30,
-    .maxNumOfStates = 30,
-    .minNumOfCalls = 5,
+constexpr TesterParameters CdaTestParameters{
+    .minNumOfStates = 3,
+    .maxNumOfStates = 8,
+    .minNumOfCalls = 4,
     .maxNumOfCalls = 5,
-    .minNumOfLocals = 7,
-    .maxNumOfLocals = 7,
-    .minNumOfReturns = 5,
+    .minNumOfLocals = 15,
+    .maxNumOfLocals = 15,
+    .minNumOfReturns = 3,
     .maxNumOfReturns = 5,
-    .minNumOfStackSymbols = 6,
-    .maxNumOfStackSymbols = 6,
+    .minNumOfStackSymbols = 16,
+    .maxNumOfStackSymbols = 16,
     .numOfRandomTestingWords = 10000,
     .maxTestingWordLength = 30,
     .density = 1,
+    .numOfModules = 3,
+    .useSrs = false,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
-// if useSrs = true, then numOfStackSymbols should be equal numOfModules + 1
-constexpr TesterParameters eCDATestParameters{
+constexpr TesterParameters SeVpaTestParameters{
     .minNumOfStates = 10,
     .maxNumOfStates = 10,
     .minNumOfCalls = 5,
     .maxNumOfCalls = 5,
-    .minNumOfLocals = 15,
+    .minNumOfLocals = 5,
+    .maxNumOfLocals = 15,
+    .minNumOfReturns = 5,
+    .maxNumOfReturns = 5,
+    .minNumOfStackSymbols = 16,
+    .maxNumOfStackSymbols = 16,
+    .numOfRandomTestingWords = 10000,
+    .maxTestingWordLength = 30,
+    .density = 1,
+    .numOfModules = 3,
+    .useSrs = false,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
+constexpr TesterParameters MeVpaTestParameters{
+    .minNumOfStates = 10,
+    .maxNumOfStates = 10,
+    .minNumOfCalls = 5,
+    .maxNumOfCalls = 5,
+    .minNumOfLocals = 5,
     .maxNumOfLocals = 15,
     .minNumOfReturns = 5,
     .maxNumOfReturns = 5,
@@ -88,6 +108,26 @@ constexpr TesterParameters eCDATestParameters{
     .maxTestingWordLength = 30,
     .density = 1,
     .numOfModules = 3,
+    .useSrs = false,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
+constexpr TesterParameters ECdaTestParameters{
+    .minNumOfStates = 10,
+    .maxNumOfStates = 10,
+    .minNumOfCalls = 4,
+    .maxNumOfCalls = 4,
+    .minNumOfLocals = 2,
+    .maxNumOfLocals = 10,
+    .minNumOfReturns = 1,
+    .maxNumOfReturns = 7,
+    .minNumOfStackSymbols = 6,
+    .maxNumOfStackSymbols = 6,
+    .numOfRandomTestingWords = 10000,
+    .maxTestingWordLength = 30,
+    .density = 1,
+    .numOfModules = 5,
     .useSrs = true,
     .savePassedTestData = false,
     .supervisedMode = false,

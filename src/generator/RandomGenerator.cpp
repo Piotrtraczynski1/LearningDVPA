@@ -3,16 +3,10 @@
 
 namespace generator
 {
-bool RandomGenerator::generatorSpecificCheck(std::shared_ptr<common::VPA> hypothesis)
-{
-    return hypothesis->getNumOfStates() <= numOfStates + 1; // +1 for explicit sink state
-}
-
 std::shared_ptr<common::VPA> RandomGenerator::run()
 {
     generateTransition();
-    auto acceptingStates{selectAcceptingStates()};
-    common::transition::State initialState{0};
+    selectAcceptingStates();
     return std::make_shared<common::VPA>(*transition, initialState, acceptingStates, numOfStates);
 }
 
@@ -75,19 +69,5 @@ void RandomGenerator::addReturns(common::transition::State state)
             transition->add(state, stackSymbol, common::symbol::ReturnSymbol{ret}, dest);
         }
     }
-}
-
-std::vector<uint16_t> RandomGenerator::selectAcceptingStates()
-{
-    std::vector<uint16_t> acceptingStates{};
-    for (uint16_t i = 0; i < numOfStates; i++)
-    {
-        if (shouldAccept())
-        {
-            acceptingStates.push_back(i);
-        }
-    }
-
-    return acceptingStates;
 }
 } // namespace generator

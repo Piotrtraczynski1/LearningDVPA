@@ -4,8 +4,7 @@
 
 #include "Tester.hpp"
 #include "TesterParameters.hpp"
-#include "generator/RandomGenerator.hpp"
-#include "generator/XMLGenerator.hpp"
+#include "generator/Generators.hpp"
 #include "utils/TimeMarker.hpp"
 
 static void runRandomGenerator()
