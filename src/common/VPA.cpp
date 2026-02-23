@@ -22,25 +22,25 @@ bool VPA::checkWord(const Word &word)
     {
         switch (letter.index())
         {
-        case 0:
+        case CallSymbolVariant:
         {
             transition::CoArgument coArg = delta(state, std::get<symbol::CallSymbol>(letter));
             state = coArg.state;
             stack.push(coArg.stackSymbol);
             break;
         }
-        case 1:
+        case ReturnSymbolVariant:
         {
             state = delta(state, stack.top(), std::get<symbol::ReturnSymbol>(letter));
             stack.pop();
             break;
         }
-        case 2:
+        case LocalSymbolVariant:
         {
             state = delta(state, std::get<symbol::LocalSymbol>(letter));
             break;
         }
-        case 3:
+        case ControlWordSymbolVariant:
         {
             stack = std::get<Stack>(letter);
             break;

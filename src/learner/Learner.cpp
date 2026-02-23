@@ -137,7 +137,7 @@ void Learner::handleStackContentDiverges(
 void Learner::addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const common::Word &a)
 {
     const auto successor{addNewSelectorIfNeeded(v + a)};
-    if (a[0].index() == 1)
+    if (a[0].index() == common::ReturnSymbolVariant)
     {
         const auto returnSymbol{std::get<symbol::ReturnSymbol>(a[0])};
         hypothesis->checkWord(v);

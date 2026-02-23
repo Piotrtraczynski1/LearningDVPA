@@ -27,22 +27,22 @@ std::ostream &operator<<(std::ostream &os, const Symbol &symbol)
 {
     switch (symbol.index())
     {
-    case 0:
+    case CallSymbolVariant:
     {
         os << "C-" << std::get<symbol::CallSymbol>(symbol);
         break;
     }
-    case 1:
+    case ReturnSymbolVariant:
     {
         os << "R-" << std::get<symbol::ReturnSymbol>(symbol);
         break;
     }
-    case 2:
+    case LocalSymbolVariant:
     {
         os << "L-" << std::get<symbol::LocalSymbol>(symbol);
         break;
     }
-    case 3:
+    case ControlWordSymbolVariant:
     {
         os << "CW-" << std::get<Stack>(symbol);
         break;

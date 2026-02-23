@@ -53,20 +53,20 @@ Terminal convertSymbolToTerminal(const common::Symbol symbol)
 {
     switch (symbol.index())
     {
-    case 0:
+    case common::CallSymbolVariant:
     {
         auto callSymbol = std::get<common::symbol::CallSymbol>(symbol);
         uint32_t terminal =
             static_cast<uint32_t>((callSymbol + 1) * maxNumOfLetters * maxNumOfLetters);
         return cfg::Terminal{terminal};
     }
-    case 1:
+    case common::ReturnSymbolVariant:
     {
         auto returnSymbol = std::get<common::symbol::ReturnSymbol>(symbol);
         uint32_t terminal = static_cast<uint32_t>((returnSymbol + 1) * maxNumOfLetters);
         return cfg::Terminal{terminal};
     }
-    case 2:
+    case common::LocalSymbolVariant:
     {
         auto localSymbol = std::get<common::symbol::LocalSymbol>(symbol);
         uint32_t terminal = static_cast<uint32_t>(localSymbol);
