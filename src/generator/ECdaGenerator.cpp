@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "generator/ECdaGenerator.hpp"
+#include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 
 namespace generator
@@ -12,19 +13,20 @@ void ECdaGenerator::validateGeneratorConfig()
     if (numOfStates < numOfModules)
     {
         ERR("[ECdaGenerator]: Number of states is lower than number of modules!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 
     if (not(numOfCalls < numOfModules))
     {
         ERR("[ECdaGenerator]: Number of calls should be lower than number of modules!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 
-    if (numOfStackSymbols != numOfModules + 1) // TODO: numOfStackSymbols > numOfModules (require notification to Tester)
+    if (numOfStackSymbols !=
+        numOfModules + 1) // TODO: numOfStackSymbols > numOfModules (require notification to Tester)
     {
         ERR("[ECdaGenerator]: Invalid number of stack symbols!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 }
 

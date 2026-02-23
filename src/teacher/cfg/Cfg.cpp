@@ -1,6 +1,7 @@
 #include "teacher/cfg/Cfg.hpp"
 #include "common/Word.hpp"
 #include "utils/Constants.hpp"
+#include "utils/ExitCode.hpp"
 #include "utils/TimeMarker.hpp"
 #include "utils/log.hpp"
 
@@ -76,7 +77,7 @@ void Cfg::addProjection(
     if (numOfProjections == unknownIndex)
     {
         ERR("[CFG]: Too many projections!");
-        exit(1);
+        exit(toExit(ExitCode::UNDEFINED));
     }
 }
 

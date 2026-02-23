@@ -3,6 +3,7 @@
 #include "common/VPA.hpp"
 #include "teacher/Teacher.hpp"
 #include "teacher/cfg/Calculator.hpp"
+#include "utils/ExitCode.hpp"
 #include "utils/TimeMarker.hpp"
 
 namespace teacher
@@ -51,6 +52,6 @@ Teacher::equivalenceQuery(const std::shared_ptr<common::VPA> hypothesis) const
     std::cout << *output << ", vpa: " << vpa->checkWord(*output)
               << ", hypothesis: " << hypothesis->checkWord(*output)
               << ", combined: " << combinedVpa.checkWord(*output) << std::endl;
-    exit(1);
+    exit(toExit(ExitCode::EQUIVALENCEQUERY));
 }
 } // namespace teacher

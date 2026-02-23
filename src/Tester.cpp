@@ -63,25 +63,26 @@ std::shared_ptr<common::VPA> Tester::runLearner()
 void Tester::runSupervisedTest()
 {
     auto res = runTestWithTimeout();
-    switch (res.kind)
+    switch (res.exitCode)
     {
-    case RunResultKind::Ok:
+    case ExitCode::OK:
         testOutput(res.hyp);
         break;
-    case RunResultKind::Timeout:
+    case ExitCode::TIMEOUT:
         ERR("[Tester]: TIMEOUT after %ld ms", res.elapsed.count());
         numOfHangouts++;
         saveFailedTestData("HANGOUT DETECTED!");
         break;
-    case RunResultKind::ChildError:
-        ERR("[Tester]: Child exited early, after %ld ms", res.elapsed.count());
-        numOfChildErrors++;
-        saveFailedTestData("CHILD ERROR!");
-        break;
-    case RunResultKind::HandleStackContentDiverages:
+    case ExitCode::STACKCONTENTDIVERGE:
         ERR("[Tester]: ERROR in StackContentDiverages, after %ld ms", res.elapsed.count());
         numOfErrInHandleStackContent++;
         saveFailedTestData("StackContentDiverages ERROR!");
+        break;
+    default:
+        ERR("[Tester]: Child exited early, after %ld ms with error: %s", res.elapsed.count(),
+            toString(res.exitCode));
+        numOfChildErrors++;
+        saveFailedTestData("CHILD ERROR: " + std::string(toString(res.exitCode)));
         break;
     }
 }
@@ -123,7 +124,7 @@ RunResult Tester::runTestWithTimeout()
     if (pid == 0)
     {
         (void)runLearner();
-        exit(0);
+        exit(toExit(ExitCode::OK));
     }
 
     const auto deadline = clock::now() + params.supervisedTestMaxDuration;
@@ -137,15 +138,11 @@ RunResult Tester::runTestWithTimeout()
                 std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - startTime);
             if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
             {
-                return {RunResultKind::Ok, runLearner(), elapsed};
+                return {ExitCode::OK, runLearner(), elapsed};
             }
             else
             {
-                if (WEXITSTATUS(status) == 2)
-                {
-                    return {RunResultKind::HandleStackContentDiverages, nullptr, elapsed};
-                }
-                return {RunResultKind::ChildError, nullptr, elapsed};
+                return {ExitCode{WEXITSTATUS(status)}, nullptr, elapsed};
             }
         }
 
@@ -155,7 +152,7 @@ RunResult Tester::runTestWithTimeout()
             (void)waitpid(pid, &status, 0);
             auto elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - startTime);
-            return {RunResultKind::Timeout, nullptr, elapsed};
+            return {ExitCode::TIMEOUT, nullptr, elapsed};
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -256,7 +253,7 @@ void Tester::setOutputFile()
     if (not outputFile)
     {
         ERR("[Tester]: Could not create file!");
-        exit(1);
+        exit(toExit(ExitCode::UNDEFINED));
     }
 }
 

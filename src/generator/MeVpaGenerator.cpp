@@ -1,5 +1,6 @@
 #include "generator/MeVpaGenerator.hpp"
 #include "utils/log.hpp"
+#include "utils/ExitCode.hpp"
 
 namespace generator
 {
@@ -8,13 +9,13 @@ void MeVpaGenerator::validateGeneratorConfig()
     if (numOfStates < numOfModules)
     {
         ERR("[MeVpaGenerator]: Number of states is lower than number of modules!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 
     if (numOfStackSymbols != numOfModules + 1)
     {
         ERR("[MeVpaGenerator]: Invalid number of stack symbols!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 }
 

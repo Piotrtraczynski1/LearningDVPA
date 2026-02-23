@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "learner/Learner.hpp"
+#include "utils/ExitCode.hpp"
 #include "utils/TimeMarker.hpp"
 
 namespace learner
@@ -90,7 +91,7 @@ void Learner::handleCounterExample(std::shared_ptr<common::Word> counterExample)
     ERR("[Learner]: Counter example partition not found membershipQuery()=%d, "
         "hypothesis->checkWord()=%d",
         oracle.membershipQuery(*counterExample), hypothesis->checkWord(*counterExample));
-    exit(1);
+    exit(toExit(ExitCode::COUNTEREXAMPLE));
 }
 
 void Learner::handleSuffixesMismatch(
@@ -130,7 +131,7 @@ void Learner::handleStackContentDiverges(
     }
 
     ERR("[Learner]: Word partition in handleStackContentDiverges not found!");
-    exit(2);
+    exit(toExit(ExitCode::STACKCONTENTDIVERGE));
 }
 
 void Learner::addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const common::Word &a)

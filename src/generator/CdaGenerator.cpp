@@ -3,6 +3,7 @@
 #include <random>
 
 #include "generator/CdaGenerator.hpp"
+#include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 
 namespace generator
@@ -12,13 +13,13 @@ void CdaGenerator::validateGeneratorConfig()
     if (numOfStates < numOfModules)
     {
         ERR("[CdaGenerator]: Number of states is lower than number of modules!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 
     if (numOfStackSymbols != numOfModules * numOfCalls + 1)
     {
         ERR("[CdaGenerator]: Invalid number of stack symbols!");
-        exit(2);
+        exit(toExit(ExitCode::GENERATOR));
     }
 }
 

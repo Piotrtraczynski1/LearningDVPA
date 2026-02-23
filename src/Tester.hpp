@@ -11,6 +11,7 @@
 #include "generator/Generator.hpp"
 #include "learner/Learner.hpp"
 #include "teacher/Teacher.hpp"
+#include "utils/ExitCode.hpp"
 
 struct RunResult;
 
@@ -72,17 +73,9 @@ private:
     std::shared_ptr<learner::Learner> learner;
 };
 
-enum class RunResultKind
-{
-    Ok,
-    Timeout,
-    ChildError,
-    HandleStackContentDiverages
-};
-
 struct RunResult
 {
-    RunResultKind kind;
+    ExitCode exitCode;
     std::shared_ptr<common::VPA> hyp;
     std::chrono::milliseconds elapsed{};
 };
