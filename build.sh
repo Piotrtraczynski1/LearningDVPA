@@ -26,7 +26,7 @@ build_benchmark() {
     cd "$BUILD_DIR"
 
     cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=ON $EXTRA_FLAGS ..
-    cmake --build . --target run_bench
+    cmake --build . --target run
 
     cd ..
 }

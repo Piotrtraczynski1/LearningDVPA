@@ -59,6 +59,6 @@ if(NOT BUILD_BENCHMARKS)
     add_executable(run src/main.cpp src/Tester.cpp)
     target_link_libraries(run PRIVATE common teacher learner utils generator) #parser
 else()
-    add_executable(run_bench src/benchmark/benchMain.cpp src/Tester.cpp)
-    target_link_libraries(run_bench PRIVATE common teacher learner utils generator benchmark::benchmark)
+    add_executable(run src/benchmark/benchMain.cpp src/Tester.cpp)
+    target_link_libraries(run PRIVATE common teacher learner utils generator benchmark::benchmark)
 endif()
