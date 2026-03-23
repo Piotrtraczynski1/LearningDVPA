@@ -1,0 +1,63 @@
+\chapter{Podstawy teoretyczne}
+
+Niech $\Sigma$ oznacza alfabet, rozumiany jako skończony zbiór liter. Słowo $w$ jest skończonym ciągiem liter z alfabetu.
+Wszystkie słowa nad alfabetem $\Sigma$ oznaczamy jako $\Sigma^*$, a słowo puste jako $\epsilon$. Literą $\Gamma$, oznaczamy alfabet stosowy,
+a pusty stos poprzez $\bot$.
+
+\textbf{Deterministycznym automatem skończonym} $A$ dalej DFA $A$ nazywamy krotkę $(\Sigma, Q, q_0, F, \delta)$ w której:
+\begin{description}
+    \item[$\Sigma$] -- alfabet wejściowy
+    \item[$Q$] -- zbiór stanów automatu
+    \item[$q_0$] -- stan początkowy
+    \item[$F$] -- zbiór stanów akceptujących
+    \item[$\delta : Q \times \Sigma \to Q$] -- funkcja przejścia.
+\end{description}
+
+Domknięciem funkcji $\delta$ nazywamy $\widehat{\delta}: Q \times \Sigma^* \to Q$, zdefiniowaną w następujący sposób:
+$$\widehat{\delta}(q, \epsilon) = q$$
+$$\widehat{\delta}(q, aw) = \widehat{\delta}(\delta(q, a), w) \text{,\ gdzie\ } a \in \Sigma, w \in \Sigma^*$$
+Język $L(A)$ generowany przez automat DFA, to zbiór wszystkich słów $w \in \Sigma^*$, dla których $\widehat{\delta}(q_0, w) \in F$.
+Taki język nazywamy językiem regularnym.
+
+\textbf{Deterministyczny automat ze stosem} $A$ dalej DPDA $A$ nazywamy krotkę $(\Sigma, Q, q_0, F, \Gamma, \delta)$
+w której $\Sigma$, $Q$, $q_0$ i $F$ są zdefiniowane dokładnie jak w przypadku automatu DFA. $\Gamma$ oznacza alfabet stosowy,
+a funkcja $\delta : Q\times\Sigma\times\Gamma\to Q\times\Gamma^*$ definiuje przejścia automatu.
+Analogicznie do DFA definiujemy domknięcie funkcji $\delta$, jako $\widehat{\delta}: Q\times\Sigma^*\times\Gamma^* \to Q\times\Gamma^*$.
+$$\widehat{\delta}(q, \epsilon, s) = (q, s) \text{,\ gdzie\ } s \in \Gamma^*$$
+$$\widehat{\delta}(q, aw, sB) = \widehat{\delta}(q', w, ss') \text{,\ gdzie\ } \delta(q, a, B) = (q', s') \text{,\ gdzie\ } B\in \Gamma \text{\ i\ } s, s' \in \Gamma^*$$
+Język $L(A)$ generowany przez automat DPDA, to zbiór wszystkich słów $w \in \Sigma^*$, dla których $\widehat{\delta}(q_0, w, \bot) \in F$.
+Zwracamy uwagę, że stos po przeczytaniu słowa $w$ nie musi być pusty, żeby słowo zostało zaakceptowane.
+
+
+\textbf{Deterministycznym automatem visibly pushdown \cite{vpl}} $A$ dalej DVPA $A$ nazywamy automat DPDA, dla którego alfabet wejściowy
+możemy podzielić na trzy parami rozłączne zbiory: $\Sigma_{call}$, $\Sigma_{return}$ i $\Sigma_{local}$,
+takie że $\Sigma_{call} \cup \Sigma_{return} \cup \Sigma_{local} = \Sigma$ i dla ustalonego $q \in Q$ zachodzą następujące własności:
+
+$$\forall_{l\in\Sigma_{local}} \forall_{B\in\Gamma} : \delta(q, l, B) = (q', B)$$
+Czyli zachowanie automatu po przeczytaniu symbolu $l \in \Sigma_{local}$ nie zależy od symbolu stosowego na stosie, ani nie modyfikuje stosu.
+Dalej przejścia dla symboli local będziemy oznaczać jako: $\delta(q, l) = q'$ dla uproszczenia notacji.
+
+$$\forall_{c\in\Sigma_{call}} \forall_{B\in\Gamma} : \delta(q, c, B) = (q', BB')$$
+Czyli zachowanie automatu po przeczytaniu symbolu $c \in \Sigma_{call}$ również nie zależy od wczytanego symbolu stosowego i automat zawsze
+wkłada dokładnie jeden dodatkowy symbol na stos. Dalej operacje na symbolach call będziemy oznaczać w następujący sposób: $\delta(q, c) = (q', B)$.
+
+$$\forall_{r\in\Sigma_{return}} : \delta(q, r, sB) = (q', s)$$
+Czyli automat po przeczytaniu symbolu $r \in \Sigma_{return}$ zawsze zdejmuje dokładnie jeden symbol ze stosu. Dalej operacje na symbolach
+return będziemy oznaczać w następujący sposób: $\delta(q, r, B) = q'$
+
+Oznacza to, że klasa automatów DVPA stanowi podklasę DPDA, w której operacja na stosie jest determinowana przez symbol wejściowy.
+Model ten zachowuje istotne własności automatów skończonych, takie jak domknięcie ze względu na sumę, przekrój oraz dopełnienie,
+przy jednoczesnym umożliwieniu modelowania struktur o zagnieżdżonej naturze.
+
+\textbf{Słowa dobrze zbalansowane.}
+
+\textbf{Relacja prawostronnej kongruencji $\sim$.} To relacja, która spełnia warunek $\forall_{v_1, v_2 \in \Sigma^*} \forall_{a \in \Sigma}(v_1 \sim v_2 \Leftrightarrow v_1a \sim v_2a)$
+
+\textbf{Twierdzenie Myhilla-Nerode'a \cite{Myhill-Nerode}} podaje konieczne i dostateczne warunki aby język był regularny.
+Definiuje ono relację równoważności $\sim_L \subseteq\Sigma^*\times\Sigma^*$, jako $u \sim_L v \Leftrightarrow \forall_{w \in\Sigma^*}(uw \in L \Leftrightarrow vw \in L)$.
+Język $L$ jest regularny wtedy i tylko wtedy, kiedy relacja $\sim_L$ ma skończenie wiele klas abstrakcji, a minimalny automat DFA
+rozpoznający ten język ma dokładnie tyle stanów ile klas abstrakcji ma ta relacja.
+
+\textbf{Gramatyka bezkontekstowa.}
+
+\textbf{String Rewriting System}

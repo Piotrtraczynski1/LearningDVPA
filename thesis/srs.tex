@@ -1,0 +1,43 @@
+\chapter{String rewriting systems}
+
+\textbf{Active Automata Learning with Advice \cite{srs}} przedstawia podejście, w którym algorytm aktywnego uczenia się, 
+może dostać dodatkową wskazówkę, dzięki której jest możliwe zredukowanie liczby zapytań kierowanych do nauczyciela.
+Autorzy sugerują także w jaki sposób wykorzystać to podejście w innych algorytmach aktywnego uczenia się automatów,
+z wykorzystaniem odpowiednika Twierdzenia Myhilla-Nerode'a.
+
+Podejście to nie wymaga zmian w algorytmie ucznia. Zapytania, które zadaje uczeń nie są wprost przekazywane do nauczyciela,
+tylko kierowane do systemu, który wnioskuje o nich na podstawie zadanego systemu $SRS$.
+Jeśli system nie jest w stanie odpowiedzieć na zapytanie, wtedy przekierowuje je do nauczyciela i zwraca jego odpowiedź.
+
+Szczególnie wartościową częścią, z punktu zaprezentowanej w tej pracy implementacji algorytmu
+\textit{Learning Deterministic Visibly Pushdown Automata under Accessible Stack} jest wnioskowanie podczas zapytań o równoważność, 
+które stanowią znaczący narzut czasowy. Zapytania o przynależność nie są kosztowne z punktu widzenia tego algorytmu,
+więc ta cześć nie została wykorzystana.
+
+Jan Otop i Michał Fica wprowadzają następujące definicje: system $SRS$ jest spójny z językiem, wtedy i tylko wtedy,
+gdy dla wszystkich słów $s, t$, jeśli $s \to^*_R t$, to $s \in L \Leftrightarrow t \in L$.
+Podpowiedzią dla algorytmu jest system $SRS$ spójny z językiem docelowym.
+
+Następnie dowodzą, że, jeśli $R$ jest $SRS$ nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
+to $SRS$ $R$ jest spójny z $L(A)$ wtedy i tylko wtedy, gdy dla każdego stanu $q \in Q_A$ i każdej reguły
+$l \to r \in R$ mamy $\delta_A(q, l) = \delta_A(q, r)$.
+
+Ta obserwacja umożliwia przeiterowanie się po konfiguracjach automatu DFA i regułach systemu $SRS$ $R$ w celu wykrycia niespójności hipotezy z systemem.
+Następnie pokazują jak znając stan $q \in Q_A$ i $l \to r \in R$, takie że tylko jeden ze stanów $H(q, l)$ i $H(q, r)$ należy do $F_H$
+skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
+
+\textbf{Problemy z adaptacją tego podejścia.}
+
+\begin{enumerate}
+    \item Zastosowany odpowiednik Twierdzenia Myhilla-Nerode'a dla automatów visibly pushdown nie jest prawo-kongruencją. 
+    Oznacza to, że dwie różne konfiguracje hipotezy $H$ mogą generować dokładnie te same prawostronne języki.
+    Dlatego znalezienie reguły $r \to l \in R$ i konfiguracji $(q, s)$, takich że konfiguracje $H(q, l, s)$ i $H(q, r, s)$
+    się różnią nie gwarantuje nam, że automat nie jest zgodny z systemem $SRS$.
+    
+    \item Nie jesteśmy w stanie sprawdzić wszystkich osiągalnych konfiguracji dla hipotezy, bo w ogólności jest ich nieskończenie wiele.
+    Musimy ograniczyć się tylko do części osiągalnych konfiguracji.
+\end{enumerate}
+
+Konsekwencje, które niosą za sobą te problemy: TODO
+
+\textbf{Finalne zastosowanie} TODO

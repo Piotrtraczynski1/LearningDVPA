@@ -1,0 +1,98 @@
+\chapter{Aktywne uczenie automatów}
+
+\textbf{Model aktywnego uczenia} zakłada istnienie nauczyciela, który potrafi odpowiadać na określony zestaw zapytań dotyczących nieznanego
+języka docelowego $L$. Algorytm konstruujący automat $H$, nazywany hipotezą, który docelowo powinien rozpoznawać język $L$, nazywany jest uczniem. 
+
+W klasycznym modelu Angluin \cite{Angluin} nauczyciel odpowiada na dwa typy zapytań:
+\begin{itemize}
+  \item \textbf{zapytanie o przynależność (ang. membership query) $MQ(w)$} -- zapytanie o to, czy dane słowo $w$ należy do języka $L$.
+  \item \textbf{zapytanie o równoważność (ang. equivalence query) $EQ(H)$} --  zapytanie o to, czy skonstruowana hipoteza $H$ generuje język $L$.
+\end{itemize}
+W odpowiedzi na zapytanie o równoważność nauczyciel może ją potwierdzić, co kończy działanie algorytmu, albo zwrócić kontrprzykład,
+czyli słowo, które należy do dokładnie jednego z języków $L$ i $L(H)$.
+
+\textbf{Algorytm L$^*$}, zaproponowany przez Angluin \cite{Angluin}, stanowi realizację powyższego modelu dla języków regularnych.
+W tym podejściu uczeń utrzymuje dwa zbiory: zbiór selektorów $S$ reprezentujący stany automatu i zbiór słów testowych $C$.
+Definiujemy relacje $\sim^C_L$, w taki sposób, że $s_1 \sim^C_L s_2 \Leftrightarrow \forall_{c\in C} (s_1c \in L \Leftrightarrow s_2c \in L)$.
+W trakcie trwania algorytmu chcemy utrzymywać dwa niezmienniki dla tych zbiorów:
+
+\begin{enumerate}
+  \item \textbf{Rozdzielność}: różne słowa z $S$ należą do różnych klas abstrakcji relacji $\sim^C_L$
+  \item \textbf{Domkniętość}: dla każdego słowa $s \in S$ i $a \in \Sigma$ istnieje $s' \in S$, takie że $sa \sim^C_L s'$
+\end{enumerate}
+
+Jeśli $C = \Sigma^*$, to relacja $\sim^C_L$ jest dokładnie relacją $\sim_L$ z Twierdzenia Myhilla-Nerode'a.
+Gwarantuje to, że rozszerzając zbiory $S$ i $C$, a przy tym utrzymując powyższe własności będziemy w stanie skonstruować minimalny automat DFA
+rozpoznający język $L$.
+
+Algorytm zaczyna działanie z $S = \{\epsilon\}$ i $C = \emptyset$, które spełniają powyższe własności. Następnie powtarza w pętli procedurę:
+
+\begin{enumerate}
+    \item Zaczynając z rozdzielnymi $S$ i $C$ domknij je rozszerzając zbiór $S$ o dodatkowe selektory w postaci $sa$,
+    jeśli dla danych $s \in S$ i $a \in \Sigma$ nie istnieje $s'$ spełniający własność domkniętości.
+    Jeśli własność rozdzielności nie jest zachowana rozszerz zbiór $C$ o odpowiedni sufiks.
+
+    \item Skonstruuj hipotezę $H$ na podstawie $S$ i $C$ korzystając z własności domkniętości, następnie zadaj zapytanie $EQ(H)$.
+    Jeśli nauczyciel potwierdzi równoważność zakończ działanie.
+
+    \item Jeśli nauczyciel zwrócił kontrprzykład $w$, znajdź $s \in S$, $a \in \Sigma$ i $w'$ które jest sufiksem słowa $w$,
+    takie że $S \cup \{sa\}$ i $C \cup \{w'\}$ są rozdzielne.
+\end{enumerate}
+
+Jeśli docelowy automat ma $n$ stanów, a najdłuższy zwrócony przez nauczyciela kontrprzykład $m$ liter to algorytm zadaje w przybliżeniu
+$O(n)$ zapytań o równoważność i $O(mn^2)$ zapytań o przynależność do języka \cite{Angluin}.
+
+
+\textbf{Aktywne Uczenie z Resetami} jest rozszerzeniem modelu aktywnego uczenia zaproponowanym przez Jana Otopa i Jakuba Michaliszyna
+\cite[5. Learning with resets, 6. Learning with a single reset]{main}.
+
+W tym podejściu model zakłada naukę nieznanego uczniowi automatu DVPA $T$, zwanego automatem docelowym,
+zamiast języka rozpoznawanego poprzez pewien automat z tej klasy. Ponieważ problem minimalizacji DVPA jest NP-trudny \cite{minimalization}
+nie istnieje wielomianowy algorytm w stylu $L^*$ konstruujący minimalny automat. Dlatego to podejście nie gwarantuje minimalizacji automatu.
+Autorzy wykazują również, że sama obserwacja stosu nie wystarczy do stworzenia algorytmu działającego w czasie wielomianowym
+\cite[3.1 Difficulty of adapting $L^*$ to visibly pushdown languages]{main} dlatego algorytm modyfikuję stos automatu w trakcie wczytywania słowa.
+
+W celu umożliwienia manipulacji zawartością stosu autorzy wprowadzają dodatkowe pojęcia związane z kontrolą stosu:
+\begin{description}
+    \item[Litera kontrolna] $\underline{\bot s}$, gdzie $s \in \Gamma^*$, jest to litera po przeczytaniu której automat podmienia
+    zawartość stosu na $\bot s$.
+
+    \item[Zbiór liter kontrolnych] oznaczamy symbolem $\underline{\Gamma}$.
+
+    \item[Słowo standardowe] jest to słowo nad alfabetem $\Sigma$, nie zawiera ono liter kontrolnych.
+
+    \item[Słowo kontrolne] jest to słowo składające się zarówno z liter z alfabetu $\Sigma$, jak i liter kontrolnych
+
+    \item[Słowo z pojedynczym resetem] jest to słowo zawierające dokładnie jedną literę kontrolną. Zbiór wszystkich słów z pojedynczym
+    resetem nad alfabetem $\Sigma$ i $\Gamma$ oznaczamy jako $Reset_1^{\Sigma, \Gamma}$.
+
+    \item[Słowo z pojedynczym resetem inicjalizującym] jest to słowo z pojedynczym resetem, którego pierwszą literą jest litera kontrolna.
+    Zbiór tych słów oznaczamy jako $Init_1^{\Sigma,\Gamma}$.
+\end{description}
+Poprzez $\underline{L}(A)$ oznaczamy język generowany przez automat nad alfabetem zawierającym litery kontrolne.
+
+Zbiór zapytań na jakie powinien odpowiadać nauczyciel w tym modelu zostaje rozszerzony o dodatkowe zapytanie: zapytanie o stos $SC(w)$,
+w odpowiedzi na to zapytanie nauczyciel powinien zwrócić zawartość stosu automatu docelowego po przeczytaniu słowa $w$.
+Zapytania zostają również dostosowane do modelu zawierającego litery kontrolne w następujący sposób:
+
+\begin{itemize}
+    \item \textbf{zapytanie o równoważność $EQ(H)$}. Nauczyciel powinien zwrócić słowo standardowe, rozróżniające język $L(H)$ od języka $L(T)$,
+    gdy takie istnieje.
+
+    \item \textbf{zapytanie o przynależność $MQ(w)$}. Nauczyciel powinien odpowiedzieć czy słowo $w$ będące słowem standardowym,
+    lub słowem kontrolnym należy do języka $\underline{L}(T)$.
+
+    \item \textbf{zapytanie o stos $SC(w)$}. Nauczyciel powinien zwrócić zawartość stosu po przeczytaniu słowa $w$ będącego słowem standardowym,
+    lub słowem kontrolnym.
+\end{itemize}
+
+Kluczowym jest również wprowadzenie odpowiednika relacji równoważności, która będzie udoskonalana w trakcie działania algorytmu.
+Dla języków rozpoznawanych przez DVPA Twierdzenie Myhilla-Nerode'a nie może być zastosowane wprost. W szczególności minimalny automat DVPA
+rozpoznający dany język nie jest jednoznaczny, a kanoniczna konstrukcja automatu \cite{canonical} może być wykładniczo większa niż minimalny DVPA.
+
+Autorzy wprowadzają pojęcie kontrolnej prawostronnej kongruencji. Relacja $\simeq$ na słowach nad alfabetem $(\Sigma \cup \underline{\Gamma})$,
+jest kontrolną prawostronną kongruencją, jeśli:
+$$\text{dla wszystkich słów }w_1, w_2 \in (\Sigma \cup \underline{\Gamma})^* \text{ i } \alpha \in \underline{\Gamma} \cdot \Sigma \text{ } (w_1 \simeq w_2 \Rightarrow w_1\alpha \simeq w_2\alpha)$$
+
+Relacje tego typu stanowią podstawę konstrukcji automatu uczonego przez algorytm. 
+W następnym rozdziale przedstawię konkretną relacje zaproponowaną przez autorów, która została zaimplementowana.

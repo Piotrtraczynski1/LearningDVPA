@@ -1,0 +1,53 @@
+\chapter{Generatory}
+\label{chap:generators}
+
+Ten rozdział zawiera opis generatorów, których celem jest wytworzenie kontrolowanych klas automatów DVPA, które różnią się strukturą stosu oraz
+organizacją przejść, w celu zbadania wpływu tych własności na wydajność aktywnego uczenia.
+
+TODO: jak było to robione w innych pracach.
+
+\section{Generator losowy}
+
+TODO
+
+\section{Generatory sterowane call}
+\label{chap:CDA}
+
+Sekcja ta zawiera opisy cztery rodzai automatów, które były generowane podczas testowania algorytmu. Bazują one na zmodyfikowanych definicjach
+z pracy \textit{Minimizing variants of visibly pushdownautomata} \cite{variants}. Definicje z tej pracy zakładają, że zbiór symboli
+stosowych $\Gamma$ jest równy $Q\times\Sigma_{call}$, daje to pełną swobodę w wyborze symboli stosowych, gdyż jest to maksymalny sensowny
+zbiór symboli stosowych. W tej pracy zakładamy, że $\Gamma$ jest równa $M\times\Sigma_{call}$, gdzie $M$ oznacza zbiór modułów.
+
+Intuicyjnie automaty te przypominają stos wywołań programu, gdzie symbolami call możemy dostać się do innego modułu. Symbole lokalne
+pozostają w tym samym module, a symbole return wracają do modułu z którego został zawołany call.
+
+\textbf{Call Driven Automaton} jest to automat dla, którego można zdefiniować funkcję $Target: \Sigma_{call} \rightarrow Q$ i podzielić zbiór
+stanów $Q$ na $|M|$ parami rozłączonych zbiorów $Q_k$. Stan $q_i$ oznacza stan należący do zbioru $Q_i$. Relacja $\sameModuleRel$ jest zdefiniowana
+w następujący sposób: $v \sameModuleRel v' \Leftrightarrow \exists i (v \in Q_i \land v' \in Q_i)$. Taki automat musi spełniać następujące własności:
+
+
+\begin{equation}
+\begin{aligned}
+    \delta(q_i, c) &= (q_j, s),
+    && \text{gdzie } c \in \Sigma_{call},\ q_j = Target(c),\ s = (i, c) \\
+    \delta(q_i^{1}, l) &= (q_i^{2}),
+    && \text{gdzie } l \in \Sigma_{local} \\
+    \delta(q_i, (j, c), r) &= (q_j),
+    && \text{gdzie } r \in \Sigma_{return}
+\end{aligned}
+\end{equation}
+
+
+\textbf{Single Entry Visibly Pushdown automaton} jest klasą automatów, która zawiera się w klasie Call Driven. Dodatkowo jest wymagane żeby
+funkcja $Target$ spełniała warunek: jeśli $Target(c_1) \sameModuleRel Target(c_2)$, to $Target(c_1) = Target(c_2)$.
+
+\textbf{Multiple Entry Visibly Pushdown automaton} jest to klasa automatów, która zawiera się w klasie Call Driven.
+Jednakże zbiór $\Gamma = M$, czyli stos przenosi informację tylko o module z którego został zawołany call.
+Pozostałe wymagania są zdefiniowane analogicznie do automatów Call Driven.
+
+Automat $A$ w tej formie ma własność, że $lcw \in L(A) \Leftrightarrow cw \in L(A)$, umożliwia to zdefiniowanie prostych reguł SRS,
+które mogą zostać wykorzystane do usprawnienia aktywnego uczenia.
+
+\textbf{Extended Call Driven Automaton} jest to kalasa automatów, która zawiera się zawrówno w klasie Multiple Entry, jak i Single Entry.
+Jest zdefiniowana poprzez dostosowanie funkcji $Target$. Automat $A$ należy do klasy Extended Call Driven,
+wtedy i tylko wtedy, gdy $Target(c_1) \sameModuleRel Target(c_2) \Rightarrow c_1 = c_2$.

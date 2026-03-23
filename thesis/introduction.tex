@@ -1,0 +1,32 @@
+\chapter{Wprowadzenie}
+
+\textbf{Teoria automatów} stanowi jeden z fundamentalnych działów informatyki teoretycznej. Znajduje zastosowanie w matematycznym
+modelowaniu systemów komputerowych, takich jak analiza leksykalna kompilatorów \cite[3.8.3 DFA's for Lexical Analyzers]{compilers},
+czy \cite{}[TODO]. Zachowania takich systemów mogą zostać opisane w postaci formalnych modeli automatów, co umożliwia ich analizę oraz
+wnioskowanie o własnościach przy użyciu narzędzi teorii języków formalnych.
+
+\textbf{Aktywne uczenie się automatów} umożliwia stworzenie takiego modelu na podstawie obserwacji badanego systemu. Podejście to zakłada
+dostęp do systemu w postaci czarnej skrzynki oraz wnioskowanie na podstawie jego odpowiedzi.
+
+\textbf{Algorytm $L^*$ \cite{Angluin}}, opublikowany w roku 1987 przez Danę Angluin był jednym z pierwszych sukcesów w tej dziedzinie,
+który przedstawił w jaki sposób można odtworzyć strukturę automatu na podstawie obserwacji. Zakładając możliwość odpowiadania na 2 rodzaje zapytań:
+"Czy słowo $w$ jest akceptowane przez automat?" i "Czy dla zadanego automatu $H$, istnieje słowo które odróżnia go od uczonego systemu?",
+można skonstruować minimalny deterministyczny automat skończony równoważny systemowi na podstawie którego odpowiadamy na zapytania.
+
+\textbf{Automaty ze stosem} stanowią rozszerzenie automatów skończonych o dodatkową pamięć w postaci stosu. Umożliwiają reprezentowanie bardziej
+skomplikowanych systemów, rozwiązujących szerszą gamę problemów, w szczególności te składające się z zagnieżdżonych struktur.
+Jednakże ogólność tych automatów wiąże się z istotnymi ograniczeniami, jak nierozstrzygalność, lub koszt obliczeniowy wielu problemów decyzyjnych.
+
+\textbf{Automaty Visibly Pushdown} stanowią klasę automatów zdefiniowaną w roku 2004 przez Rajeeva Alura i P.Madhusudana \cite{vpl}.
+Jej obiekty podobnie jak automaty ze stosem, posiadają nieskończoną pamięć. Ich struktura jednakże jest bardziej przewidywalna,
+co umożliwia wykonywanie m.in. takich operacji jak suma, różnica, czy przekrój dwóch automatów \cite{vpl}[2.3 Decision problems].
+
+Automaty visibly pushdown znajdują zastosowanie w wielu systemach komputerowych. Przykładowo mogą służyć do przetwarzania dokumentów XML \cite{xml},
+walidacji plików JSON \cite{json}, czy monitorowania programów w języku C \cite{Cmonitor}. Czyni je to wartościowymi obiektami badań.
+
+\textbf{Aktywne uczenie się z dostępem do stosu.} W 2025 roku Jan Otop i Jakub Michaliszyn przedstawili algorytm do aktywnego uczenia się automatów DVPA.
+Algorytm umożliwia poznanie dokładnej struktury automatu DVPA na podstawie obserwacji w wielomianowym czasie. Algorytm wymaga w porównaniu
+do algorytmu $L^*$ dodatkowego zapytania o aktualny stan stosu, jak i możliwości modyfikacji stosu podczas wczytywania słowa przez automat.
+
+Praca przedstawia implementację tego algorytmu, jak i sprawdzenie jego wydajność pod kątem ilości wymaganych zapytań dla różnych klas automatów DVPA.
+Dodatkowo analizowany jest wpływ zastosowania idei z pracy \textit{Active Automata Learning with Advice} \cite{srs} dla omawianego algorytmu.

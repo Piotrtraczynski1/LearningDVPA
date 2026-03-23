@@ -1,0 +1,171 @@
+\chapter{Opis algorytmu}
+
+Rozdział ten stanowi opis zaimplementowanego algorytmu, który jest realizacją aktywnego uczenia z pojedynczym
+resetem \cite[6. Learning with a single reset]{main} wraz z algorytmem nauczyciela, umożliwiającym testowanie algorytmu.
+Algorytm ten wykorzystuje model uczenia z pojedynczym resetem, w którym słowa wykorzystywane w zapytaniach mogą zawierać
+co najwyżej jedną literę kontrolną. Ograniczenie to pozwala uniknąć konstruowania stanów nieosiągalnych w uczonym automacie
+oraz prowadzi do algorytmu działającego w czasie wielomianowym. Wtedy zbiór zapytań do nauczyciela będzie następujący:
+
+\begin{itemize}
+    \item \textbf{zapytanie o równoważność $EQ(H)$}. Nauczyciel powinien zwrócić słowo standardowe, rozróżniające języki $L(H)$ oraz $L(T)$, gdy takie istnieje.
+    \item \textbf{zapytanie o przynależność $MQ(w)$}. Nauczyciel powinien odpowiedzieć czy słowo $w \in Init_1 \cup \Sigma^*$ należy do języka $\underline{L}(T)$.
+    \item \textbf{zapytanie o stos $SC(w)$}. Nauczyciel powinien zwrócić zawartość stosu po przeczytaniu słowa $w \in Init_1 \cup \Sigma^*$.
+\end{itemize}
+
+Relacja $\equiv^{C}_T$, gdzie $C \subseteq Init_1$, jest zdefiniowaną w następujący sposób:
+$$w_1 \equiv^{C}_T w_2 \Leftrightarrow \forall_{c \in C}((w_1c \in \underline{L}(T) \Leftrightarrow w_2c \in \underline{L}(T)) \land SC_T(w_1c) = SC_T(w_2c))$$
+
+Relacja ta nie jest kontrolną prawostronną kongruencją, jednak jak pokazują autorzy algorytmu \cite{main}[Lemma 6]. Każdy DVPA skonstruowany
+na podstawie $\equiv^{Init_1}_T$ i ograniczony do standardowych słów jest równoważny do automatu docelowego. Umożliwia to udoskonalanie
+relacji $\equiv^{C}_T$ poprzez rozszerzanie zbioru $C$ w celu aktywnego uczenia automatu.
+
+
+\section{Uczeń}
+
+Uczeń jako parametry wejściowe otrzymuje alfabet $\Sigma$ i zbiór symboli stosowych $\Gamma$, które obsługuje automat docelowy.
+
+Algorytm utrzymuje dwa zbiory $S \subseteq \Sigma^*$ oraz $C \subseteq Init_1$, gdzie $S$ jest zbiorem selektorów,
+które reprezentują stany w konstruowanym automacie. Zbiór $C$ nazywany zbiorem słów testowych, udoskonala relację $\equiv^{C}_T$ poprzez
+wykluczanie przejść w hipotezie, które nie są poprawne. Algorytm zaczyna działanie z $S = \{\epsilon\}$ oraz $C = \{ \underline{\bot}\epsilon\}$.
+Następnie generuje hipotezę bazując tylko na aktualnym stanie zbiorów $S$ oraz $C$. Wygenerowaną hipotezę przesysyła do nauczyciela przy pomocy
+zapytania $EQ$, jeśli nauczyciel zwróci kontrprzykład algorytm rozszerza $S$ oraz $C$, w sposób, który sprawia, że następna wygenerowania
+hipoteza będzie bliżej automatu docelowego. Procedura ta jest powtarzania, aż do skonstruowania poprawnego automatu. 
+
+W trakcie trwania algorytmu utrzymywany jest odpowiednik rozdzielności, który gwarantuje ograniczenie ilości stanów hipotezy.
+Utrzymywany jest także w pewnym stopniu ograniczony odpowiednik domkniętości. Ponieważ nie wszystkie rozważane konfiguracje muszą być osiągalne
+w automacie, nie zawsze można dodać nowy selektor, który zagwarantowałby domkniętość. Własności te są zdefiniowane w następujący sposób:
+
+\begin{enumerate}
+    \item \textbf{Rozdzielność}: różne słowa z $S$ należą do różnych klas abstrakcji relacji $\equiv^C_T$
+
+    \item \textbf{Domkniętość}: dla każdego słowa $s \in S$, litery $a \in \Sigma$ i symbolu $B \in \Gamma \cup \{\bot\}$ istnieje
+    $s' \in S$, takie że $s\underline{\bot B}a \equiv^C_T s'$
+\end{enumerate}
+
+W algorytmie procedury domykania $S$ i $C$ oraz generowania automatu w przeciwieństwie do algorytmu $L^*$, są połączone w jedną procedurę.
+
+\subsection{Generowanie hipotezy}
+
+Stan początkowy określany jest jako $\epsilon$, a stany akceptujące to te selektory dla których $MQ(s)$ zwraca \texttt{true}.
+Żeby skonstruować hipotezę należy jeszcze zdefiniować funkcje przejścia $\delta$, w tym celu rozważa się każdą możliwą literę $a \in \Sigma$
+oraz każdą możliwą konfiguracje $(s, B)$, gdzie $s \in S$ i $B \in \Gamma$. Żeby określić $\delta(s, a, B)$, należy znaleźć selektor $s'$,
+taki że $s' \equiv^C_T s\underline{\bot B}a$. Ponieważ relacja $s\underline{\bot B}a$ jest zdefiniowana nad słowami standardowymi nie można
+wprost skorzystać z definicji równoważności. Dlatego podczas sprawdzania równoważności należy zamienić słowo $s\underline{\bot B}ac$
+na równoważne słowo z pojedynczym resetem w następujący sposób:
+
+\begin{description}
+    \item[Jeśli $a$ jest literą local albo call:] \hfill \\
+        Ponieważ litery te nie zależą one od symbolu stosowego, oraz po przeczytaniu litery $a$ stos zostanie zresetowany przez pierwszą
+        literę słowa testowego można pominąć wkładanie symbolu stosowego $B$ na stos. Jeśli istnieje równoważny selektor to jest on dobrym następnikiem,
+        jeśli nie to należy dodać nowy selektor $sa$. Ponadto w przypadku symbolu call trzeba określić jaki symbol powinien być dołożony na stos,
+        przy pomocy zapytania $SC(sa)$.
+
+    \item[Jeśli $a$ jest literą return] \hfill \\
+        Należy rozpatrzeć dwa przypadki:
+        \begin{description}
+            \item[Jeśli $B = \bot$] \hfill \\
+                Ważne są tylko słowa testowe, które zaczynają się od symbolu $\underline{\bot}$, ponieważ stos po przeczytaniu $s\underline{\bot B}a$
+                będzie pusty. Teraz rozważając słowo testowe $\underline{\bot}c \in C$ należy sprawdzać $s\underline{\bot}ac$.
+
+            \item[Jeśli $B \neq \bot$] \hfill \\
+                Dla danego słowa testowego $\underline{\bot v}c \in C$ przejście automatu nad $s\underline{\bot B}a\underline{\bot v}c$ osiągnie
+                tą samą konfiguracje, co przejście nad $s\underline{\bot vB}ac$, co umożliwia sprawdzenie równoważności.
+        \end{description}
+        
+        Jeżeli zbiór $S$ zawiera już równoważny selektor to jest on następnikiem dla przejścia $\delta(s, a, B)$. W przeciwnym wypadku sprawdzamy
+        pewne słowo $w_s$, które jest świadkiem osiągalności stanu $s$. Jeśli osiąga ono konfigurację $(s, B)$ zapewnia to, że bezpiecznym jest
+        rozszerzenie zbioru selektorów o słowo $sa$?. W przypadku, gdy nie istnieje równoważny selektor, ani odpowiedni świadek,
+        oznaczamy to przejście jako nieokreślone.
+        
+
+\end{description}
+
+Na końcu nieokreślone przejścia są kierowane do stanu $\epsilon$, lub stanu który został oznaczony jako poprawny następnik dla tej konfiguracji
+podczas obsługi kontrprzykładu. Skonstruowany w ten sposób automat zachowuje własność rozdzielności, ze względu na restrykcyjność w rozszerzaniu
+zbioru $S$. Własność domkniętności nie musi być zachowana z powodu nieokreślonych przejść, jednakże przekierowanie ich od odpowiedniego stanu
+pozwala nam skonstruować pełny automat określany jako $A^c$.
+
+\subsection{Obsługa kontrprzykładu}
+Algorytm otrzymując kontrprzykład $w$ powinien rozszerzyć przynajmniej jeden ze zbiorów $S$ oraz $C$ w sposób, który zapewni progres algorytmu
+poprzez dodanie nowego selektora, bądź wykluczenie przejścia, które nie jest poprawne. Odbywa się to poprzez znalezienie podziału $w$ na $vaw'$,
+gdzie $v, w' \in \Sigma^*$ i $a \in \Sigma$, takiego że:
+$$SC_T(v) = SC_{A^c}(v) = u \text{ i } \underline{\bot u}aw' \in \underline{L}(T) \Leftrightarrow s\underline{\bot u}aw' \in \underline{L}(T) \text{, ale}$$
+$$SCT_T(va) \neq SC_{A^c}(va) \text{, albo }$$
+$$SC_{T}(va) = SC_{A^c}(va) = u' \text{, ale } va\underline{\bot u'}w' \in \underline{L}(T) \neq s' \underline{\bot u'}w' \in \underline{L}(T)$$
+
+Jest to pierwsze miejsce, w którym hipoteza nie zgadza się z automatem docelowym na słowie $w$. W zależności czy niespójność w hipotezie z automatem
+docelowym została wykryta na podstawie zawartości stosu, czy akceptacji słowa możliwe są dwa przypadki:
+
+\textbf{1. Zawartość stosu się różni.} Należy znaleźć pierwsze miejsce w słowie $va$, po którym perspektywa stosu różni się pomiędzy
+hipotezą i automatemdocelowym. Formalnie rozważa się rozkład słowa $va$ na $v_1bv_2$, gdzie $b \in \Sigma$, $v_1, v_2 \in \Sigma^*$.
+Niech $q, q'$ oznaczają stany hipotez po przeczytaniu odpowiednio $v_1$ oraz $v_1b$, a $x = SC_T(v_1)$ i $x' = SC_T(v_1b)$.
+Słowo $v_1$ wybiera się jako najkrótsze spełniające warunek:
+$$SC_T(v_1 \underline{\bot x}bv_2) = SC_T(q \underline{\bot x}bv_2) \text{, ale } SC_T(v_1b \underline{\bot x'}v_2) \neq SC_T(q' \underline{\bot x'}v_2)$$
+
+Autorzy dowodzą \cite{main}[Lemma 15], że rozszerzenie zbioru $C$ o słowo $\underline{\bot x'}v_2$ gwarantuje, że wygenerowany automat nie może
+zawierać przejścia z $q$ do $q'$ za pomocą litery $b$ oraz symbolu stosowego będącego szczytem stosu $SC_T(v_1)$, co zapewnia progres algorytmu.
+
+\textbf{2. Sufiksy się nie zgadzają.} Niech $SC_T(va) = SC_{A^c}(va) = u'$. Wtedy rozszerzamy zbiór $C$ o słowo $\underline{\bot u'}w'$,
+następnie rozszerzamy zbiór selektorów o $va$, jeżeli nie istnieje już równoważny do niego selektor.
+Jeśli rozszerzyliśmy zbiór $S$ to gwarantuję to dalszy progres. W innym przypadku autorzy pracy dowodzą \cite{main}[Lemma 16],
+że w dowolnym automacie wygenerowanym na podstawie zbioru $S$ oraz nowego zbioru $C$ nie będzie istnieć przejście z $s$ do $s'$ za pomocą
+litery $a$ i symbolu stosowego $B$. Szczególnym przypadkiem jest sytuacja, w której $s' = \epsilon$, a algorytm nie znajdzie świadka
+dla konfiguracji $(s, B)$. W celu zapewnienia, że przejście to nie pozostanie nieokreślone oznaczamy selektor równoważny do słowa $va$
+jako następnik dla $(s, B, a)$, zamiast stanu $\epsilon$.
+
+
+\section{Nauczyciel}
+
+Nauczyciel jako parametr wejściowy przyjmuje docelowy automat DVPA $T$ i odpowiada na trzy rodzaje zapytań. Na zapytania o zawartość stosu
+i przynależność do języka odpowiada wczytując zadane słowo do automatu $T$. Na zapytania o równoważność odpowiada przez wykonanie następujących kroków:
+
+\begin{enumerate}
+    \item Konstruuje automat $P = T \triangle H$, czyli taki, który generuje język $L(T) \triangle L(H) = (L(T) \setminus L(H)) \cup (L(H) \setminus L(T))$.
+
+    \item Zamienia automat $P$ na automat $P'$ nad alfabetem $\Sigma_P \cup {r'}$, gdzie $r' \in \Sigma_{return}^{P'}$,
+    który akceptuje przez stos i $L(P') = \{w : \ w = vv' \text{, gdzie } v \in L(P), v' \in {r'}^* \}$.
+
+    \item Zamianie automat $P'$ na równoważną gramatykę bezkontekstową.
+
+    \item Sprawdza czy utworzona gramatyka bezkontekstowa jest pusta, jeśli nie zwraca słowo $w$ akceptowane przez tą gramatykę.
+
+    \item Jeśli słowo zwrócone przez gramatykę jest puste, nauczyciel odpowiada, że automaty są równe, inaczej znajduję
+    rozbicie słowa $w$ na $v$ i $v'$ i zwraca słowo $v$ jako kontrprzykład.
+\end{enumerate}
+
+1. Automat $P$ jest tworzony w taki sposób, żeby symulować jednocześnie zachowanie obu automatów i jego stanami akceptującymi są stany
+akceptowane przez dokładnie jeden z dwóch automatów. Formalnie jeśli $T = (\Sigma, Q_T, q_0^T, F_T, \Gamma, \delta_T)$
+i $H = (\Sigma, Q_H, q_0^H, F_H, \Gamma, \delta_H)$, to $P = (\Sigma, Q_p, q_0^P, F_P, \Gamma_P, \delta_P)$, gdzie:
+
+\begin{description}
+    \item[$Q_P$] $ = Q_T \times Q_H$
+    \item[$q_0^P$] $ = (q_0^T, q_0^H)$
+    \item[$F_P$] $= \{(q_1, q_2) \in Q_P : (q_1 \in F_T \land q_2 \notin F_H) \lor (q_1 \notin F_T \land q_2 \in F_H)\}$
+    \item[$\Gamma_P$] $= \Gamma \times \Gamma$
+    \item[$\delta_P((q_1, q_2), a, (B_1, B_2))$] $= ((q_1', q_2'), (B_1',B_2')) \text{, gdzie:}$
+    \item $\delta_T(q_1, a, B_1) = (q_1', B_1') \text{ i } \delta_H(q_2, a, B_2) = (q_2', B_2')$
+\end{description}
+
+2. Ponieważ klasyczne algorytmy konwersji DPDA do gramatyki bezkontekstowej \cite[6.3.2 From PDA’s to Grammars]{DPDAtoCFG}
+\cite[2.2 Equivalence with context-free grammars]{Sipser} operują na automatach, które akceptują poprzez pusty stos,
+zostały one wykorzystane i poprzedzone prostą konwersją.
+
+Do konwersji zostało zastosowane uproszczone podejście klasycznego algorytmu, w którym konstruujemy równoważny automat
+\cite[6.2.4 From Final State to Empty Stack]{DPDAtoCFG}. Automat $P'$ akceptuje inny język, niż $P$ i jest zdefiniowany nad innym alfabetem,
+ale znając słowo akceptowane przez ten automat można w prosty sposób odtworzyć słowo akceptowane przez $P$.
+Formalnie automat $P' = (\Sigma_{P'}, Q_{P'}, q_0^P, \Gamma_P, \delta_{P'})$, gdzie:
+
+\begin{description}
+    \item[$\Sigma_{P'}$] $ = \Sigma_P \cup \{r'\}$
+    \item[$Q_{P'}$] $ = Q_P \cup \{q'\}$
+    \item[$\delta_{P'}$] $= \delta_P \cup \{(q, r', sB) \mapsto (q', s) : q \in F_P \cup \{q'\}\}$
+\end{description}
+
+3. Automat $P'$ przekształcamy w równoważną gramatykę bezkontekstową przy użyciu klasycznej konstrukcji \cite[6.3.2 From PDA's to Grammars]{DPDAtoCFG}.
+Otrzymujemy gramatykę $G$, dla której zachodzi $L(G) = L(P')$.
+
+4. Problem pustości gramatyki można rozwiązać przez obliczenie zbioru symboli generujących
+\cite[7.1.2 Computing the Generating and Reachable Symbols]{DPDAtoCFG}. W przypadku niepustości, przykładowe słowo można odzyskać zapamiętując
+dla każdego generującego nieterminalu produkcję, która świadczy o jego generatywności.
+
+5. Żeby znaleźć rozbicie słowa $w$ na $v$ i $v'$ wystarczy odrzucić najdłuższy możliwy sufiks składający się jedynie z liter $r'$.

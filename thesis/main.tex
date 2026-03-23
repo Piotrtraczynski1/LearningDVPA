@@ -1,0 +1,96 @@
+% Opcje klasy 'iithesis' opisane sa w komentarzach w pliku klasy. Za ich pomoca
+% ustawia sie przede wszystkim jezyk oraz rodzaj (lic/inz/mgr) pracy.
+\documentclass[shortabstract]{iithesis}
+
+\usepackage[utf8]{inputenc}
+
+%%%%% DANE DO STRONY TYTUŁOWEJ
+% Niezaleznie od jezyka pracy wybranego w opcjach klasy, tytul i streszczenie
+% pracy nalezy podac zarowno w jezyku polskim, jak i angielskim.
+% Pamietaj o madrym (zgodnym z logicznym rozbiorem zdania oraz estetyka) recznym
+% zlamaniu wierszy w temacie pracy, zwlaszcza tego w jezyku pracy. Uzyj do tego
+% polecenia \fmlinebreak.
+\polishtitle    {Implementacja i badanie efektywności algorytmu \fmlinebreak "Learning Deterministic Visibly Pushdown Automata under Accessible Stack"}
+\englishtitle   {English title}
+\polishabstract {
+Tematem pracy licencjackiej jest implementacja oraz analiza wydajności algorytmu aktywnego uczenia się automatów visibly pushdown \cite{main}.
+Przedstawiono motywację do aktywnego uczenia się automatów. Opisano algorytm wraz ze szczegółami implementacyjnymi oraz wykorzystanie dodatkowej
+wskazówki usprawniającej jego działanie \cite{srs}. Następnie przedstawiono sposób generowania automatów oraz ich wykorzystanie do testowania algorytmu.
+Na końcu przedstawione zostały wyniki eksperymentów.
+
+}
+\englishabstract{
+The aim of this thesis is the implementation and performance analysis of an active learning algorithm for visibly pushdown automata \cite{main}.
+The motivation for active automata learning is presented. The algorithm is described with its implementation details, as well as the use of additional
+information which improves the algorithm's performance \cite{srs}. Then, the method of generating automata and their use in testing
+the algorithm are presented. Finally, the results of the experiments are presented.
+
+}
+% w pracach wielu autorow nazwiska mozna oddzielic poleceniem \and
+\author         {Piotr Traczyński}
+% w przypadku kilku promotorow, lub koniecznosci podania ich afiliacji, linie
+% w ponizszym poleceniu mozna zlamac poleceniem \fmlinebreak
+\advisor        {dr hab. Jan Otop}
+%\date          {}                     % Data zlozenia pracy
+% Dane do oswiadczenia o autorskim wykonaniu
+\transcriptnum {330019}                     % Numer indeksu
+\advisorgen    {dr hab. Jana Otopa} % Nazwisko promotora w dopelniaczu
+%%%%%
+
+%%%%% WLASNE DODATKOWE PAKIETY
+%
+%\usepackage{graphicx,listings,amsmath,amssymb,amsthm,amsfonts,tikz}
+\usepackage{amsmath}
+%
+%%%%% WŁASNE DEFINICJE I POLECENIA
+%
+%\theoremstyle{definition} \newtheorem{definition}{Definition}[chapter]
+%\theoremstyle{remark} \newtheorem{remark}[definition]{Observation}
+%\theoremstyle{plain} \newtheorem{theorem}[definition]{Theorem}
+%\theoremstyle{plain} \newtheorem{lemma}[definition]{Lemma}
+%\renewcommand \qedsymbol {\ensuremath{\square}}
+% ...
+
+\newcommand{\sameModuleRel}{\mathrel{\overset{Q}{\leftrightarrow}}}
+%%%%%
+
+\begin{document}
+
+%%%%% POCZĄTEK ZASADNICZEGO TEKSTU PRACY
+
+
+\input{introduction}
+\input{preliminaries}
+\input{activeLearning}
+\input{algorithm}
+\input{srs}
+\input{project}
+\input{generators}
+\input{results}
+\input{summary}
+
+
+%%%%% BIBLIOGRAFIA
+
+\begin{thebibliography}{1}
+
+\bibitem{main} Jakub Michaliszyn, Jan Optop. Learning Deterministic Visibly Pushdown Automata uder Accessible Stack. 
+\bibitem{srs} Michał Fica, Jan Otop. Active Automata Learning with Advice.
+\bibitem{Angluin} Dana Angluin. Learning Regular Sets from Queries and Counterexamples.
+\bibitem{DPDAtoCFG} John E. Hopcroft, Rajeev Motwani, Jeffrey D. Ullman. Introduction to Automata Theory, Languages, and Computation 3rd Edition
+\bibitem{Sipser} Michael Sipser. Introduction to the Theory of Computation, Second Edition.
+\bibitem{compilers} Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman. Compilers Pinciples, Techniques, \& Tools Second Edition.
+\bibitem{Cmonitor} Swarat Chaudhuri and Rajeev Alur. Instrumenting C programs with Nested Word Monitors.
+\bibitem{minimalization} Olivier Gauwin, Anca Muscholl, and Michael Raskin. Minimalization of visibly pushdown automata is NP-complete.
+\bibitem{canonical} Rajeev Alur, Viraj Kumar, Parthasarathy Madhusudan, and Mahesh Viswanathan. Congruences for Visibly Pushdown Languages.
+\bibitem{vpl} Rajeev Alur, P. Madhusudan. Visibly Pushdown Languages.
+\bibitem{variants} Patrick Chervet, Igor Walukiewicz. Minimizing variants of visibly pushdown
+automata.
+\bibitem{xml} Viraj Kumar, P. Madhusudan, Mahesh Viswanathan. Visibly Pushdown Automata for Streaming XML.
+\bibitem{json} Veronique Bruyere, Guillermo A. Perez, and Gaetan Staquet. Validating Streaming JSON Documents with Learned VPAs.
+\bibitem{Wmethod} BernHard K. Aichernig, Martin Tappler, Felix Wallner. Benchmarking Combinations of Learning and Testing
+Algorithms for Automata Learning.
+
+\end{thebibliography}
+
+\end{document}

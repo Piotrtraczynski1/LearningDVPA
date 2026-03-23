@@ -1,0 +1,329 @@
+\chapter{Rozwiązania projektowe}
+
+\section{Technologia}
+
+\begin{itemize}
+    \item Implementacja została wykonana w języku C++ z wykorzystaniem standardu C++20 przy użyciu kompilatora GCC w wersji 13.3.0.
+    \item Projekt budowany jest przy użyciu systemu budowania \texttt{CMake}.
+    \item Testy jednostkowe zaimplementowano przy użyciu biblioteki \texttt{GoogleTest} w wersji 1.14.0.
+    \item Do pomiarów wydajności wykorzystano bibliotekę \texttt{Google Benchmark} w wersji 1.9.1.
+    \item Program był rozwijany i testowany w systemie operacyjnym Ubuntu 24.04.
+\end{itemize}
+
+\section{Struktura projektu}
+
+Struktura katalogów projektu przedstawiona jest poniżej. Testy jednostkowe dla pliku \texttt{path/File.cpp}, jeśli zostały zdefiniowane,
+znajdują się w katalogu \texttt{path/ut/} pod nazwą \texttt{TestFile.cpp}.
+
+\begin{verbatim}
+workspace/
+|-- src/
+|   |-- benchmark/              # punkt wejścia programu benchmarkującego
+|   |-- common/                 # podstawowe struktury danych
+|   |-- failedTests/            # szczegóły testów zakończonych niepowodzeniem
+|   |-- generator/              # generatory automatów testowych
+|   |-- learner/                # implementacja algorytmu ucznia
+|   |-- teacher/                # implementacja nauczyciela
+|   |-- utils/                  # dodatkowe narzędzia użyte w projekcie
+|   |-- Tester.hpp              # klasa odpowiedzialna za uruchamianie testów
+|   |-- TesterParameters.hpp    # parametry służące do konfigurowania testów
+|   |-- main.cpp                # punkt wejścia programu
+|-- build.sh                    # skrypt służący do budowania
+|-- CMakeLists.txt              # konfiguracja systemu budowania
+\end{verbatim}
+
+\section{Struktury danych}
+
+W tej sekcji przedstawiono kluczowe struktury danych wykorzystywane w implementacji algorytmu. Struktury te zostały zdefiniowane w module \texttt{common}.
+
+\textbf{Alfabet wejściowy} jest reprezentowany za pomocą trzech typów wyliczeniowych: \texttt{CallSymbol}, \texttt{LocalSymbol}
+oraz \texttt{ReturnSymbol}. Dzięki temu możliwe jest reprezentowanie dowolnego alfabetu
+$\Sigma = \Sigma_{call} \cup \Sigma_{local} \cup \Sigma_{return}$ poprzez numerację symboli w każdym z tych zbiorów. 
+
+Alfabet opisany jest przez krotkę $\langle |\Sigma_{call}|, |\Sigma_{local}|, |\Sigma_{return}| \rangle$
+oznaczającą liczność poszczególnych zbiorów symboli.
+
+\textbf{Zbiór symboli stosowych} jest reprezentowany za pomocą typu wyliczeniowego \texttt{StackSymbol}.
+Symbol $\bot$ jest oznaczany poprzez wartość 0. Zbiór symboli stosowych musi zawierać co najmniej jeden element
+reprezentujący symbol dna stosu. Jeśli $|\Sigma_{call}| > 0$ wymagane jest, żeby ten zbiór zawierał przynajmniej 2 elementy.
+
+\textbf{Zbiór stanów automatu} również jest reprezentowany w postaci typu wyliczeniowego \texttt{State}.
+
+\textbf{Stos} reprezentowany jest poprzez klasę \texttt{Stack} stanowiącą nakładkę na stos ze standardowej biblioteki języka C++
+dostosowaną do zwracania symbolu $\bot$, gdy stos jest pusty.
+
+\textbf{Litera kontrolna} reprezentowana jest przy użyciu tej samej struktury danych co stos automatu.
+W implementacji zastosowano alias typu \texttt{ControlWord = Stack}. 
+
+\textbf{Litera} reprezentowana jest jako typ danych \texttt{Symbol} oznaczający wariant symboli wejściowych i litery kontrolnej. 
+\begin{verbatim}
+std::variant<CallSymbol, ReturnSymbol, LocalSymbol, ControlWord>
+\end{verbatim}
+
+\textbf{Słowo} reprezentowane jest jako wektor liter typu \texttt{Symbol}.
+
+\textbf{Funkcja przejścia $\delta$} jest reprezentowana jako klasa \texttt{Transition} zawierająca trzy tablice reprezentujące
+przejścia dla poszczególnych typów liter z alfabetu wejściowego.
+\begin{verbatim}
+CoArgument callT[MaxNumOfStates][MaxNumOfLetters];
+State returnT[MaxNumOfStates][MaxNumOfStackSymbols][MaxNumOfLetters];
+State localT[MaxNumOfStates][MaxNumOfLetters];
+\end{verbatim}
+
+Tablice są inicjalizowane specjalnymi wartościami, które nie należą do alfabetu wejściowego,
+ani zbioru symboli stosowych i reprezentują przejście do stanu \texttt{sink}.
+
+
+\textbf{Deterministyczny automat visibly pushdown} reprezentowany jest jako klasa \texttt{VPA} która przechowuje zbiór stanów automatu $Q$,
+stan początkowy $q_0$, zbiór stanów akceptujących $F$ i funkcję przejścia $\delta$. Alfabet wejściowy oraz zbiór symboli stosowych nie są
+przechowywane jawnie w strukturze automatu, ponieważ ich reprezentacja wynika z parametrów funkcji przejścia. Wczytanie liter z poza
+alfabetu nie generuje błędu, lecz prowadzi do stanu \texttt{sink}.
+
+\textbf{String rewriting system} jest reprezentowany jako wektor reguł typu \texttt{SrsRule}, z których każda składa się z pary słów.
+
+\section{Moduły projektu}
+
+\subsection{Learner}
+\begin{verbatim}
+teacher/
+|-- AutomataGenerator.hpp   # generator automatu na podstawie S i C
+|-- Learner.hpp             # algorytm ucznia
+|-- Selectors.hpp           # zbiór selektorów
+|-- TestWords.hpp           # zbiór słów testowych
+\end{verbatim}
+
+Jest to moduł w który zawiera implementacje algorytmu ucznia. Zaczyna działanie od zainicjalizowania zbiorów $S$ i $C$,
+następnie wykonuję w pętli następującą procedurę:
+
+\begin{verbatim}
+while(true)
+{
+    hypothesis = generator.generate();
+    counterExample = oracle.equivalenceQuery(hypothesis);
+    if (counterExample->empty())
+        return hypothesis;
+    handleCounterExample(counterExample);
+}
+\end{verbatim}
+
+\textbf{Obsługa kontrprzykładu $w$} odbywa się poprzez przeiterowanie się po słowie w celu znalezienia podziału na $vaw'$.
+Jeśli niezgodność zostanie wykryta na podstawie różnicy w akceptacji słowa i litera $a$ jest typu return, to zapisujemy selektor równoważny do słowa $va$,
+jako wymuszony następnik automatu w konfiguracji otrzymanej po przeczytaniu słowa $v$, dla litery $a$.
+Pozwala to wykluczyć to przejście, w przypadku gdyby pozostało nieokreślone na podstawie procedury generowania automatu.
+
+\textbf{Generowanie automatu} odbywa się poprzez interfejs klasy \texttt{AutomataGenerator}. Przeplata ona procedure generowania automatu
+razem z ustawianiem nieokreślonych przejść. Procedura iteruje po zbiorze selektorów konstruując funkcje przejścia, jednocześnie uzupełnia
+tablice \texttt{witnesses}, w której dla każdego selektora zapisywany jest jeden świadek, który świadczy o osiągalności pewnej konfiguracji.
+
+\begin{enumerate}
+    \item Dla każdego symbolu call oraz local sprawdzane jest czy istnieje poprawny następnik w zbiorze selektorów,
+    wybierając pierwszego napotkanego. Jeśli taki nie istnieje to zbiór selektorów jest rozszerzany o nowy element.
+
+    \item Dla każdego symbolu return oraz każdego symbolu stosowego sprawdzane jest czy istnieje poprawny następnik.
+    Jeśli nie istnieje to sprawdzamy, czy ta konfiguracja jest osiągalna na podstawie tablic \texttt{witnesses},
+    co umożliwiłoby rozszerzenie zbioru selektorów. Jeśli nie istnieje poprawny następnik oraz świadek świadczący o osiągalności,
+    to wybierany jest następnik na podstawie tablicy \texttt{forcedSelector}. Domyślnie wpisy w tej tablicy są zainicjalizowane zerami,
+    co skutkuje przejściem do stanu $\epsilon$. Jednak jeśli w trakcie obsługi kontrprzykładu przejście to było uznane za błędne,
+    to znajduje się w niej stan, który jest poprawnym następnikiem. 
+\end{enumerate}
+
+
+\subsection{Teacher}
+
+\begin{verbatim}
+teacher/
+|-- Teacher.hpp           # interfejs nauczyciela
+|-- Converter.hpp         # łączy automaty i konwertuje do gramatyki
+|-- cfg/
+    |-- Calculator.hpp    # koduje i dekoduje terminale i nieterminale
+    |-- Cfg.hpp           # struktura gramatyki i sprawdzanie pustości
+    |-- NonTerminal.hpp
+    |-- Terminal.hpp
+\end{verbatim}
+
+Nauczyciel jako parametry wejściowe przyjmuje alfabet wejściowy, alfabet stosowy i automat docelowy. Jego zadaniem jest udostępnić interfejs,
+który będzie odpowiadać na zapytania: \texttt{membershipQuery}, \texttt{stackContentQuery} i \texttt{equivalenceQuery}.
+Odpowiedzi na dwa pierwsze zapytania wymagają jedynie przekazania słowa do automatu docelowego. Zapytanie o równoważność jest dominującą
+częścią całego modułu. Należy podkreślić, że złożoność zapytań o równoważność w trakcie aktywnego uczenia jest znanym problemem.
+Zazwyczaj jest stosowane podejście heurystyczne jak sprawdzenie losowo generowanych słów \cite{json}[5.3 Learning Algorithm],
+lub bardziej złożone techniki jak np. W-method \cite{Wmethod}. Obecne podejście gwarantuje zwrócenie poprawnej odpowiedzi za każdym razem,
+ale dominuje przy tym złożoność czasową i pamięciową całego programu, które wynoszą $O(?)$.
+
+Cała procedura \texttt{equivalenceQuery} przebiega w następujących krokach:
+\begin{enumerate}
+    \item Oblicz $A = T \triangle H$.
+    \item Przekształć $A$ na $A'$ akceptujący poprzez pusty stos.
+    \item Przekształć $A'$ na gramatykę bezkontekstową $G$.
+    \item Sprawdź pustość $G$.
+    \item Zwróć słowo akceptowane przez $A$ na podstawie wyniku gramatyki, lub puste słowo jeśli $G$ jest pusta.
+\end{enumerate}
+
+\paragraph{Konstrukcja automatu $A = T \triangle H$}
+
+Konstrukcja produktu automatów została zaimplementowana w metodzie \texttt{combineVPA} klasy \texttt{Converter}. Klasa ta tworzy nowy automat
+symulujący jednoczesne działanie automatów $T$ oraz $H$. Zawiera on $(|Q_{T}| + 1) \cdot (|Q_{H}| + 1)$ stanów, ponieważ wszystkie przejścia
+w tym automacie są zdefiniowane jawnie w przeciwieństwie do $T$ i $H$, gdzie nieokreślone przejścia były niejawnie kierowane do stanu \texttt{sink}.
+
+\paragraph{Przekształcenie do automatu $A'$}
+
+Przekształcenie automatu $A$ do automat akceptującego poprzez pusty stos odbywa się również w metodzie \texttt{combineVPA}.
+Po wyznaczeniu stanów akceptujących możemy zdefiniować dla nich dodatkowe przejścia umożliwiające opróżnienie stosu.
+
+\paragraph{Konstrukcja gramatyki bezkontekstowej}
+
+Konstrukcja gramatyki bezkontekstowej $G$ została zaimplementowana w metodzie \texttt{convertVpaToCfg} klasy \texttt{Converter}.
+Rozpoczyna ona od heurystycznego oszacowania liczby projekcji i nieterminali w $G$, które są podawane jako argumenty klasy \texttt{Cfg},
+żeby zarezerwować pamięć na dynamicznie kontenery wymagające ciągłości pamięci.
+
+Testy wykazały, że znacząca część dodawanych projekcji jest nieosiągalna, dlatego zastosowano heurystyczne podejście do zmniejszenia ich liczby.
+Na początku dodajemy nieterminale osiągalne z nieterminala startowego razem z potrzebnymi projekcjami i umieszczamy te nieterminale w kolejce.
+Następne projekcje i nieterminale się dodawne stosując algorytm BFS po osiągalnych z symbolu startowego nieterminalach.
+Podejście to na losowych testach zredukowało ilość generowanych produkcji o około jedną trzecią, co również skróciło czas potrzebny na zapytanie.
+
+\paragraph{Sprawdzanie pustości gramatyki bezkontekstowej}
+
+Klasa \texttt{Cfg} ma na celu sprawdzić pustość poprzez wyznaczenie zbioru generujących nieterminali.
+W tym celu udostępnia dwie publiczne metody: \texttt{addProjection} oraz \texttt{isEmpty}. 
+
+Metoda \texttt{addProjection} wykorzystywana podczas konstrukcji gramatyki indeksuje nieterminale pojawiające się w projekcjach.
+Dla każdej projekcji oblicza liczbę jej nieterminali po prawej stronie oraz dla każdego nieterminala zapisuję w ilu projekcjach występuje
+po prawej stronie oraz zapisuję nieterminale generujące. Informacja ta pozwala skonstruować dwie tablice określające zakres produkcji zależnych
+od danego nieterminala. Takie podejście umożliwia szybkie przechodzenie po wszystkich zależnych produkcjachi korzysta z ciągłości pamięci,
+co w praktyce okazało się wydajne.
+
+Sprawdzanie pustości realizowane jest w metodzie \texttt{isEmpty}. Wykonywana jest propagacja generatywności przy użyciu przeszukiwania BFS.
+Jeśli wszystkie nieterminale po prawej stronie danej produkcji zostały oznaczone jako generujące, generujący staje się również jej lewy nieterminal.
+
+Podczas działania algorytmu dla każdego generującego nieterminala zapamiętywany jest świadek jego generatywności.
+Pozwala to w przypadku niepustości gramatyki odtworzyć przykładowe słowo należące do jej języka.
+
+\paragraph{Odzyskiwanie kontrprzykładu}
+
+Klasa \texttt{Cfg} zwraca słowo, którego prefiks rozróżnia $T$ i $H$. Ponieważ zwrócenie najkrótszego możliwego prefiksu jest
+korzystne dla algorytmu uczenia, a musimy odrzucić sufiks zawierający symbole spoza alfabetu wejściowego,
+przechodzi po całym słowie szukając najkrótszego prefiksu, który rozróżnia $T$ i $H$.
+
+\subsection{Generator}
+
+Moduł ten stanowi narzędzie służące do generowania automatów wykorzystywanych do testowania algorytmu.
+Składa się z interfejsu \texttt{Generator} oraz implementacji poszczególnych generatorów, które zostały szerzej opisane w kolejnym
+rozdziale~\ref{chap:generators}.
+
+\textbf{Parametry konfiguracyjne}, które opisują generowany automat to: 
+
+\begin{itemize}
+    \item liczba stanów automatu: \texttt{numOfStates}
+    \item liczba poszczególnych symboli alfabetu wejściowego: \texttt{numOfCalls}, \texttt{numOfLocals}, \texttt{numOfReturns}
+    \item liczba poszczególnych symboli alfabetu stosowego: \texttt{numOfStackSymbols}
+    \item gęstość przejść w automacie: \texttt{density}
+    \item gęstość stanów akceptujących: \texttt{acceptingStatesDensity}
+    \item liczba modułów: \texttt{numOfModules}, stosowana tylko dla automatów sterowanych symbolami call (rozdz.~\ref{chap:CDA})
+\end{itemize}
+
+\textbf{Interfejs} udostępniany przez klasę \texttt{Generator} obejmuje następujące metody:
+\begin{itemize}
+    \item \texttt{setConfig} umożliwiająca ustawienie parametrów konfiguracyjnych generatora.
+    \item \texttt{run} generująca automat DVPA na podstawie ustawionej konfiguracji.
+    \item \texttt{getSrs} zwracającą SRS dla ostatniego wygenerowanego automatu, który może być pusty jeśli generator nie wspiera generowania SRS.
+\end{itemize}
+
+\textbf{Generowanie automatu} polega na zdefiniowaniu funkcji przejścia oraz zbioru stanów akceptujących. Stan początkowy zawsze ustawiany
+jest na \texttt{State\{0\}}. Ze względu na losowy charakter generatora wybór stanu początkowego nie wpływa na różnorodność generowanych automatów.
+Pozostałe parametry potrzebne do konstrukcji automatu wynikają z konfiguracji generatora.
+
+Zbiór stanów akceptujących jest wyznaczany poprzez rozpatrzenie każdego możliwego stanu i dodanie go do stanów akceptujących
+z prawdopodobieństwem określonym przez parametr \texttt{acceptingStatesDensity}.
+
+Do wygenerowania przejść w automacie dla każdego stanu, bądź konfiguracji w przypadku symbolu return losujemy czy dane przejście
+będzie zdefiniowane zgodnie z parametrem \texttt{density}. Następnie spośród możliwych następników, wynikających ze specyfiki danego generatora,
+losowo wybierany jest stan docelowy. W przypadku symboli typu call losowany jest również symbol stosowy z uwzględnieniem specyfiki danego generatora.
+
+System SRS jest generowany tylko dla wybranych generatorów, gdy wynika to bezpośrednio z definicji generowanej klasy automatów DVPA.
+
+Generator nie ustawia ziarna generatora liczb losowych, co powoduje, że kolejne uruchomienia generują różne automaty.
+
+\subsection{Tester}
+
+Klasa \texttt{Tester} odpowiada za przeprowadzenie zbioru testów, z których każdy polega na wygenerowaniu automatu, uruchomieniu algorytmu
+aktywnego uczenia dla tego automatu oraz weryfikacji otrzymanego wyniku poprzez sprawdzenie jego wielkości oraz porównanie go z automatem
+docelowym na losowo wygenerowanych słowach.
+
+\textbf{Parametry konfiguracyjne}, które przyjmuje \texttt{Tester} to:
+
+\begin{itemize}
+    \item liczba testów do przeprowadzenia: \texttt{numOfTests}
+    
+    \item obiekt generatora wykorzystywany do generowania automatów testowych
+    
+    \item para parametrów określająca przedział, z którego losowane są parametry generatora:
+    \texttt{minParameter} oraz \texttt{maxParameter} dla parametrów \texttt{numOfStates}, \texttt{numOfCalls}, \texttt{numOfLocals},
+    \texttt{numOfReturns} oraz \texttt{numOfStackSymbols}
+    
+    \item pozostałe parametry generatora: \texttt{density}, \texttt{acceptingStatesDensity}, \texttt{numOfModules}
+
+    \item parametr określający, czy zestaw testów powinien używać systemu SRS: \texttt{useSrs}
+
+    \item parametry charakteryzujące maksymalną długość i liczbę słów testowych do przetestowania automatu będącego
+    wynikiem działania algorytmu: \texttt{maxTestingWordLength}, \texttt{numOfRandomTestingWords}
+
+    \item parametry służące do debugowania: \texttt{savePassedTestData}, \texttt{supervisedMode}, \texttt{supervisedTestMaxDuration}
+\end{itemize}
+
+Parametry generatora są losowo wybierane na podstawie konfiguracji. Na koniec każdego testu aktualne statystyki dotyczące przeprowadzonych
+testów są drukowane na standardowe wyjście. Test kończy się niepowodzeniem, jeśli zostanie znalezione słowo, które rozróżnia wygenerowany
+automat od automatu otrzymanego przez algorytm, lub jeśli otrzymany automat ma więcej stanów niż automat wygenerowany.
+Jeśli test zakończy się niepowodzeniem lub parametr \texttt{savePassedTestData = true}, to szczegółowe informacje o teście
+zostają zapisane w pliku \texttt{failedTests/output\_\{testNumber\}.txt}.
+
+Użycie trybu nadzorowanego (\texttt{supervisedMode = true}) powoduje uruchomienie algorytmu uczącego w osobnym procesie.
+Pozwala to kontynuować wykonywanie testów, gdy działanie programu zakończy się krytycznym błędem oraz przerwać test,
+jeśli jego czas wykonania przekroczy wartość \texttt{supervisedTestMaxDuration}.
+
+\subsection{Benchmark}
+\label{chap:bench}
+
+Moduł ten został stworzony do odpowiedniego przeprowadzenia testów na większych grupach testowych i odpowiednim zagregowaniu
+wyników przy pomocy narzędzia \texttt{Google Benchmark}. TODO
+
+\section{Podręcznik użytkownika}
+
+W tej sekcji opisano sposób kompilacji programu oraz konfiguracji jego podstawowych parametrów.
+
+\subsection{Uruchomienie programu}
+
+Projekt kompilowany jest przy użyciu skryptu \texttt{build.sh}, który umożliwia:
+
+\begin{itemize}
+    \item Standardowe zbudowanie pliku wykonywalnego \texttt{build/run} przy pomocy komendy \texttt{./build.sh}
+    \item Zbudowanie pliku wykonywalnego \texttt{build-debug/run} z dodatkowymi flagami debugowymi przy pomocy komendy \texttt{./build.sh -d}
+    \item Zbudowanie pliku wykonywalnego służącego do benchmarkowania wyników~\ref{chap:bench} \texttt{build-bench/run} przy pomocy komendy \texttt{./build.sh -bench}
+    \item Zbudowanie i uruchomienie wszystkich testów jednostkowych używając komendy \texttt{./build.sh test} (lub \texttt{./build.sh -d test})
+    \item Zbudowanie i uruchomienie pojedynczego testu jednostkowego \texttt{test} używając komendy \texttt{./build.sh test -t test} (lub \texttt{./build.sh -d test -t test})
+\end{itemize}
+
+Plik wykonywalny \texttt{build/run} przyjmuje następujące argumenty:
+\begin{verbatim}
+./build/run numOfTest generator
+\end{verbatim}
+Gdzie \texttt{numOfTest} oznacza liczbę testów przekazywaną do klasy \texttt{Tester}, a \texttt{generator} określa,
+który generator powinien zostać użyty i może przyjąć jedną z następujących wartości:
+\textbf{random}, \textbf{cda}, \textbf{sevpa}, \textbf{mevpa}, \textbf{ecda} lub \textbf{custom}.
+
+Podanie jako generatora \textbf{custom} ignoruje argument liczby testów i uruchamia algorytm dla jednego automatu zdefiniowanego
+bezpośrednio w pliku \texttt{main.cpp} w metodzie \texttt{getCustomVpa()}. Umożliwia to zdefiniowanie własnego automatu i przetestowanie
+algorytmu na jego przykładzie.
+
+\subsection{Konfiguracja programu}
+
+Program zawiera dwa istotne pliki konfiguracyjne:
+\begin{enumerate}
+    \item \texttt{utils/Constants.hpp} zawiera m.in. definicje parametrów: \texttt{MaxNumOfAutomatonStates}, \texttt{MaxNumOfLetters}
+    oraz \texttt{MaxNumOfStackSymbols}, które określają maksymalny rozmiar automatów przyjmowanych przez algorytm.
+    Podczas dostosowywania tych wartości należy zwrócić uwagę, że złożoność pamięciowa nauczyciela wynosi $O(?)$, a czasowa $O(?)$.
+
+    \item \texttt{TesterParameters.hpp} zawiera definicję struktury \texttt{TesterParameters} oraz obiekty:
+    \texttt{RandomTestParameters}, \texttt{CdaTestParameters}, \texttt{SeVpaTestParameters}, \texttt{MeVpaTestParameters}
+    oraz \texttt{ECdaTestParameters}, które są wykorzystywane podczas odpalenia programu dla odpowiedniego generatora.
+\end{enumerate}
+
+Zmiana parametrów konfiguracyjnych wymaga ponownego skompilowania programu.
