@@ -40,6 +40,8 @@ public:
         const std::vector<uint16_t> &accStates, uint16_t numStates);
     VPA(const VPA<Kind> &vpa);
     VPA &operator=(const VPA &vpa);
+    VPA(VPA &&) = default;
+    VPA &operator=(VPA &&) = default;
 
     bool checkWord(const Word &word);
 

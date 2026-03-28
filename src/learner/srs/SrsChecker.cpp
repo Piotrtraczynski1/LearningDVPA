@@ -1,34 +1,40 @@
 #include <cstdint>
 #include <queue>
 
+#include "learner/srs/ConvertedAutomata.hpp"
 #include "learner/srs/SrsChecker.hpp"
+#include "teacher/Converter.hpp"
+#include "teacher/cfg/Calculator.hpp"
+#include "teacher/cfg/Cfg.hpp"
 #include "utils/log.hpp"
 
 namespace learner::srs
 {
 SrsChecker::SrsChecker(
-    std::shared_ptr<Selectors> selectors_, std::shared_ptr<TestWords> testWords_, Srs srs_,
-    teacher::Teacher &oracle_)
-    : selectors{selectors_}, testWords{testWords_}, srs{srs_}, oracle{oracle_}
+    const Srs srsArg, const teacher::Teacher &oracleArg, const uint16_t numOfCallsArg,
+    const uint16_t numOfReturnArg, const uint16_t numOfLocalsArg,
+    const uint16_t numOfStackSymbolsArg)
+    : srs{srsArg}, oracle{oracleArg}, converter{common::symbol::LocalSymbol{numOfLocalsArg}},
+      numOfCalls{numOfCallsArg}, numOfReturns{numOfReturnArg}, numOfLocals{numOfLocalsArg},
+      numOfStackSymbols{numOfStackSymbolsArg},
+      specialSymbol{common::symbol::LocalSymbol{numOfLocalsArg}}
 {
 }
 
-common::Word
-SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis) const
+common::Word SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
-    for (const auto &srsRule : srs)
+    prepareWellMatchedWords(hypothesis);
+
+    for (const auto &word : wellMatchedWords)
     {
-        for (uint16_t it = 0; it < selectors->size(); it++)
+        for (const auto &rule : srs)
         {
-            common::Word lhs{(*selectors)[it] + srsRule.l};
-            common::Word rhs{(*selectors)[it] + srsRule.r};
-
-            common::Word res{checkConfigurationsConsistency(hypothesis, lhs, rhs)};
-
-            if (res != common::Word{})
+            SrsRule srsRule{.l = word, .r = rule.l + word + rule.r};
+            ConvertedAutomata convertedAutomata{converter.run(hypothesis, srsRule)};
+            auto word{checkEquivalence(convertedAutomata)};
+            if (word != emptyWord)
             {
-                IMP("SRS WORKS");
-                return res;
+                return prepareCounterexample(hypothesis, word, srsRule);
             }
         }
     }
@@ -36,62 +42,67 @@ SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypo
     return common::Word{};
 }
 
-common::Word SrsChecker::checkConfigurationsConsistency(
-    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &lhs,
-    const common::Word &rhs) const
+void SrsChecker::prepareWellMatchedWords(
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
-    hypothesis->checkWord(lhs);
-    common::transition::State s1{hypothesis->state};
-    common::Stack stack1{hypothesis->stack};
-    hypothesis->checkWord(rhs);
-    common::transition::State s2{hypothesis->state};
-    common::Stack stack2{hypothesis->stack};
-    if (s1 == s2 and stack1 == stack2)
+    wellMatchedWords.clear();
+
+    // TODO
+    for (uint16_t localId = 0; localId < numOfLocals; localId++)
     {
-        return common::Word{};
+        wellMatchedWords.push_back(common::Word{common::symbol::LocalSymbol{localId}});
     }
-
-    std::queue<common::Word> vCandidates{};
-    vCandidates.push(common::Word{});
-
-    while (not vCandidates.empty())
-    {
-        common::Word vCandidate{vCandidates.front()};
-        vCandidates.pop();
-
-        if (hypothesis->checkWord(lhs + vCandidate) != hypothesis->checkWord(rhs + vCandidate))
-        {
-            if (hypothesis->checkWord(lhs + vCandidate) != oracle.membershipQuery(lhs + vCandidate))
-            {
-                std::cout << "CA found (1): lhs: " << lhs << ", rhs: " << rhs
-                          << ", vCandidate: " << vCandidate << std::endl;
-                return lhs + vCandidate;
-            }
-            std::cout << "CA found (2): lhs: " << lhs << ", rhs: " << rhs
-                      << ", vCandidate: " << vCandidate << std::endl;
-            return rhs + vCandidate;
-        }
-
-        if (vCandidate.size() > 20)
-        {
-            ERR("vCandidate.size() > 20");
-            continue;
-        }
-
-        for (uint16_t it = 0; it < numOfCalls; it++)
-        {
-            vCandidates.push(vCandidate + common::Word{common::symbol::CallSymbol{it}});
-        }
-        for (uint16_t it = 0; it < numOfLocals; it++)
-        {
-            vCandidates.push(vCandidate + common::Word{common::symbol::LocalSymbol{it}});
-        }
-        for (uint16_t it = 0; it < numOfReturns; it++)
-        {
-            vCandidates.push(vCandidate + common::Word{common::symbol::ReturnSymbol{it}});
-        }
-    }
-
-    return common::Word{};
 }
-} // namespace learner
+
+common::Word SrsChecker::checkEquivalence(const ConvertedAutomata &convertedAutomata)
+{
+    auto converter = std::make_unique<teacher::Converter>(
+        convertedAutomata.lAutomaton, numOfCalls, numOfReturns, numOfLocals + 1, numOfStackSymbols);
+    common::VPA<AutomatonKind::Combined> combinedVpa{
+        converter->combineVPA(*convertedAutomata.rAutomaton)};
+    std::shared_ptr<teacher::cfg::Cfg> cfg{converter->convertVpaToCfg(combinedVpa)};
+    auto cfgOutput{cfg->isEmpty()};
+    std::shared_ptr<common::Word> output{
+        teacher::cfg::Calculator::convertCfgOutputToWord(*cfgOutput)};
+
+    common::Symbol leftoverSymbol{common::symbol::ReturnSymbol{numOfReturns}};
+    for (uint16_t i = 0; i < output->size(); i++)
+    {
+        if ((*output)[i] == leftoverSymbol)
+        {
+            return common::Word{(*output).begin(), (*output).begin() + i};
+        }
+    }
+
+    return *output;
+}
+
+common::Word SrsChecker::prepareCounterexample(
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &word,
+    const SrsRule &srsRule)
+{
+    common::Word firstCandidate{};
+    common::Word secondCandidate{};
+
+    for (const auto &symbol : word)
+    {
+        if (symbol == specialSymbol)
+        {
+            firstCandidate += srsRule.l;
+            secondCandidate += srsRule.r;
+        }
+        else
+        {
+            firstCandidate += symbol;
+            secondCandidate += symbol;
+        }
+    }
+
+    if (oracle.membershipQuery(firstCandidate) != hypothesis->checkWord(firstCandidate))
+    {
+        return firstCandidate;
+    }
+
+    return secondCandidate;
+}
+} // namespace learner::srs

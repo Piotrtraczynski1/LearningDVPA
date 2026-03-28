@@ -15,7 +15,7 @@ Learner::Learner(
       testWords{std::make_shared<TestWords>()},
       generator{oracle,       selectors,   testWords,        numOfCalls,
                 numOfReturns, numOfLocals, numOfStackSymbols},
-      srsChecker{selectors, testWords, srs, teacher}
+      srsChecker{srs, teacher, numOfC, numOfR, numOfL, numOfS}
 {
     setInitialState();
 };

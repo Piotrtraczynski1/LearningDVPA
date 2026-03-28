@@ -12,7 +12,7 @@ AutomataConverter::AutomataConverter(common::symbol::LocalSymbol specialSymbolAr
 }
 
 ConvertedAutomata AutomataConverter::run(
-    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const SrsRule &srsRule)
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis, const SrsRule &srsRule)
 {
     init(hypothesis);
     const auto numOfStates{hypothesis->getNumOfStates()};
@@ -23,7 +23,7 @@ ConvertedAutomata AutomataConverter::run(
     return convertedAutomata;
 }
 
-void AutomataConverter::init(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
+void AutomataConverter::init(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis)
 {
     convertedAutomata.lAutomaton =
         std::make_shared<common::VPA<AutomatonKind::Normal>>(*hypothesis);
@@ -33,7 +33,7 @@ void AutomataConverter::init(const std::shared_ptr<common::VPA<AutomatonKind::No
 }
 
 void AutomataConverter::addTransitionsForSpecialSymbol(
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> automaton, const common::Word &word,
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> &automaton, const common::Word &word,
     const uint16_t numOfStates)
 {
     for (uint16_t stateId = 0; stateId < numOfStates; stateId++)

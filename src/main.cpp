@@ -90,7 +90,7 @@ Command parseCommand(const std::string &cmd)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 1)
+    if (argc < 2)
     {
         ERR("Invalid number of arguments");
         printHelp();
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     if (command == Command::Random or command == Command::Cda or command == Command::SeVpa or
         command == Command::MeVpa or command == Command::eCda)
     {
-        if (argc < 3)
+        if (argc < 4)
         {
             ERR("Invalid number of arguments");
             printHelp();

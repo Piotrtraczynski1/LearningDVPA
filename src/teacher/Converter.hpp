@@ -21,7 +21,7 @@ class Converter
 
 public:
     Converter(
-        const std::shared_ptr<VPA<AutomatonKind::Normal>> vpa, uint16_t numCalls,
+        const std::shared_ptr<VPA<AutomatonKind::Normal>> &vpa, uint16_t numCalls,
         uint16_t numReturns, uint16_t numLocals, uint16_t stackSymbolsNumber)
         : vpa{vpa}, numOfCalls{numCalls}, numOfReturns{numReturns}, numOfLocals{numLocals},
           numOfStackSymbols{stackSymbolsNumber} {};
