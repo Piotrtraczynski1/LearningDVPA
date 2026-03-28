@@ -19,14 +19,15 @@ void Generator::setConfig(
     transition = std::make_shared<common::transition::Transition<AutomatonKind::Normal>>();
 }
 
-bool Generator::generatorSpecificCheck(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
+bool Generator::generatorSpecificCheck(
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     return numOfStates + 1 >= hypothesis->getNumOfStates(); // +1 for explicit sink state
 }
 
-learner::Srs Generator::getSrs()
+learner::srs::Srs Generator::getSrs()
 {
-    return learner::Srs{};
+    return learner::srs::Srs{};
 }
 
 void Generator::selectAcceptingStates()

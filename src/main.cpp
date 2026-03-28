@@ -51,8 +51,8 @@ int main()
 
     // std::srand(std::time(0));
     std::srand(164);
-    runRandomGenerator(numOfTests);
-    // runECdaGenerator(numOfTests);
+    // runRandomGenerator(numOfTests);
+    runECdaGenerator(numOfTests);
 
     return 0;
 }

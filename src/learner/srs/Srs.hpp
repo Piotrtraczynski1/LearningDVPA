@@ -4,7 +4,7 @@
 
 #include "common/Word.hpp"
 
-namespace learner
+namespace learner::srs
 {
 struct SrsRule
 {

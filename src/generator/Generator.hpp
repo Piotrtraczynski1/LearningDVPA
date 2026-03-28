@@ -6,7 +6,7 @@
 #include "common/VPA.hpp"
 #include "common/transition/State.hpp"
 #include "common/transition/Transition.hpp"
-#include "learner/Srs.hpp"
+#include "learner/srs/Srs.hpp"
 
 namespace generator
 {
@@ -22,8 +22,9 @@ public:
         const double acceptingStatesDensity_, const uint16_t numOfModules_);
 
     virtual std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() = 0;
-    virtual bool generatorSpecificCheck(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
-    virtual learner::Srs getSrs();
+    virtual bool
+    generatorSpecificCheck(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
+    virtual learner::srs::Srs getSrs();
 
 protected:
     virtual void selectAcceptingStates();

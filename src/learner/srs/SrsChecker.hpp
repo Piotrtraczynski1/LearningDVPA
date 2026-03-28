@@ -5,11 +5,11 @@
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
 #include "learner/Selectors.hpp"
-#include "learner/Srs.hpp"
 #include "learner/TestWords.hpp"
+#include "learner/srs/Srs.hpp"
 #include "teacher/Teacher.hpp"
 
-namespace learner
+namespace learner::srs
 {
 class SrsChecker
 {
@@ -31,7 +31,7 @@ public:
 
 private:
     common::Word checkConfigurationsConsistency(
-        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &lhs,
-        const common::Word &rhs) const;
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
+        const common::Word &lhs, const common::Word &rhs) const;
 };
-} // namespace learner
+} // namespace learner::srs

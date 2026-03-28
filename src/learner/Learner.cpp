@@ -9,7 +9,7 @@ namespace learner
 
 Learner::Learner(
     teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL, uint16_t numOfS,
-    Srs srs)
+    srs::Srs srs)
     : oracle{teacher}, numOfCalls{numOfC}, numOfReturns{numOfR}, numOfLocals{numOfL},
       numOfStackSymbols{numOfS}, selectors{std::make_shared<Selectors>()},
       testWords{std::make_shared<TestWords>()},

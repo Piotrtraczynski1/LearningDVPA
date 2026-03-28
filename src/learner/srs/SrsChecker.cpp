@@ -1,10 +1,10 @@
 #include <cstdint>
 #include <queue>
 
-#include "learner/SrsChecker.hpp"
+#include "learner/srs/SrsChecker.hpp"
 #include "utils/log.hpp"
 
-namespace learner
+namespace learner::srs
 {
 SrsChecker::SrsChecker(
     std::shared_ptr<Selectors> selectors_, std::shared_ptr<TestWords> testWords_, Srs srs_,

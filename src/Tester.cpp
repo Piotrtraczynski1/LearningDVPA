@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #include "Tester.hpp"
-#include "learner/Srs.hpp"
+#include "learner/srs/Srs.hpp"
 #include "teacher/Converter.hpp"
 #include "utils/TimeMarker.hpp"
 
@@ -53,7 +53,7 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
     converter = std::make_shared<teacher::Converter>(
         vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
     teacher = std::make_shared<teacher::Teacher>(vpa, converter);
-    learner::Srs srs = params.useSrs ? generator->getSrs() : learner::Srs{};
+    learner::srs::Srs srs = params.useSrs ? generator->getSrs() : learner::srs::Srs{};
     learner = std::make_shared<learner::Learner>(
         *teacher, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols, srs);
 
