@@ -14,12 +14,13 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> AutomataGenerator::generate(
     buildTransition();
 
     return std::make_shared<common::VPA<AutomatonKind::Normal>>(common::VPA<AutomatonKind::Normal>{
-        transition, selectors->getState(0), selectors->getAcceptingStates(), selectors->size()});
+        std::move(transition), selectors->getState(0), selectors->getAcceptingStates(),
+        selectors->size()});
 }
 
 void AutomataGenerator::clearGenerator()
 {
-    transition.clear();
+    transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
     std::fill(&witnesses[0], &witnesses[0] + utils::MaxNumOfAutomatonStates + 1, common::Word{});
 }
 
@@ -56,7 +57,7 @@ void AutomataGenerator::considerCall(const uint16_t selectorIndex, const uint16_
 
     common::symbol::StackSymbol pushedStackSymbol{oracle.stackContentQuery(candidate).top()};
 
-    transition.add(
+    transition->add(
         selectors->getState(selectorIndex), common::symbol::CallSymbol{symbolIndex},
         selectors->getState(successor), pushedStackSymbol);
 
@@ -70,7 +71,7 @@ void AutomataGenerator::considerLocal(const uint16_t selectorIndex, const uint16
 
     uint16_t successor{findOrAddSuccessor(candidate)};
 
-    transition.add(
+    transition->add(
         selectors->getState(selectorIndex), common::symbol::LocalSymbol{symbolIndex},
         selectors->getState(successor));
 
@@ -97,7 +98,7 @@ void AutomataGenerator::considerReturn(
         }
     }
 
-    transition.add(
+    transition->add(
         selectors->getState(selectorIndex), common::symbol::StackSymbol{stackIndex},
         common::symbol::ReturnSymbol{symbolIndex}, selectors->getState(successor));
 

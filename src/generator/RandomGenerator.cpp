@@ -7,12 +7,13 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> RandomGenerator::run()
 {
     generateTransition();
     selectAcceptingStates();
-    return std::make_shared<common::VPA<AutomatonKind::Normal>>(*transition, initialState, acceptingStates, numOfStates);
+    return std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        std::move(transition), initialState, acceptingStates, numOfStates);
 }
 
 void RandomGenerator::generateTransition()
 {
-    transition->clear();
+    transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
 
     for (uint16_t stateId = 0; stateId < numOfStates; stateId++)
     {

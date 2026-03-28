@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <memory>
 #include <variant>
 #include <vector>
 
@@ -15,12 +16,19 @@ namespace teacher::cfg
 class Converter;
 }
 
+namespace learner::srs
+{
+class AutomataConverter;
+}
+
 namespace common
 {
 template <AutomatonKind Kind = AutomatonKind::Normal>
 class VPA
 {
     friend class teacher::Converter;
+    friend class learner::srs::AutomataConverter;
+
     using Size = AutomatonSize<Kind>;
 
 public:
@@ -28,65 +36,24 @@ public:
     transition::State state;
     std::array<bool, Size::MaxNumOfStates> acceptingStates;
 
-    VPA(transition::Transition<Kind> &transition, transition::State initial,
+    VPA(std::unique_ptr<transition::Transition<Kind>> transition, transition::State initial,
         const std::vector<uint16_t> &accStates, uint16_t numStates);
+    VPA(const VPA<Kind> &vpa);
+    VPA &operator=(const VPA &vpa);
 
     bool checkWord(const Word &word);
 
-    VPA &operator=(const VPA &vpa);
+    transition::State getSink() const;
+    uint16_t getNumOfStates() const;
 
-    transition::State getSink() const
-    {
-        return sink;
-    }
-
-    uint16_t getNumOfStates() const
-    {
-        return numOfStates;
-    }
-
-    void print(std::ostream &os = std::cout) const
-    {
-        os << "initial state: " << initialState << "\n";
-        os << "accepting states: ";
-        for (int i = 0; i < Size::MaxNumOfStates; i++)
-        {
-            if (acceptingStates[i])
-                os << ", " << i;
-        }
-        os << std::endl;
-        delta.print(os);
-    }
-
-    void printUt(std::ostream &os = std::cout) const
-    {
-        os << "numOfStates = " << numOfStates << ";\n";
-        os << "acceptingStates = std::vector<uint16_t>{";
-        for (int i = 0; i < Size::MaxNumOfStates; i++)
-        {
-            if (acceptingStates[i])
-                os << ", " << i;
-        }
-        os << "};\n";
-        os << "numOfStackSymbols = ;\n";
-        os << "numOfCalls = ;\n";
-        os << "numOfReturns = ;\n";
-        os << "numOfLocals = ;\n";
-
-        os << "transition = std::make_shared<Transition>();\n\n";
-        delta.printUt(os);
-
-        os << "init();" << std::endl;
-    }
+    void print(std::ostream &os = std::cout) const;
+    void printUt(std::ostream &os = std::cout) const;
 
 private:
-    void setInitialState()
-    {
-        state = initialState;
-        stack = {};
-    }
+    void setInitialState();
+    void readWord(const Word &word);
 
-    transition::Transition<Kind> &delta;
+    std::unique_ptr<transition::Transition<Kind>> delta;
     transition::State initialState;
     transition::State sink;
 

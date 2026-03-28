@@ -30,8 +30,8 @@ public:
     State s1{1};
     State s2{2};
 
-    std::shared_ptr<Transition<AutomatonKind::Normal>> transitionOne;
-    std::shared_ptr<Transition<AutomatonKind::Normal>> transitionTwo;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> transitionOne;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> transitionTwo;
 
     std::shared_ptr<Converter> converter;
 
@@ -39,8 +39,8 @@ public:
 
     void SetUp() override
     {
-        transitionOne = std::make_shared<Transition<AutomatonKind::Normal>>();
-        transitionTwo = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transitionOne = std::make_unique<Transition<AutomatonKind::Normal>>();
+        transitionTwo = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         transitionOne->add(initialState, LS{0}, s1);
         transitionOne->add(s1, LS{0}, s1);
@@ -73,9 +73,9 @@ public:
 TEST_F(TestTeacherSimple, equivalenceQuery)
 {
     auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transitionOne, initialState, std::vector<uint16_t>{1}, 2);
+        std::move(transitionOne), initialState, std::vector<uint16_t>{1}, 2);
     auto hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transitionTwo, initialState, std::vector<uint16_t>{2}, 3);
+        std::move(transitionTwo), initialState, std::vector<uint16_t>{2}, 3);
 
     init(vpa, 0, 0, 1, 1);
 
@@ -87,7 +87,7 @@ TEST_F(TestTeacherSimple, equivalenceQuery)
 TEST_F(TestTeacherSimple, equivalenceQuery2)
 {
     auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transitionOne, initialState, std::vector<uint16_t>{1}, 2);
+        std::move(transitionOne), initialState, std::vector<uint16_t>{1}, 2);
 
     init(vpa, 0, 0, 1, 1);
 
@@ -99,7 +99,7 @@ TEST_F(TestTeacherSimple, equivalenceQuery2)
 TEST_F(TestTeacherSimple, equivalenceQuer3)
 {
     auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transitionTwo, initialState, std::vector<uint16_t>{2}, 3);
+        std::move(transitionTwo), initialState, std::vector<uint16_t>{2}, 3);
     init(vpa, 0, 0, 1, 1);
 
     common::Word res{*sut->equivalenceQuery(vpa)};
@@ -118,19 +118,19 @@ public:
     LS ls{0};
     common::symbol::StackSymbol ss{1};
 
-    std::shared_ptr<Transition<AutomatonKind::Normal>> vpaTransition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> vpaTransition;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
     std::shared_ptr<Converter> converter;
 
     std::shared_ptr<Teacher> sut;
 
-    std::shared_ptr<Transition<AutomatonKind::Normal>> hypothesisTransition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> hypothesisTransition;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
 
     void SetUp() override
     {
-        vpaTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
-        hypothesisTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        vpaTransition = std::make_unique<Transition<AutomatonKind::Normal>>();
+        hypothesisTransition = std::make_unique<Transition<AutomatonKind::Normal>>();
     }
 
     void init(const uint16_t c, const uint16_t r, const uint16_t l, const uint16_t ss)
@@ -144,7 +144,7 @@ public:
     void initSut(const std::vector<uint16_t> &acceptingStates, const uint16_t numOfStates)
     {
         vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-            *vpaTransition, initial, acceptingStates, numOfStates);
+            std::move(vpaTransition), initial, acceptingStates, numOfStates);
         converter = std::make_shared<Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
 
@@ -154,7 +154,7 @@ public:
     void initHypothesis(const std::vector<uint16_t> &acceptingStates, const uint16_t numOfStates)
     {
         hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-            *hypothesisTransition, initial, acceptingStates, numOfStates);
+            std::move(hypothesisTransition), initial, acceptingStates, numOfStates);
     }
 };
 

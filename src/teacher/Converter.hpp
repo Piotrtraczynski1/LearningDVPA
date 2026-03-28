@@ -30,7 +30,7 @@ public:
     std::shared_ptr<cfg::Cfg> convertVpaToCfg(const VPA<AutomatonKind::Combined> &vpa);
 
 private:
-    common::transition::Transition<AutomatonKind::Combined> transition;
+    std::unique_ptr<common::transition::Transition<AutomatonKind::Combined>> transition;
 
     void addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
     void addLocals(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);

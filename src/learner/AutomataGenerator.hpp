@@ -25,7 +25,7 @@ class AutomataGenerator
     std::shared_ptr<Selectors> selectors;
     std::shared_ptr<TestWords> testWords;
 
-    common::transition::Transition<AutomatonKind::Normal> transition;
+    std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
 
     common::Word witnesses[AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates] = {};
 

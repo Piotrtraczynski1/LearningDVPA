@@ -18,7 +18,7 @@ class TestVPA : public ::testing::Test
 public:
     void SetUp() override
     {
-        transition = new Transition<AutomatonKind::Normal>{};
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         transition->add(initialState, callSymbol, secondState, stackSymbol_1);
         transition->add(secondState, callSymbol, secondState, stackSymbol_2);
@@ -32,7 +32,7 @@ public:
         transition->add(secondState, stackSymbol_1, returnSymbol, initialState);
         transition->add(secondState, stackSymbol_2, returnSymbol, secondState);
 
-        sut = new VPA<AutomatonKind::Normal>{*transition, initialState, {1}, 2};
+        sut = new VPA<AutomatonKind::Normal>{std::move(transition), initialState, {1}, 2};
     }
 
     State initialState{1};
@@ -47,7 +47,7 @@ public:
     StackSymbol stackSymbol_2{2};
 
     VPA<AutomatonKind::Normal> *sut;
-    Transition<AutomatonKind::Normal> *transition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> transition;
 
     // expect true
     Word word1{CallSymbol{1}, ReturnSymbol{1}};

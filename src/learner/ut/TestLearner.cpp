@@ -7,7 +7,7 @@
 #include "common/Word.cpp"
 #include "common/transition/Transition.cpp"
 #include "learner/AutomataGenerator.cpp"
-#include "learner/SrsChecker.cpp"
+#include "learner/srs/SrsChecker.cpp"
 #include "teacher/Converter.cpp"
 #include "teacher/Teacher.cpp"
 #include "teacher/cfg/Calculator.cpp"
@@ -30,9 +30,10 @@ namespace learner
 class TestLearner : public ::testing::Test
 {
 public:
-    void init(Srs srs = {})
+    void init(srs::Srs srs = {})
     {
-        vpa = std::make_shared<VPA<AutomatonKind::Normal>>(*transition, initial, acceptingStates, numOfStates);
+        vpa = std::make_shared<VPA<AutomatonKind::Normal>>(
+            std::move(transition), initial, acceptingStates, numOfStates);
         converter = std::make_shared<teacher::Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
@@ -57,15 +58,15 @@ public:
     common::Word emptyControlLetter{common::Stack{common::symbol::StackSymbol::BOTTOM}};
 
     std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
-    std::shared_ptr<Transition<AutomatonKind::Normal>> transition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> transition;
     std::shared_ptr<teacher::Converter> converter;
     std::shared_ptr<teacher::Teacher> oracle;
 
     Learner *sut;
 
     bool equalUpTo(
-        std::shared_ptr<VPA<AutomatonKind::Normal>> hyp, const uint8_t maxLen, common::Word *counterExample = nullptr,
-        common::Word pref = {})
+        std::shared_ptr<VPA<AutomatonKind::Normal>> hyp, const uint8_t maxLen,
+        common::Word *counterExample = nullptr, common::Word pref = {})
     {
         if (vpa->checkWord(pref) != hyp->checkWord(pref))
         {
@@ -121,7 +122,7 @@ public:
         numOfReturns = 1;
         numOfLocals = 2;
 
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{3});
         transition->add(State{0}, CS{1}, State{4}, StackSymbol{2});
@@ -225,7 +226,7 @@ public:
         numOfReturns = 1;
         numOfLocals = 0;
 
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -269,7 +270,7 @@ public:
         acceptingStates = std::vector<uint16_t>{0, 3};
         numOfStates = 5;
 
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         transition->add(initial, cs, s1, ss);
         transition->add(initial, ls, s1);
@@ -319,7 +320,7 @@ public:
         acceptingStates = std::vector<uint16_t>{0};
         numOfStates = 3;
 
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         State s1{1}, dead{2};
 
@@ -364,7 +365,7 @@ public:
         numOfCalls = 3;
         numOfReturns = 1;
         numOfLocals = 1;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{2});
@@ -417,7 +418,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -462,7 +463,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -507,7 +508,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -552,7 +553,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 2;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{2});
@@ -606,7 +607,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 2;
         numOfLocals = 1;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{5}, StackSymbol{1});
@@ -693,7 +694,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 3;
         numOfLocals = 1;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{5}, StackSymbol{2});
@@ -803,7 +804,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 2;
         numOfLocals = 2;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -896,7 +897,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 2;
         numOfLocals = 2;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -964,9 +965,9 @@ public:
         transition->add(State{5}, LS{0}, State{4});
         transition->add(State{5}, LS{1}, State{5});
 
-        Srs srs{};
-        srs.push_back(SrsRule{{LS{0}, LS{1}, LS{0}}, {}});
-        srs.push_back(SrsRule{{LS{1}}, {}});
+        srs::Srs srs{};
+        srs.push_back(srs::SrsRule{{LS{0}, LS{1}, LS{0}}, {}});
+        srs.push_back(srs::SrsRule{{LS{1}}, {}});
         init(srs);
     }
 };
@@ -993,7 +994,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{3});
@@ -1044,7 +1045,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -1103,7 +1104,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -1150,7 +1151,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{2}, StackSymbol{1});
@@ -1207,7 +1208,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{0}, StackSymbol{3});

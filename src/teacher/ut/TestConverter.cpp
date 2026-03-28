@@ -23,14 +23,14 @@ class TestConverter : public ::testing::Test
 public:
     void SetUp() override
     {
-        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
-        secondTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
+        secondTransition = std::make_unique<Transition<AutomatonKind::Normal>>();
     }
 
     State initialState{0};
 
-    std::shared_ptr<Transition<AutomatonKind::Normal>> transition;
-    std::shared_ptr<Transition<AutomatonKind::Normal>> secondTransition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> transition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> secondTransition;
 
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
@@ -78,12 +78,12 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg)
     secondTransition->add(s2, localSymbol, s1);
 
     vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transition, initialState, std::vector<uint16_t>{0, 2}, 3);
+        std::move(transition), initialState, std::vector<uint16_t>{0, 2}, 3);
 
     sut = std::make_shared<Converter>(vpa, 1, 1, 1, 2);
 
     hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *secondTransition, initialState, std::vector<uint16_t>{0, 2}, 3);
+        std::move(secondTransition), initialState, std::vector<uint16_t>{0, 2}, 3);
 
     combinedVpa =
         std::make_shared<common::VPA<AutomatonKind::Combined>>(sut->combineVPA(*hypothesis));
@@ -129,9 +129,9 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg2)
     secondTransition->add(initialState, ssB, r0, initialState);
 
     vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transition, initialState, std::vector<uint16_t>{0, 1}, 4);
+        std::move(transition), initialState, std::vector<uint16_t>{0, 1}, 4);
     hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *secondTransition, initialState, std::vector<uint16_t>{0}, 1);
+        std::move(secondTransition), initialState, std::vector<uint16_t>{0}, 1);
 
     sut = std::make_shared<Converter>(vpa, 1, 2, 0, 2);
 
@@ -152,15 +152,12 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg3)
     using CS = common::symbol::CallSymbol;
     using RS = common::symbol::ReturnSymbol;
 
-    auto transition = std::make_shared<Transition<AutomatonKind::Normal>>();
-
     uint16_t numOfStates = 4;
     auto acceptingStates = std::vector<uint16_t>{0, 1};
     uint16_t numOfStackSymbols = 2;
     uint16_t numOfCalls = 1;
     uint16_t numOfReturns = 1;
     uint16_t numOfLocals = 0;
-    transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     // CallTransitions:
     transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -178,8 +175,6 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg3)
     transition->add(State{3}, StackSymbol{0}, RS{0}, State{2});
     transition->add(State{3}, StackSymbol{1}, RS{0}, State{0});
 
-    auto secondTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
-
     // CallTransitions:
     secondTransition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
     secondTransition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
@@ -194,9 +189,9 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg3)
     secondTransition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
 
     vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transition, initialState, acceptingStates, numOfStates);
+        std::move(transition), initialState, acceptingStates, numOfStates);
     hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *secondTransition, initialState, std::vector<uint16_t>{0}, 3);
+        std::move(secondTransition), initialState, std::vector<uint16_t>{0}, 3);
 
     sut = std::make_shared<Converter>(vpa, 1, 1, 0, 2);
 
@@ -220,15 +215,12 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg4)
     using RS = common::symbol::ReturnSymbol;
     using LS = common::symbol::LocalSymbol;
 
-    auto transition = std::make_shared<Transition<AutomatonKind::Normal>>();
-
     uint16_t numOfStates = 5;
     auto acceptingStates = std::vector<uint16_t>{0, 3};
     uint16_t numOfStackSymbols = 2;
     uint16_t numOfCalls = 1;
     uint16_t numOfReturns = 1;
     uint16_t numOfLocals = 1;
-    transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     // CallTransitions:
     transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -255,8 +247,6 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg4)
     transition->add(State{3}, LS{0}, State{3});
     transition->add(State{4}, LS{0}, State{2});
 
-    auto secondTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
-
     // CallTransitions:
     secondTransition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
     secondTransition->add(State{1}, CS{0}, State{2}, StackSymbol{1});
@@ -276,9 +266,9 @@ TEST_F(TestConverter, combineVpaAndConvertVpaToCfg4)
     secondTransition->add(State{2}, LS{0}, State{2});
 
     vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *transition, initialState, acceptingStates, numOfStates);
+        std::move(transition), initialState, acceptingStates, numOfStates);
     hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        *secondTransition, initialState, std::vector<uint16_t>{0}, 3);
+        std::move(secondTransition), initialState, std::vector<uint16_t>{0}, 3);
 
     sut =
         std::make_shared<Converter>(vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);

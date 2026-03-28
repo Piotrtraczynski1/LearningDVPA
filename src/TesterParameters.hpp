@@ -36,8 +36,8 @@ struct TesterParameters
 };
 
 constexpr TesterParameters RandomTestParameters{
-    .minNumOfStates = 4,
-    .maxNumOfStates = 5,
+    .minNumOfStates = 5,
+    .maxNumOfStates = 6,
     .minNumOfCalls = 4,
     .maxNumOfCalls = 5,
     .minNumOfLocals = 4,

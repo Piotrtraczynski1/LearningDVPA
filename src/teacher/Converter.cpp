@@ -9,7 +9,7 @@ namespace teacher
 VPA<AutomatonKind::Combined> Converter::combineVPA(const VPA<AutomatonKind::Normal> &secondVpa)
 {
     TIME_MARKER("[Converter]: combineVPA");
-    transition.clear();
+    transition = std::make_unique<common::transition::Transition<AutomatonKind::Combined>>();
 
     combinedVpaNumOfStates =
         static_cast<uint16_t>((vpa->numOfStates + 1) * (secondVpa.numOfStates + 1)); // +1 for sink
@@ -44,7 +44,7 @@ VPA<AutomatonKind::Combined> Converter::combineVPA(const VPA<AutomatonKind::Norm
     {
         for (uint16_t stackSymbol = 0; stackSymbol < combinedVpaNumOfStackSymbols; stackSymbol++)
         {
-            transition.add(
+            transition->add(
                 common::transition::State{state}, common::symbol::StackSymbol{stackSymbol},
                 popStack, popStackState);
         }
@@ -52,7 +52,7 @@ VPA<AutomatonKind::Combined> Converter::combineVPA(const VPA<AutomatonKind::Norm
 
     auto init = combineStates(vpa->initialState, secondVpa.initialState);
     return VPA<AutomatonKind::Combined>{
-        transition, init, acceptingStates,
+        std::move(transition), init, acceptingStates,
         static_cast<uint16_t>(combinedVpaNumOfStates + 1)}; // +1 for poping stack state
 }
 
@@ -124,10 +124,10 @@ std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA<AutomatonKind::Co
 
         const auto [state1, stackSymbol, state2] = cfg::Calculator::decodeNonTerminal(nonTerminal);
 
-        addCallProjections(vpa.delta.callT[state1], nonTerminal, stackSymbol, state2);
+        addCallProjections((*vpa.delta).callT[state1], nonTerminal, stackSymbol, state2);
         addReturnProjections(
-            vpa.delta.returnT[state1][stackSymbol], nonTerminal, stackSymbol, state2);
-        addLocalProjections(vpa.delta.localT[state1], nonTerminal, stackSymbol, state2);
+            (*vpa.delta).returnT[state1][stackSymbol], nonTerminal, stackSymbol, state2);
+        addLocalProjections((*vpa.delta).localT[state1], nonTerminal, stackSymbol, state2);
     }
 
     return cfg;
@@ -140,7 +140,7 @@ void Converter::addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secon
         auto states{convertCombinedStateIntoStates(state)};
         const common::symbol::CallSymbol callSymbol{call};
 
-        common::transition::CoArgument coArg1{vpa->delta(states.first, callSymbol)};
+        common::transition::CoArgument coArg1{(*vpa->delta)(states.first, callSymbol)};
         if (coArg1.state == common::transition::State::INVALID)
         {
             coArg1.state = vpa->getSink();
@@ -150,7 +150,7 @@ void Converter::addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secon
             coArg1.stackSymbol = common::symbol::StackSymbol{numOfStackSymbols};
         }
 
-        common::transition::CoArgument coArg2{secondVpa.delta(states.second, callSymbol)};
+        common::transition::CoArgument coArg2{(*secondVpa.delta)(states.second, callSymbol)};
         if (coArg2.state == common::transition::State::INVALID)
         {
             coArg2.state = secondVpa.getSink();
@@ -160,7 +160,7 @@ void Converter::addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secon
             coArg2.stackSymbol = common::symbol::StackSymbol{numOfStackSymbols};
         }
 
-        transition.add(
+        transition->add(
             common::transition::State{state}, callSymbol, combineStates(coArg1.state, coArg2.state),
             combineStackSymbols(coArg1.stackSymbol, coArg2.stackSymbol));
     }
@@ -173,18 +173,18 @@ void Converter::addLocals(uint16_t state, const VPA<AutomatonKind::Normal> &seco
         auto states{convertCombinedStateIntoStates(state)};
         const common::symbol::LocalSymbol localSymbol{local};
 
-        common::transition::State coArg1{vpa->delta(states.first, localSymbol)};
+        common::transition::State coArg1{(*vpa->delta)(states.first, localSymbol)};
         if (coArg1 == common::transition::State::INVALID)
         {
             coArg1 = vpa->getSink();
         }
-        common::transition::State coArg2{secondVpa.delta(states.second, localSymbol)};
+        common::transition::State coArg2{(*secondVpa.delta)(states.second, localSymbol)};
         if (coArg2 == common::transition::State::INVALID)
         {
             coArg2 = secondVpa.getSink();
         }
 
-        transition.add(
+        transition->add(
             common::transition::State{state}, localSymbol, combineStates(coArg1, coArg2));
     }
 }
@@ -200,20 +200,20 @@ void Converter::addReturns(
         const common::symbol::ReturnSymbol returnSymbol{ret};
 
         common::transition::State coArg1{
-            vpa->delta(states.first, stackSymbols.first, returnSymbol)};
+            (*vpa->delta)(states.first, stackSymbols.first, returnSymbol)};
         if (coArg1 == common::transition::State::INVALID)
         {
             coArg1 = vpa->getSink();
         }
 
         common::transition::State coArg2{
-            secondVpa.delta(states.second, stackSymbols.second, returnSymbol)};
+            (*secondVpa.delta)(states.second, stackSymbols.second, returnSymbol)};
         if (coArg2 == common::transition::State::INVALID)
         {
             coArg2 = secondVpa.getSink();
         }
 
-        transition.add(
+        transition->add(
             common::transition::State{state}, common::symbol::StackSymbol{stackSymbol},
             returnSymbol, combineStates(coArg1, coArg2));
     }

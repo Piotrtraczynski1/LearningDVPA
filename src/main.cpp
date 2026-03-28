@@ -5,6 +5,8 @@
 #include "TesterParameters.hpp"
 #include "generator/Generators.hpp"
 
+#include "common/transition/Transition.hpp"
+
 void runRandomGenerator(const uint16_t numOfTests)
 {
     Tester tester{
@@ -49,10 +51,12 @@ int main()
 {
     constexpr uint16_t numOfTests{50000};
 
+    std::cout << sizeof(common::transition::Transition<AutomatonKind::Combined>) << std::endl;
+
     // std::srand(std::time(0));
     std::srand(164);
-    // runRandomGenerator(numOfTests);
-    runECdaGenerator(numOfTests);
+    runRandomGenerator(numOfTests);
+    // runECdaGenerator(numOfTests);
 
     return 0;
 }

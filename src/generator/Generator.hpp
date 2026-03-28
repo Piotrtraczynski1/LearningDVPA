@@ -42,7 +42,7 @@ protected:
 
     uint16_t numOfModules;
 
-    std::shared_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
+    std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
 
     common::transition::State initialState{0};
     std::vector<uint16_t> acceptingStates{0};

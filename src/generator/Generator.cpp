@@ -16,7 +16,7 @@ void Generator::setConfig(
     acceptingStatesDensity = acceptingStatesDensity_;
     numOfModules = numOfModules_;
 
-    transition = std::make_shared<common::transition::Transition<AutomatonKind::Normal>>();
+    transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
 }
 
 bool Generator::generatorSpecificCheck(

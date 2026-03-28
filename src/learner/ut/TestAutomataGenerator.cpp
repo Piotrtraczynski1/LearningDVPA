@@ -27,7 +27,8 @@ class TestAutomataGenerator : public ::testing::Test
 public:
     void init()
     {
-        vpa = std::make_shared<VPA<AutomatonKind::Normal>>(transition, initial, acceptingStates, numOfStates);
+        vpa = std::make_shared<VPA<AutomatonKind::Normal>>(
+            std::move(transition), initial, acceptingStates, numOfStates);
         converter = std::make_shared<teacher::Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
@@ -53,7 +54,7 @@ public:
     common::Word emptyControlLetter{common::Stack{common::symbol::StackSymbol::BOTTOM}};
 
     std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
-    Transition<AutomatonKind::Normal> transition;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> transition;
     std::shared_ptr<teacher::Converter> converter;
     std::shared_ptr<teacher::Teacher> oracle;
 
@@ -71,27 +72,27 @@ public:
         numOfStates = 4;
         acceptingStates = std::vector<uint16_t>{0, 2};
 
-        transition = Transition<AutomatonKind::Normal>{};
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
-        transition.add(initial, cs, s1, ss);
-        transition.add(s1, cs, s2, ss);
-        transition.add(s2, cs, s3, ss);
-        transition.add(s3, cs, initial, ss);
+        transition->add(initial, cs, s1, ss);
+        transition->add(s1, cs, s2, ss);
+        transition->add(s2, cs, s3, ss);
+        transition->add(s3, cs, initial, ss);
 
-        transition.add(initial, ls, s1);
-        transition.add(s1, ls, s2);
-        transition.add(s2, ls, s3);
-        transition.add(s3, ls, initial);
+        transition->add(initial, ls, s1);
+        transition->add(s1, ls, s2);
+        transition->add(s2, ls, s3);
+        transition->add(s3, ls, initial);
 
-        transition.add(initial, StackSymbol::BOTTOM, rs, s1);
-        transition.add(s1, StackSymbol::BOTTOM, rs, s2);
-        transition.add(s2, StackSymbol::BOTTOM, rs, s3);
-        transition.add(s3, StackSymbol::BOTTOM, rs, initial);
+        transition->add(initial, StackSymbol::BOTTOM, rs, s1);
+        transition->add(s1, StackSymbol::BOTTOM, rs, s2);
+        transition->add(s2, StackSymbol::BOTTOM, rs, s3);
+        transition->add(s3, StackSymbol::BOTTOM, rs, initial);
 
-        transition.add(initial, ss, rs, s1);
-        transition.add(s1, ss, rs, s2);
-        transition.add(s2, ss, rs, s3);
-        transition.add(s3, ss, rs, initial);
+        transition->add(initial, ss, rs, s1);
+        transition->add(s1, ss, rs, s2);
+        transition->add(s2, ss, rs, s3);
+        transition->add(s3, ss, rs, initial);
 
         init();
     }
@@ -117,30 +118,30 @@ public:
         acceptingStates = std::vector<uint16_t>{0, 3};
         numOfStates = 5;
 
-        transition = Transition<AutomatonKind::Normal>{};
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
 
-        transition.add(initial, cs, s1, ss);
-        transition.add(initial, ls, s1);
-        transition.add(initial, StackSymbol::BOTTOM, rs, s1);
+        transition->add(initial, cs, s1, ss);
+        transition->add(initial, ls, s1);
+        transition->add(initial, StackSymbol::BOTTOM, rs, s1);
 
-        transition.add(s1, cs, s2, ss);
-        transition.add(s2, cs, s4, ss);
-        transition.add(s4, cs, s4, ss);
-        transition.add(s3, cs, s3, ss);
+        transition->add(s1, cs, s2, ss);
+        transition->add(s2, cs, s4, ss);
+        transition->add(s4, cs, s4, ss);
+        transition->add(s3, cs, s3, ss);
 
-        transition.add(s1, ls, s1);
-        transition.add(s2, ls, s4);
-        transition.add(s4, ls, s2);
-        transition.add(s3, ls, s3);
+        transition->add(s1, ls, s1);
+        transition->add(s2, ls, s4);
+        transition->add(s4, ls, s2);
+        transition->add(s3, ls, s3);
 
-        transition.add(s1, StackSymbol::BOTTOM, rs, s1);
-        transition.add(s1, ss, rs, s1);
-        transition.add(s2, StackSymbol::BOTTOM, rs, s3);
-        transition.add(s2, ss, rs, s1);
-        transition.add(s3, StackSymbol::BOTTOM, rs, s3);
-        transition.add(s3, ss, rs, s3);
-        transition.add(s4, StackSymbol::BOTTOM, rs, s1);
-        transition.add(s4, ss, rs, s4);
+        transition->add(s1, StackSymbol::BOTTOM, rs, s1);
+        transition->add(s1, ss, rs, s1);
+        transition->add(s2, StackSymbol::BOTTOM, rs, s3);
+        transition->add(s2, ss, rs, s1);
+        transition->add(s3, StackSymbol::BOTTOM, rs, s3);
+        transition->add(s3, ss, rs, s3);
+        transition->add(s4, StackSymbol::BOTTOM, rs, s1);
+        transition->add(s4, ss, rs, s4);
 
         init();
     }

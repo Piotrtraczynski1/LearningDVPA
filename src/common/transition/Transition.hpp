@@ -16,9 +16,10 @@ namespace common::transition
 template <AutomatonKind Kind = AutomatonKind::Normal>
 class Transition
 {
+    friend class teacher::Converter;
+
     using Size = AutomatonSize<Kind>;
 
-    friend class teacher::Converter;
     CoArgument callT[Size::MaxNumOfStates][Size::MaxNumOfLetters];
     State returnT[Size::MaxNumOfStates][Size::MaxNumOfStackSymbols][Size::MaxNumOfLetters];
     State localT[Size::MaxNumOfStates][Size::MaxNumOfLetters];
@@ -26,6 +27,9 @@ class Transition
 public:
     Transition();
     void clear();
+
+    Transition(const Transition &) = default;
+    Transition(Transition &&) = default;
     Transition &operator=(const Transition &) = default;
     Transition &operator=(Transition &&) = default;
 
