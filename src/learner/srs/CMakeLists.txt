@@ -3,7 +3,8 @@ if(BUILD_TESTS)
 endif()
 
 add_library(srs STATIC
+    AutomataConverter.cpp
     SrsChecker.cpp
 )
 
-target_link_libraries(srs PRIVATE common)
+target_link_libraries(srs PRIVATE utils common teacher)

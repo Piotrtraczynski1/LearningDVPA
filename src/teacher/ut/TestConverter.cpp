@@ -1,15 +1,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "common/Stack.cpp"
-#include "common/VPA.cpp"
-#include "common/Word.cpp"
-#include "common/transition/Transition.cpp"
-#include "teacher/cfg/Calculator.cpp"
-#include "teacher/cfg/Cfg.cpp"
-#include "utils/TimeMarker.cpp"
-
-#include "teacher/Converter.cpp"
+#include "teacher/Converter.hpp"
 
 using namespace common::transition;
 using namespace common::symbol;

@@ -9,4 +9,4 @@ add_library(teacher STATIC
     Converter.cpp
 )
 
-target_link_libraries(teacher PRIVATE common cfg)
+target_link_libraries(teacher PRIVATE common cfg utils)

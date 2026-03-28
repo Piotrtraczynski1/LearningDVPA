@@ -2,9 +2,7 @@
 #include <map>
 #include <stack>
 
-#include "common/Stack.cpp"
-#include "common/Word.cpp"
-#include "common/transition/Transition.cpp"
+#include "common/Stack.hpp"
 
 using namespace common::symbol;
 

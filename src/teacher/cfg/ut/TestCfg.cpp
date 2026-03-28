@@ -1,11 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "common/Stack.cpp"
-#include "common/Word.cpp"
-#include "teacher/cfg/Calculator.cpp"
-#include "utils/TimeMarker.cpp"
-
-#include "teacher/cfg/Cfg.cpp"
+#include "teacher/cfg/Cfg.hpp"
 
 using namespace teacher::cfg;
 

@@ -1,16 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "common/Stack.cpp"
-#include "common/VPA.cpp"
-#include "common/Word.cpp"
-#include "common/transition/Transition.cpp"
-#include "teacher/Converter.cpp"
-#include "teacher/Teacher.cpp"
-#include "teacher/cfg/Calculator.cpp"
-#include "teacher/cfg/Cfg.cpp"
-#include "utils/TimeMarker.cpp"
-
-#include "learner/AutomataGenerator.cpp"
+#include "learner/AutomataGenerator.hpp"
 
 using namespace common::symbol;
 using namespace common::transition;

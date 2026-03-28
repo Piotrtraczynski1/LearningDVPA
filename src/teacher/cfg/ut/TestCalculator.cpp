@@ -1,10 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "common/Stack.cpp"
-#include "common/Word.cpp"
-#include "utils/Constants.hpp"
-
-#include "teacher/cfg/Calculator.cpp"
+#include "teacher/cfg/Calculator.hpp"
 
 namespace teacher::cfg::Calculator
 {

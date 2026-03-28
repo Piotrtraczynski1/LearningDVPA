@@ -2,12 +2,7 @@
 #include <memory>
 #include <vector>
 
-#include "common/Stack.cpp"
-#include "common/VPA.cpp"
-#include "common/Word.cpp"
-#include "common/transition/Transition.cpp"
-#include "learner/srs/AutomataConverter.cpp"
-#include "learner/srs/Srs.hpp"
+#include "learner/srs/AutomataConverter.hpp"
 
 using namespace common::symbol;
 using common::transition::State;

@@ -2,19 +2,7 @@
 #include <map>
 #include <stack>
 
-#include "common/Stack.cpp"
-#include "common/VPA.cpp"
-#include "common/Word.cpp"
-#include "common/transition/Transition.cpp"
-#include "learner/AutomataGenerator.cpp"
-#include "learner/srs/SrsChecker.cpp"
-#include "teacher/Converter.cpp"
-#include "teacher/Teacher.cpp"
-#include "teacher/cfg/Calculator.cpp"
-#include "teacher/cfg/Cfg.cpp"
-#include "utils/TimeMarker.cpp"
-
-#include "learner/Learner.cpp"
+#include "learner/Learner.hpp"
 
 using namespace common::symbol;
 using namespace common::transition;

@@ -3,11 +3,7 @@
 #include <stack>
 #include <stdexcept>
 
-#include "common/Stack.cpp"
-#include "common/Word.cpp"
-#include "common/transition/Transition.cpp"
-
-#include "common/VPA.cpp"
+#include "common/VPA.hpp"
 
 using namespace common::symbol;
 
