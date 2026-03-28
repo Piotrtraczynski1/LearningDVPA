@@ -47,16 +47,103 @@ void runECdaGenerator(const uint16_t numOfTests)
     tester.run();
 }
 
-int main()
+void runCustomTest()
 {
-    constexpr uint16_t numOfTests{50000};
+    LOG("custom test");
+}
 
-    std::cout << sizeof(common::transition::Transition<AutomatonKind::Combined>) << std::endl;
+void printHelp()
+{
+    std::cout << "help\n";
+}
 
-    // std::srand(std::time(0));
-    std::srand(164);
-    runRandomGenerator(numOfTests);
-    // runECdaGenerator(numOfTests);
+enum class Command
+{
+    Random,
+    Cda,
+    SeVpa,
+    MeVpa,
+    eCda,
+    Custom,
+    Help,
+    Unknown
+};
+
+Command parseCommand(const std::string &cmd)
+{
+    if (cmd == "random")
+        return Command::Random;
+    if (cmd == "cda")
+        return Command::Cda;
+    if (cmd == "sevpa")
+        return Command::SeVpa;
+    if (cmd == "mevpa")
+        return Command::MeVpa;
+    if (cmd == "ecda")
+        return Command::eCda;
+    if (cmd == "custom")
+        return Command::Custom;
+    if (cmd == "--help" or cmd == "-h")
+        return Command::Help;
+    return Command::Unknown;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc < 1)
+    {
+        ERR("Invalid number of arguments");
+        printHelp();
+        return 1;
+    }
+
+    std::string cmd = argv[1];
+    Command command{parseCommand(cmd)};
+
+    uint16_t numOfTests{};
+
+    if (command == Command::Random or command == Command::Cda or command == Command::SeVpa or
+        command == Command::MeVpa or command == Command::eCda)
+    {
+        if (argc < 3)
+        {
+            ERR("Invalid number of arguments");
+            printHelp();
+            return 1;
+        }
+        numOfTests = std::stoi(argv[3]);
+        int seed = std::stoi(argv[2]);
+        std::srand(seed);
+    }
+
+    switch (command)
+    {
+    case (Command::Random):
+        runRandomGenerator(numOfTests);
+        break;
+    case (Command::Cda):
+        runCdaGenerator(numOfTests);
+        break;
+    case (Command::SeVpa):
+        runSeVpaGenerator(numOfTests);
+        break;
+    case (Command::MeVpa):
+        runMeVpaGenerator(numOfTests);
+        break;
+    case (Command::eCda):
+        runECdaGenerator(numOfTests);
+        break;
+    case (Command::Custom):
+        runCustomTest();
+        break;
+    case (Command::Help):
+        printHelp();
+        break;
+    default:
+        ERR("Invalid command");
+        printHelp();
+        return 1;
+    }
 
     return 0;
 }
