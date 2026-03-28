@@ -1,6 +1,6 @@
 #include "generator/MeVpaGenerator.hpp"
-#include "utils/log.hpp"
 #include "utils/ExitCode.hpp"
+#include "utils/log.hpp"
 
 namespace generator
 {

@@ -130,14 +130,14 @@ common::transition::State CdaGenerator::findSuccessorForReturn(const uint16_t st
     return common::transition::State{module[randRange(0, module.size())]};
 }
 
-common::symbol::StackSymbol
-CdaGenerator::selectStackSymbol(const uint16_t module, const uint16_t callId) const
+common::symbol::StackSymbol CdaGenerator::selectStackSymbol(
+    const uint16_t module, const uint16_t callId) const
 {
     return encodeStackSymbol(module, callId);
 }
 
-common::symbol::StackSymbol
-CdaGenerator::encodeStackSymbol(const uint16_t module, const uint16_t callId) const
+common::symbol::StackSymbol CdaGenerator::encodeStackSymbol(
+    const uint16_t module, const uint16_t callId) const
 {
     return static_cast<common::symbol::StackSymbol>(module * numOfCalls + callId + 1);
 }

@@ -219,8 +219,8 @@ void Converter::addReturns(
     }
 }
 
-std::pair<common::transition::State, common::transition::State>
-Converter::convertCombinedStateIntoStates(uint16_t state) const
+std::pair<common::transition::State, common::transition::State> Converter::
+    convertCombinedStateIntoStates(uint16_t state) const
 {
     const uint16_t numOfStates{static_cast<uint16_t>(vpa->numOfStates + 1)};
     return {
@@ -228,8 +228,8 @@ Converter::convertCombinedStateIntoStates(uint16_t state) const
         common::transition::State{static_cast<uint16_t>(state / numOfStates)}};
 }
 
-std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol>
-Converter::convertCombinedStackSymbolIntoSymbols(uint16_t stackSymbol) const
+std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol> Converter::
+    convertCombinedStackSymbolIntoSymbols(uint16_t stackSymbol) const
 {
     if (stackSymbol == symbol::StackSymbol::BOTTOM)
     {

@@ -80,8 +80,8 @@ Terminal convertSymbolToTerminal(const common::Symbol symbol)
     }
 }
 
-std::shared_ptr<common::Word>
-convertCfgOutputToWord(const std::optional<std::vector<Terminal>> &output)
+std::shared_ptr<common::Word> convertCfgOutputToWord(
+    const std::optional<std::vector<Terminal>> &output)
 {
     std::shared_ptr<common::Word> word = std::make_shared<common::Word>();
     if (not output.has_value())

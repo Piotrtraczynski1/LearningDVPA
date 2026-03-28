@@ -59,8 +59,8 @@ public:
         sut = std::make_shared<Teacher>(vpa, converter);
     }
 
-    std::shared_ptr<common::Word>
-    equivalenceQuery(common::VPA<AutomatonKind::Normal> &secondVpa, Converter &sut)
+    std::shared_ptr<common::Word> equivalenceQuery(
+        common::VPA<AutomatonKind::Normal> &secondVpa, Converter &sut)
     {
         common::VPA<AutomatonKind::Combined> combinedVpa{sut.combineVPA(secondVpa)};
         std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};

@@ -21,6 +21,6 @@ common::Symbol convertTerminalToSymbol(const Terminal terminal);
 
 Terminal convertSymbolToTerminal(const common::Symbol symbol);
 
-std::shared_ptr<common::Word>
-convertCfgOutputToWord(const std::optional<std::vector<Terminal>> &output);
+std::shared_ptr<common::Word> convertCfgOutputToWord(
+    const std::optional<std::vector<Terminal>> &output);
 } // namespace teacher::cfg::Calculator

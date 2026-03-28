@@ -34,16 +34,16 @@ private:
 
     void addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
     void addLocals(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
-    void
-    addReturns(uint16_t state, uint16_t stackSymbol, const VPA<AutomatonKind::Normal> &secondVpa);
+    void addReturns(
+        uint16_t state, uint16_t stackSymbol, const VPA<AutomatonKind::Normal> &secondVpa);
     bool isAcceptingState(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa) const;
 
     common::symbol::StackSymbol combineStackSymbols(uint16_t s1, uint16_t s2) const;
     common::transition::State combineStates(uint16_t s1, uint16_t s2) const;
     std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol>
     convertCombinedStackSymbolIntoSymbols(uint16_t stackSymbol) const;
-    std::pair<common::transition::State, common::transition::State>
-    convertCombinedStateIntoStates(uint16_t state) const;
+    std::pair<common::transition::State, common::transition::State> convertCombinedStateIntoStates(
+        uint16_t state) const;
 
     void insertNonTerminalIfNeeded(const cfg::NonTerminal nonTerminal);
     std::tuple<size_t, size_t> calculateEstimatedCfgSize();

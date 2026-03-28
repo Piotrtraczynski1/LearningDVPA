@@ -26,8 +26,8 @@ protected:
 
     virtual void selectTargetsForCalls();
 
-    virtual common::symbol::StackSymbol
-    selectStackSymbol(const uint16_t module, const uint16_t callId) const;
+    virtual common::symbol::StackSymbol selectStackSymbol(
+        const uint16_t module, const uint16_t callId) const;
     virtual common::transition::State findSuccessorForReturn(const uint16_t stackSymbol) const;
 
     common::transition::State target[utils::MaxNumOfLetters];

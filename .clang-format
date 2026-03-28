@@ -16,4 +16,4 @@ ColumnLimit: 100
 AlignAfterOpenBracket: AlwaysBreak
 AllowShortFunctionsOnASingleLine: false
 AlwaysBreakTemplateDeclarations: true
-
+PenaltyReturnTypeOnItsOwnLine: 1000

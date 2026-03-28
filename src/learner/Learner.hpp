@@ -38,10 +38,10 @@ public:
 
 private:
     void handleCounterExample(std::shared_ptr<common::Word> counterExample);
-    void
-    handleStackContentDiverges(const common::Word &v, const common::Word &a, const common::Word &w);
-    void
-    handleSuffixesMismatch(const common::Word &v, const common::Word &a, const common::Word &w);
+    void handleStackContentDiverges(
+        const common::Word &v, const common::Word &a, const common::Word &w);
+    void handleSuffixesMismatch(
+        const common::Word &v, const common::Word &a, const common::Word &w);
     void addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const common::Word &a);
     uint16_t addNewSelectorIfNeeded(const common::Word &selector);
 

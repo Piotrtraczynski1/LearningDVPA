@@ -29,9 +29,9 @@ void MeasurementDataBase::printInfo()
 
         std::cout << "Marker " << std::left << std::setw(40) << marker.first << " | " << std::right
                   << std::setw(4) << minutes << "m:" << std::setw(3) << seconds
-                  << "s:" << std::setw(4) << millis << "ms"
-                  << " | " << std::setw(12) << marker.second.time << " us"
-                  << " | total executions: " << std::setw(10) << marker.second.executions << "\n";
+                  << "s:" << std::setw(4) << millis << "ms" << " | " << std::setw(12)
+                  << marker.second.time << " us" << " | total executions: " << std::setw(10)
+                  << marker.second.executions << "\n";
     }
     std::cout << "===================================================\n";
 }

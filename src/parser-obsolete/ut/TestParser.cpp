@@ -50,16 +50,40 @@ public:
                               ReturnSymbol{0}, LocalSymbol{1}, LocalSymbol{2}};
 };
 
-TEST_F(TestParser, default1) { EXPECT_EQ(sut->checkWord(word1), true); }
-TEST_F(TestParser, default2) { EXPECT_EQ(sut->checkWord(word2), true); }
-TEST_F(TestParser, default3) { EXPECT_EQ(sut->checkWord(word3), true); }
+TEST_F(TestParser, default1)
+{
+    EXPECT_EQ(sut->checkWord(word1), true);
+}
+TEST_F(TestParser, default2)
+{
+    EXPECT_EQ(sut->checkWord(word2), true);
+}
+TEST_F(TestParser, default3)
+{
+    EXPECT_EQ(sut->checkWord(word3), true);
+}
 
-TEST_F(TestParser, default4) { EXPECT_EQ(sut->checkWord(word4), false); }
-TEST_F(TestParser, default5) { EXPECT_EQ(sut->checkWord(word5), false); }
+TEST_F(TestParser, default4)
+{
+    EXPECT_EQ(sut->checkWord(word4), false);
+}
+TEST_F(TestParser, default5)
+{
+    EXPECT_EQ(sut->checkWord(word5), false);
+}
 
-TEST_F(TestParser, default6) { EXPECT_THROW(sut->checkWord(word6), std::out_of_range); }
-TEST_F(TestParser, default7) { EXPECT_THROW(sut->checkWord(word7), std::out_of_range); }
-TEST_F(TestParser, default8) { EXPECT_THROW(sut->checkWord(word8), std::out_of_range); }
+TEST_F(TestParser, default6)
+{
+    EXPECT_THROW(sut->checkWord(word6), std::out_of_range);
+}
+TEST_F(TestParser, default7)
+{
+    EXPECT_THROW(sut->checkWord(word7), std::out_of_range);
+}
+TEST_F(TestParser, default8)
+{
+    EXPECT_THROW(sut->checkWord(word8), std::out_of_range);
+}
 
 TEST_F(TestParser, default9)
 {

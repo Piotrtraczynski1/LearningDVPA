@@ -22,8 +22,8 @@ public:
         const double acceptingStatesDensity_, const uint16_t numOfModules_);
 
     virtual std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() = 0;
-    virtual bool
-    generatorSpecificCheck(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
+    virtual bool generatorSpecificCheck(
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
     virtual learner::srs::Srs getSrs();
 
 protected:

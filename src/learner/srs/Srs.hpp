@@ -13,4 +13,4 @@ struct SrsRule
 };
 
 using Srs = std::vector<SrsRule>;
-} // namespace learner
+} // namespace learner::srs

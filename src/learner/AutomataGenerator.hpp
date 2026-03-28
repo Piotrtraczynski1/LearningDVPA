@@ -61,8 +61,8 @@ private:
     void considerReturn(
         const uint16_t selectorIndex, const uint16_t symbolIndex, const uint16_t stackIndex);
 
-    void
-    setWitness(const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix);
+    void setWitness(
+        const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix);
     template <typename T, typename K>
     void fillTransitionRegardlessOfStackSymbol(
         const T symbol, const common::transition::State state, const K coArg);
@@ -74,8 +74,8 @@ private:
     bool isRightCongruence(
         const common::Word &a, const uint16_t selectorIndex, const uint16_t stackIndex,
         const uint16_t symbolIndex) const;
-    bool
-    checkRightCongruenceWithEmptyControlLetters(const common::Word &a, const common::Word &b) const;
+    bool checkRightCongruenceWithEmptyControlLetters(
+        const common::Word &a, const common::Word &b) const;
     bool checkRightCongruenceWithReturnLetter(
         const common::Word &a, const uint16_t selectorIndex, const uint16_t stackIndex,
         const uint16_t symbolIndex) const;

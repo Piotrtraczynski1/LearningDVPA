@@ -17,8 +17,8 @@ class AutomataConverter
 public:
     AutomataConverter(common::symbol::LocalSymbol specialSymbolArg);
 
-    ConvertedAutomata
-    run(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
+    ConvertedAutomata run(
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
         const SrsRule &srsRule);
 
 private:
