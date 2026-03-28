@@ -13,19 +13,19 @@ Cfg::Cfg()
     insertDummyElements();
 }
 
-Cfg::Cfg(const size_t estimatedNumberOfProjections, const size_t estimatedNumberOfNonTerminals)
+Cfg::Cfg(const size_t estimatedNumberOfProductions, const size_t estimatedNumberOfNonTerminals)
 {
-    unresolvedNonTerminalsPerProj.reserve(estimatedNumberOfProjections);
-    nonTerminalIndexPerProj.reserve(estimatedNumberOfProjections);
-    firstNonTerminalPerProj.reserve(estimatedNumberOfProjections);
-    secondNonTerminalPerProj.reserve(estimatedNumberOfProjections);
-    terminalValuePerProj.reserve(estimatedNumberOfProjections);
+    unresolvedNonTerminalsPerProj.reserve(estimatedNumberOfProductions);
+    nonTerminalIndexPerProj.reserve(estimatedNumberOfProductions);
+    firstNonTerminalPerProj.reserve(estimatedNumberOfProductions);
+    secondNonTerminalPerProj.reserve(estimatedNumberOfProductions);
+    terminalValuePerProj.reserve(estimatedNumberOfProductions);
 
     nonTerminalIndexes.reset(new uint32_t[utils::MaxNumOfNonTerminals]());
     generativeNonTerminalsQueue.reserve(estimatedNumberOfNonTerminals);
     isGenerative.reserve(estimatedNumberOfNonTerminals);
     witnesses.reserve(estimatedNumberOfNonTerminals);
-    numOfParentProjections.reserve(estimatedNumberOfNonTerminals);
+    numOfParentProductions.reserve(estimatedNumberOfNonTerminals);
 
     insertDummyElements();
 }
@@ -34,10 +34,10 @@ void Cfg::insertDummyElements()
 {
     isGenerative.push_back(false);
     witnesses.push_back(Witness{});
-    numOfParentProjections.push_back(0);
+    numOfParentProductions.push_back(0);
 }
 
-void Cfg::addProjection(
+void Cfg::addProduction(
     const NonTerminal nonTerminal, const Terminal terminal, const NonTerminal n1,
     const NonTerminal n2)
 {
@@ -49,14 +49,14 @@ void Cfg::addProjection(
     if (n1 != NonTerminal::INVALID)
     {
         n1Index = setNonTerminalIndex(n1);
-        numOfParentProjections[n1Index]++;
+        numOfParentProductions[n1Index]++;
         deps++;
     }
     uint32_t n2Index{unknownIndex};
     if (n2 != NonTerminal::INVALID)
     {
         n2Index = setNonTerminalIndex(n2);
-        numOfParentProjections[n2Index]++;
+        numOfParentProductions[n2Index]++;
         deps++;
     }
 
@@ -72,11 +72,11 @@ void Cfg::addProjection(
         generativeNonTerminalsQueue.push_back(nonTerminalId);
     }
 
-    numOfProjections++;
+    numOfProductions++;
 
-    if (numOfProjections == unknownIndex)
+    if (numOfProductions == unknownIndex)
     {
-        ERR("[CFG]: Too many projections!");
+        ERR("[CFG]: Too many productions!");
         exit(toExit(ExitCode::UNDEFINED));
     }
 }
@@ -96,39 +96,39 @@ uint32_t Cfg::setNonTerminalIndex(const NonTerminal nonTerminal)
     return nonTerminalIndex;
 }
 
-void Cfg::calculateParentProjections()
+void Cfg::calculateParentProductions()
 {
-    TIME_MARKER("[CFG]: calculateParentProjections");
+    TIME_MARKER("[CFG]: calculateParentProductions");
 
-    parentProjectionsOffsets.resize(numOfNonTerminals + 1);
-    parentProjectionsOffsets[0] = 0;
+    parentProductionsOffsets.resize(numOfNonTerminals + 1);
+    parentProductionsOffsets[0] = 0;
 
     for (uint32_t i = 0; i < numOfNonTerminals; i++)
     {
-        const uint64_t next = static_cast<uint64_t>(parentProjectionsOffsets[i]) +
-                              static_cast<uint64_t>(numOfParentProjections[i]);
-        parentProjectionsOffsets[i + 1] = next;
+        const uint64_t next = static_cast<uint64_t>(parentProductionsOffsets[i]) +
+                              static_cast<uint64_t>(numOfParentProductions[i]);
+        parentProductionsOffsets[i + 1] = next;
     }
 
-    std::vector<uint32_t>().swap(numOfParentProjections);
+    std::vector<uint32_t>().swap(numOfParentProductions);
 
-    parentProjections.assign(static_cast<size_t>(parentProjectionsOffsets[numOfNonTerminals]), 0);
+    parentProductions.assign(static_cast<size_t>(parentProductionsOffsets[numOfNonTerminals]), 0);
 
     std::vector<uint64_t> cursor{};
-    cursor.assign(parentProjectionsOffsets.begin(), parentProjectionsOffsets.end());
+    cursor.assign(parentProductionsOffsets.begin(), parentProductionsOffsets.end());
 
-    for (uint32_t proj = 0; proj < numOfProjections; proj++)
+    for (uint32_t proj = 0; proj < numOfProductions; proj++)
     {
         const uint32_t a = firstNonTerminalPerProj[proj];
         if (a != unknownIndex)
         {
-            parentProjections[static_cast<size_t>(cursor[a]++)] = proj;
+            parentProductions[static_cast<size_t>(cursor[a]++)] = proj;
         }
 
         const uint32_t b = secondNonTerminalPerProj[proj];
         if (b != unknownIndex)
         {
-            parentProjections[static_cast<size_t>(cursor[b]++)] = proj;
+            parentProductions[static_cast<size_t>(cursor[b]++)] = proj;
         }
     }
 }
@@ -138,27 +138,27 @@ std::shared_ptr<Cfg::OutputType> Cfg::isEmpty()
     TIME_MARKER("[CFG]: isEmpty");
     LOG("[CFG]: checking emptiness of CFG");
 
-    calculateParentProjections();
+    calculateParentProductions();
 
     uint32_t queHead{0};
     while (queHead < generativeNonTerminalsQueue.size())
     {
         uint32_t nonTerminal{generativeNonTerminalsQueue[queHead]};
         queHead++;
-        for (uint64_t it = parentProjectionsOffsets[nonTerminal];
-             it < parentProjectionsOffsets[nonTerminal + 1]; it++)
+        for (uint64_t it = parentProductionsOffsets[nonTerminal];
+             it < parentProductionsOffsets[nonTerminal + 1]; it++)
         {
-            const uint32_t projection = parentProjections[it];
-            if (--unresolvedNonTerminalsPerProj[projection] == 0)
+            const uint32_t production = parentProductions[it];
+            if (--unresolvedNonTerminalsPerProj[production] == 0)
             {
-                uint32_t nonTerminalIndex = nonTerminalIndexPerProj[projection];
+                uint32_t nonTerminalIndex = nonTerminalIndexPerProj[production];
                 if (not isGenerative[nonTerminalIndex])
                 {
                     isGenerative[nonTerminalIndex] = true;
                     witnesses[nonTerminalIndex] = {
-                        .terminal = terminalValuePerProj[projection],
-                        .n1Index = firstNonTerminalPerProj[projection],
-                        .n2Index = secondNonTerminalPerProj[projection]};
+                        .terminal = terminalValuePerProj[production],
+                        .n1Index = firstNonTerminalPerProj[production],
+                        .n2Index = secondNonTerminalPerProj[production]};
                     generativeNonTerminalsQueue.push_back(nonTerminalIndex);
                 }
             }

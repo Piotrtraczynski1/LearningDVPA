@@ -34,26 +34,26 @@ class Cfg
     std::vector<uint32_t> secondNonTerminalPerProj{};
     std::vector<Terminal> terminalValuePerProj{};
 
-    std::vector<uint32_t> numOfParentProjections{};
-    std::vector<uint32_t> parentProjections{};
-    std::vector<uint64_t> parentProjectionsOffsets{};
+    std::vector<uint32_t> numOfParentProductions{};
+    std::vector<uint32_t> parentProductions{};
+    std::vector<uint64_t> parentProductionsOffsets{};
 
-    uint64_t numOfProjections{0};
+    uint64_t numOfProductions{0};
     uint32_t numOfNonTerminals{1};
     static constexpr uint32_t unknownIndex{std::numeric_limits<uint32_t>::max()};
 
 public:
     Cfg();
-    Cfg(const size_t estimatedNumberOfProjections, const size_t estimatedNumberOfNonTerminals);
+    Cfg(const size_t estimatedNumberOfProductions, const size_t estimatedNumberOfNonTerminals);
 
-    void addProjection(
+    void addProduction(
         const NonTerminal nonTerminal, const Terminal terminal, const NonTerminal n1,
         const NonTerminal n2);
     std::shared_ptr<OutputType> isEmpty();
 
 private:
     void insertDummyElements();
-    void calculateParentProjections();
+    void calculateParentProductions();
     uint32_t setNonTerminalIndex(const NonTerminal nonTerminal);
     void buildExample(std::vector<Terminal> &example, const uint32_t id);
 };

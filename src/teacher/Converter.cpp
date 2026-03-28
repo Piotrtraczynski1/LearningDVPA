@@ -93,7 +93,7 @@ std::tuple<size_t, size_t> Converter::calculateEstimatedCfgSize()
         static_cast<size_t>(combinedVpaNumOfStates) * static_cast<size_t>(stackSymbolsNumber) +
         static_cast<size_t>(combinedVpaNumOfStates);
 
-    const size_t estimatedNumberOfProjections =
+    const size_t estimatedNumberOfProductions =
         (projCalls + projLocals + projReturns + projCommon) / 4 * 3;
 
     const size_t estimatedNonTerminals =
@@ -102,7 +102,7 @@ std::tuple<size_t, size_t> Converter::calculateEstimatedCfgSize()
          1) /
         4 * 3;
 
-    return {estimatedNumberOfProjections, estimatedNonTerminals};
+    return {estimatedNumberOfProductions, estimatedNonTerminals};
 }
 
 std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA<AutomatonKind::Combined> &vpa)
@@ -112,11 +112,11 @@ std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA<AutomatonKind::Co
 
     combinedVpaNumOfStates = vpa.numOfStates;
 
-    const auto [estimatedNumberOfProjections, estimatedNonTerminals] = calculateEstimatedCfgSize();
-    cfg = std::make_shared<cfg::Cfg>(estimatedNumberOfProjections, estimatedNonTerminals);
+    const auto [estimatedNumberOfProductions, estimatedNonTerminals] = calculateEstimatedCfgSize();
+    cfg = std::make_shared<cfg::Cfg>(estimatedNumberOfProductions, estimatedNonTerminals);
     seenNonTerminals.reset();
 
-    addCommonProjections(vpa);
+    addCommonProductions(vpa);
     while (not nonTerminalsQueue.empty())
     {
         const auto nonTerminal{nonTerminalsQueue.front()};
@@ -124,10 +124,10 @@ std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA<AutomatonKind::Co
 
         const auto [state1, stackSymbol, state2] = cfg::Calculator::decodeNonTerminal(nonTerminal);
 
-        addCallProjections((*vpa.delta).callT[state1], nonTerminal, stackSymbol, state2);
-        addReturnProjections(
+        addCallProductions((*vpa.delta).callT[state1], nonTerminal, stackSymbol, state2);
+        addReturnProductions(
             (*vpa.delta).returnT[state1][stackSymbol], nonTerminal, stackSymbol, state2);
-        addLocalProjections((*vpa.delta).localT[state1], nonTerminal, stackSymbol, state2);
+        addLocalProductions((*vpa.delta).localT[state1], nonTerminal, stackSymbol, state2);
     }
 
     return cfg;
@@ -265,7 +265,7 @@ bool Converter::isAcceptingState(uint16_t state, const VPA<AutomatonKind::Normal
     return vpa->acceptingStates.at(states.first) ^ secondVpa.acceptingStates.at(states.second);
 }
 
-void Converter::addCallProjections(
+void Converter::addCallProductions(
     const common::transition::CoArgument (&callT)[utils::MaxNumOfCombinedAutomatonLetters],
     const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
     const common::transition::State state)
@@ -286,7 +286,7 @@ void Converter::addCallProjections(
             insertNonTerminalIfNeeded(nonTerminal1);
             insertNonTerminalIfNeeded(nonTerminal2);
 
-            cfg->addProjection(
+            cfg->addProduction(
                 nonTerminal,
                 cfg::Calculator::convertSymbolToTerminal(common::symbol::CallSymbol{callId}),
                 nonTerminal1, nonTerminal2);
@@ -294,7 +294,7 @@ void Converter::addCallProjections(
     }
 }
 
-void Converter::addReturnProjections(
+void Converter::addReturnProductions(
     const common::transition::State (&returnT)[utils::MaxNumOfCombinedAutomatonLetters],
     const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
     const common::transition::State state)
@@ -309,7 +309,7 @@ void Converter::addReturnProjections(
 
             insertNonTerminalIfNeeded(nonTerminal1);
 
-            cfg->addProjection(
+            cfg->addProduction(
                 nonTerminal, cfg::Calculator::convertSymbolToTerminal(returnSymbol), nonTerminal1,
                 cfg::NonTerminal::INVALID);
         }
@@ -317,7 +317,7 @@ void Converter::addReturnProjections(
         {
             if (returnT[returnSymbol] == state)
             {
-                cfg->addProjection(
+                cfg->addProduction(
                     nonTerminal, cfg::Calculator::convertSymbolToTerminal(returnSymbol),
                     cfg::NonTerminal::INVALID, cfg::NonTerminal::INVALID);
             }
@@ -325,7 +325,7 @@ void Converter::addReturnProjections(
     }
 }
 
-void Converter::addLocalProjections(
+void Converter::addLocalProductions(
     const common::transition::State (&localT)[utils::MaxNumOfCombinedAutomatonLetters],
     const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
     const common::transition::State state)
@@ -339,13 +339,13 @@ void Converter::addLocalProjections(
 
         insertNonTerminalIfNeeded(nonTerminal1);
 
-        cfg->addProjection(
+        cfg->addProduction(
             nonTerminal, cfg::Calculator::convertSymbolToTerminal(localSymbol), nonTerminal1,
             cfg::NonTerminal::INVALID);
     }
 }
 
-void Converter::addCommonProjections(const VPA<AutomatonKind::Combined> &vpa)
+void Converter::addCommonProductions(const VPA<AutomatonKind::Combined> &vpa)
 {
     for (uint16_t stateId = 0; stateId < vpa.numOfStates; stateId++)
     {
@@ -358,7 +358,7 @@ void Converter::addCommonProjections(const VPA<AutomatonKind::Combined> &vpa)
 
             insertNonTerminalIfNeeded(nonTerminal);
 
-            cfg->addProjection(
+            cfg->addProduction(
                 cfg::NonTerminal::START, cfg::Terminal::INVALID, nonTerminal,
                 cfg::NonTerminal::INVALID);
 
@@ -367,7 +367,7 @@ void Converter::addCommonProjections(const VPA<AutomatonKind::Combined> &vpa)
             {
                 symbol::StackSymbol ss{stackSymbol};
                 cfg::NonTerminal nonTerminal{cfg::Calculator::makeNonTerminal(state, ss, state)};
-                cfg->addProjection(
+                cfg->addProduction(
                     nonTerminal, cfg::Terminal::INVALID, cfg::NonTerminal::INVALID,
                     cfg::NonTerminal::INVALID);
             }

@@ -48,16 +48,16 @@ private:
     void insertNonTerminalIfNeeded(const cfg::NonTerminal nonTerminal);
     std::tuple<size_t, size_t> calculateEstimatedCfgSize();
 
-    void addCommonProjections(const VPA<AutomatonKind::Combined> &vpa);
-    void addCallProjections(
+    void addCommonProductions(const VPA<AutomatonKind::Combined> &vpa);
+    void addCallProductions(
         const common::transition::CoArgument (&callT)[utils::MaxNumOfCombinedAutomatonLetters],
         const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
         const common::transition::State state2);
-    void addReturnProjections(
+    void addReturnProductions(
         const common::transition::State (&returnT)[utils::MaxNumOfCombinedAutomatonLetters],
         const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
         const common::transition::State state2);
-    void addLocalProjections(
+    void addLocalProductions(
         const common::transition::State (&localT)[utils::MaxNumOfCombinedAutomatonLetters],
         const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
         const common::transition::State state2);

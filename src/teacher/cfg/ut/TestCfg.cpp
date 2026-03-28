@@ -8,9 +8,9 @@ TEST(CfgTest, default1)
 {
     Cfg cfg{1000, 100};
 
-    cfg.addProjection(NonTerminal::START, Terminal{1}, NonTerminal{1}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{1}, Terminal{2}, NonTerminal{1}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{1}, Terminal{3}, NonTerminal::INVALID, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal::START, Terminal{1}, NonTerminal{1}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{1}, Terminal{2}, NonTerminal{1}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{1}, Terminal{3}, NonTerminal::INVALID, NonTerminal::INVALID);
 
     auto result = cfg.isEmpty();
 
@@ -34,9 +34,9 @@ TEST(CfgTest, cyclicGrammar)
 {
     Cfg cfg;
 
-    cfg.addProjection(NonTerminal::START, Terminal{1}, NonTerminal{1}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{1}, Terminal{2}, NonTerminal{2}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{2}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal::START, Terminal{1}, NonTerminal{1}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{1}, Terminal{2}, NonTerminal{2}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{2}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
 
     auto result = cfg.isEmpty();
 
@@ -47,10 +47,10 @@ TEST(CfgTest, complexNonEmptyGrammar)
 {
     Cfg cfg;
 
-    cfg.addProjection(NonTerminal::START, Terminal{1}, NonTerminal{1}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{1}, Terminal{2}, NonTerminal{2}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{2}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{2}, Terminal{3}, NonTerminal::INVALID, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal::START, Terminal{1}, NonTerminal{1}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{1}, Terminal{2}, NonTerminal{2}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{2}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{2}, Terminal{3}, NonTerminal::INVALID, NonTerminal::INVALID);
 
     auto result = cfg.isEmpty();
 
@@ -62,11 +62,11 @@ TEST(CfgTest, test)
 {
     Cfg cfg;
 
-    cfg.addProjection(NonTerminal::START, Terminal::INVALID, NonTerminal{1}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal::START, Terminal::INVALID, NonTerminal{1}, NonTerminal::INVALID);
 
-    cfg.addProjection(NonTerminal{1}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{2}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
-    cfg.addProjection(NonTerminal{2}, Terminal{3}, NonTerminal::INVALID, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{1}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{2}, Terminal{1}, NonTerminal{2}, NonTerminal::INVALID);
+    cfg.addProduction(NonTerminal{2}, Terminal{3}, NonTerminal::INVALID, NonTerminal::INVALID);
 
     auto result = cfg.isEmpty();
 

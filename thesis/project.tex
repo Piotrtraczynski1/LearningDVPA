@@ -172,21 +172,21 @@ Po wyznaczeniu stanów akceptujących możemy zdefiniować dla nich dodatkowe pr
 \paragraph{Konstrukcja gramatyki bezkontekstowej}
 
 Konstrukcja gramatyki bezkontekstowej $G$ została zaimplementowana w metodzie \texttt{convertVpaToCfg} klasy \texttt{Converter}.
-Rozpoczyna ona od heurystycznego oszacowania liczby projekcji i nieterminali w $G$, które są podawane jako argumenty klasy \texttt{Cfg},
+Rozpoczyna ona od heurystycznego oszacowania liczby produkcji i nieterminali w $G$, które są podawane jako argumenty klasy \texttt{Cfg},
 żeby zarezerwować pamięć na dynamicznie kontenery wymagające ciągłości pamięci.
 
-Testy wykazały, że znacząca część dodawanych projekcji jest nieosiągalna, dlatego zastosowano heurystyczne podejście do zmniejszenia ich liczby.
-Na początku dodajemy nieterminale osiągalne z nieterminala startowego razem z potrzebnymi projekcjami i umieszczamy te nieterminale w kolejce.
-Następne projekcje i nieterminale się dodawne stosując algorytm BFS po osiągalnych z symbolu startowego nieterminalach.
+Testy wykazały, że znacząca część dodawanych produkcji jest nieosiągalna, dlatego zastosowano heurystyczne podejście do zmniejszenia ich liczby.
+Na początku dodajemy nieterminale osiągalne z nieterminala startowego razem z potrzebnymi produkcjami i umieszczamy te nieterminale w kolejce.
+Następne produkcje i nieterminale się dodawne stosując algorytm BFS po osiągalnych z symbolu startowego nieterminalach.
 Podejście to na losowych testach zredukowało ilość generowanych produkcji o około jedną trzecią, co również skróciło czas potrzebny na zapytanie.
 
 \paragraph{Sprawdzanie pustości gramatyki bezkontekstowej}
 
 Klasa \texttt{Cfg} ma na celu sprawdzić pustość poprzez wyznaczenie zbioru generujących nieterminali.
-W tym celu udostępnia dwie publiczne metody: \texttt{addProjection} oraz \texttt{isEmpty}. 
+W tym celu udostępnia dwie publiczne metody: \texttt{addProduction} oraz \texttt{isEmpty}. 
 
-Metoda \texttt{addProjection} wykorzystywana podczas konstrukcji gramatyki indeksuje nieterminale pojawiające się w projekcjach.
-Dla każdej projekcji oblicza liczbę jej nieterminali po prawej stronie oraz dla każdego nieterminala zapisuję w ilu projekcjach występuje
+Metoda \texttt{addProduction} wykorzystywana podczas konstrukcji gramatyki indeksuje nieterminale pojawiające się w produkcjach.
+Dla każdej produkcji oblicza liczbę jej nieterminali po prawej stronie oraz dla każdego nieterminala zapisuję w ilu produkcjach występuje
 po prawej stronie oraz zapisuję nieterminale generujące. Informacja ta pozwala skonstruować dwie tablice określające zakres produkcji zależnych
 od danego nieterminala. Takie podejście umożliwia szybkie przechodzenie po wszystkich zależnych produkcjachi korzysta z ciągłości pamięci,
 co w praktyce okazało się wydajne.
