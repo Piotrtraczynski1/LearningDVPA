@@ -16,7 +16,7 @@ class CdaGenerator : public Generator
 public:
     using Generator::Generator;
 
-    std::shared_ptr<common::VPA> run() override final;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() override final;
 
 protected:
     uint16_t randRange(const uint16_t a, const uint16_t b) const;

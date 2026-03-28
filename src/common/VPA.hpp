@@ -6,9 +6,9 @@
 
 #include "common/Stack.hpp"
 #include "common/Word.hpp"
+#include "common/transition/AutomatonSize.hpp"
 #include "symbol/Symbols.hpp"
 #include "transition/Transition.hpp"
-#include "utils/Constants.hpp"
 
 namespace teacher::cfg
 {
@@ -17,16 +17,18 @@ class Converter;
 
 namespace common
 {
+template <AutomatonKind Kind = AutomatonKind::Normal>
 class VPA
 {
     friend class teacher::Converter;
+    using Size = AutomatonSize<Kind>;
 
 public:
     Stack stack;
     transition::State state;
-    std::array<bool, utils::MaxNumOfCombinedAutomatonStates> acceptingStates;
+    std::array<bool, Size::MaxNumOfStates> acceptingStates;
 
-    VPA(transition::Transition &transition, transition::State initial,
+    VPA(transition::Transition<Kind> &transition, transition::State initial,
         const std::vector<uint16_t> &accStates, uint16_t numStates);
 
     bool checkWord(const Word &word);
@@ -47,7 +49,7 @@ public:
     {
         os << "initial state: " << initialState << "\n";
         os << "accepting states: ";
-        for (int i = 0; i < utils::MaxNumOfCombinedAutomatonStates; i++)
+        for (int i = 0; i < Size::MaxNumOfStates; i++)
         {
             if (acceptingStates[i])
                 os << ", " << i;
@@ -60,7 +62,7 @@ public:
     {
         os << "numOfStates = " << numOfStates << ";\n";
         os << "acceptingStates = std::vector<uint16_t>{";
-        for (int i = 0; i < utils::MaxNumOfCombinedAutomatonStates; i++)
+        for (int i = 0; i < Size::MaxNumOfStates; i++)
         {
             if (acceptingStates[i])
                 os << ", " << i;
@@ -84,7 +86,7 @@ private:
         stack = {};
     }
 
-    transition::Transition &delta;
+    transition::Transition<Kind> &delta;
     transition::State initialState;
     transition::State sink;
 

@@ -6,7 +6,7 @@
 
 namespace teacher
 {
-VPA Converter::combineVPA(const VPA &secondVpa)
+VPA<AutomatonKind::Combined> Converter::combineVPA(const VPA<AutomatonKind::Normal> &secondVpa)
 {
     TIME_MARKER("[Converter]: combineVPA");
     transition.clear();
@@ -51,7 +51,7 @@ VPA Converter::combineVPA(const VPA &secondVpa)
     }
 
     auto init = combineStates(vpa->initialState, secondVpa.initialState);
-    return VPA{
+    return VPA<AutomatonKind::Combined>{
         transition, init, acceptingStates,
         static_cast<uint16_t>(combinedVpaNumOfStates + 1)}; // +1 for poping stack state
 }
@@ -105,7 +105,7 @@ std::tuple<size_t, size_t> Converter::calculateEstimatedCfgSize()
     return {estimatedNumberOfProjections, estimatedNonTerminals};
 }
 
-std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA &vpa)
+std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA<AutomatonKind::Combined> &vpa)
 {
     TIME_MARKER("[Converter]: convertVpaToCfg");
     LOG("[Converter]: converting VPA to CFG");
@@ -133,7 +133,7 @@ std::shared_ptr<cfg::Cfg> Converter::convertVpaToCfg(const VPA &vpa)
     return cfg;
 }
 
-void Converter::addCalls(uint16_t state, const VPA &secondVpa)
+void Converter::addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa)
 {
     for (uint16_t call = 0; call < numOfCalls; call++)
     {
@@ -166,7 +166,7 @@ void Converter::addCalls(uint16_t state, const VPA &secondVpa)
     }
 }
 
-void Converter::addLocals(uint16_t state, const VPA &secondVpa)
+void Converter::addLocals(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa)
 {
     for (uint16_t local = 0; local < numOfLocals; local++)
     {
@@ -189,7 +189,8 @@ void Converter::addLocals(uint16_t state, const VPA &secondVpa)
     }
 }
 
-void Converter::addReturns(uint16_t state, uint16_t stackSymbol, const VPA &secondVpa)
+void Converter::addReturns(
+    uint16_t state, uint16_t stackSymbol, const VPA<AutomatonKind::Normal> &secondVpa)
 {
     for (uint16_t ret = 0; ret < numOfReturns; ret++)
     {
@@ -256,7 +257,7 @@ common::symbol::StackSymbol Converter::combineStackSymbols(uint16_t s1, uint16_t
     return common::symbol::StackSymbol{static_cast<uint16_t>((s2 * (numOfStackSymbols + 1)) + s1)};
 }
 
-bool Converter::isAcceptingState(uint16_t state, const VPA &secondVpa) const
+bool Converter::isAcceptingState(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa) const
 {
     std::pair<common::transition::State, common::transition::State> states{
         convertCombinedStateIntoStates(state)};
@@ -265,7 +266,7 @@ bool Converter::isAcceptingState(uint16_t state, const VPA &secondVpa) const
 }
 
 void Converter::addCallProjections(
-    const common::transition::CoArgument (&callT)[utils::MaxNumOfLetters],
+    const common::transition::CoArgument (&callT)[utils::MaxNumOfCombinedAutomatonLetters],
     const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
     const common::transition::State state)
 {
@@ -325,7 +326,7 @@ void Converter::addReturnProjections(
 }
 
 void Converter::addLocalProjections(
-    const common::transition::State (&localT)[utils::MaxNumOfLetters],
+    const common::transition::State (&localT)[utils::MaxNumOfCombinedAutomatonLetters],
     const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
     const common::transition::State state)
 {
@@ -344,7 +345,7 @@ void Converter::addLocalProjections(
     }
 }
 
-void Converter::addCommonProjections(const VPA &vpa)
+void Converter::addCommonProjections(const VPA<AutomatonKind::Combined> &vpa)
 {
     for (uint16_t stateId = 0; stateId < vpa.numOfStates; stateId++)
     {

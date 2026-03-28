@@ -32,7 +32,7 @@ class TestLearner : public ::testing::Test
 public:
     void init(Srs srs = {})
     {
-        vpa = std::make_shared<VPA>(*transition, initial, acceptingStates, numOfStates);
+        vpa = std::make_shared<VPA<AutomatonKind::Normal>>(*transition, initial, acceptingStates, numOfStates);
         converter = std::make_shared<teacher::Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
@@ -56,15 +56,15 @@ public:
 
     common::Word emptyControlLetter{common::Stack{common::symbol::StackSymbol::BOTTOM}};
 
-    std::shared_ptr<VPA> vpa;
-    std::shared_ptr<Transition> transition;
+    std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
+    std::shared_ptr<Transition<AutomatonKind::Normal>> transition;
     std::shared_ptr<teacher::Converter> converter;
     std::shared_ptr<teacher::Teacher> oracle;
 
     Learner *sut;
 
     bool equalUpTo(
-        std::shared_ptr<VPA> hyp, const uint8_t maxLen, common::Word *counterExample = nullptr,
+        std::shared_ptr<VPA<AutomatonKind::Normal>> hyp, const uint8_t maxLen, common::Word *counterExample = nullptr,
         common::Word pref = {})
     {
         if (vpa->checkWord(pref) != hyp->checkWord(pref))
@@ -121,7 +121,7 @@ public:
         numOfReturns = 1;
         numOfLocals = 2;
 
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{3});
         transition->add(State{0}, CS{1}, State{4}, StackSymbol{2});
@@ -204,7 +204,7 @@ public:
 
 TEST_F(TestLearner2, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -225,7 +225,7 @@ public:
         numOfReturns = 1;
         numOfLocals = 0;
 
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -250,7 +250,7 @@ public:
 
 TEST_F(TestLaearner0, automaton0)
 {
-    std::shared_ptr<VPA> result{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> result{sut->run()};
 
     common::Word test{CS{0}, CS{0}, CS{0}};
 
@@ -269,7 +269,7 @@ public:
         acceptingStates = std::vector<uint16_t>{0, 3};
         numOfStates = 5;
 
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         transition->add(initial, cs, s1, ss);
         transition->add(initial, ls, s1);
@@ -302,7 +302,7 @@ public:
 
 TEST_F(TestLaearner1, automaton1)
 {
-    std::shared_ptr<VPA> result{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> result{sut->run()};
 
     common::Word ce;
     EXPECT_TRUE(equalUpTo(result, 9, &ce)) << "counter example: " << ce;
@@ -319,7 +319,7 @@ public:
         acceptingStates = std::vector<uint16_t>{0};
         numOfStates = 3;
 
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         State s1{1}, dead{2};
 
@@ -343,7 +343,7 @@ public:
 
 TEST_F(TestLearnerBalanced, learnsBalancedUpToLen6)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce;
     common::Word test{rs, rs, rs, rs};
 
@@ -364,7 +364,7 @@ public:
         numOfCalls = 3;
         numOfReturns = 1;
         numOfLocals = 1;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{2});
@@ -398,7 +398,7 @@ public:
 
 TEST_F(TestLearner3, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
     EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
@@ -417,7 +417,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -442,7 +442,7 @@ public:
 
 TEST_F(TestLearner4, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -462,7 +462,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -487,7 +487,7 @@ public:
 
 TEST_F(TestLearner5, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -507,7 +507,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -532,7 +532,7 @@ public:
 
 TEST_F(TestLearner6, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -552,7 +552,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 2;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{2});
@@ -586,7 +586,7 @@ public:
 
 TEST_F(TestLearner7, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -606,7 +606,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 2;
         numOfLocals = 1;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{5}, StackSymbol{1});
@@ -673,7 +673,7 @@ public:
 
 TEST_F(TestLearner8, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -693,7 +693,7 @@ public:
         numOfCalls = 1;
         numOfReturns = 3;
         numOfLocals = 1;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{5}, StackSymbol{2});
@@ -783,7 +783,7 @@ public:
 
 TEST_F(TestLearner9, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -803,7 +803,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 2;
         numOfLocals = 2;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -876,7 +876,7 @@ public:
 
 TEST_F(TestLearner10, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -896,7 +896,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 2;
         numOfLocals = 2;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -973,7 +973,7 @@ public:
 
 TEST_F(TestLearnerWithSrs, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -993,7 +993,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{3}, StackSymbol{3});
@@ -1024,7 +1024,7 @@ public:
 
 TEST_F(TestLearner11, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -1044,7 +1044,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -1083,7 +1083,7 @@ TEST_F(TestLearnerInfiniteLoopCompleteAutomaton, testLearner)
     // common::Word word{
     //     common::symbol::CallSymbol{1}, common::symbol::ReturnSymbol{0},
     //     common::symbol::CallSymbol{0}, common::symbol::ReturnSymbol{0}};
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -1103,7 +1103,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -1130,7 +1130,7 @@ public:
 
 TEST_F(TestLearnerInfiniteLoop, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
@@ -1150,7 +1150,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{2}, StackSymbol{1});
@@ -1183,7 +1183,7 @@ public:
 
 TEST_F(TestLearnerTooManyStates, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     // hyp->printUt();
@@ -1207,7 +1207,7 @@ public:
         numOfCalls = 2;
         numOfReturns = 1;
         numOfLocals = 0;
-        transition = std::make_shared<Transition>();
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         // CallTransitions:
         transition->add(State{0}, CS{0}, State{0}, StackSymbol{3});
@@ -1259,7 +1259,7 @@ public:
 
 TEST_F(TestLearnerTooManyStates2, testLearner)
 {
-    std::shared_ptr<VPA> hyp{sut->run()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> hyp{sut->run()};
     common::Word ce{};
 
     EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;

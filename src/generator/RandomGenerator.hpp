@@ -15,7 +15,7 @@ class RandomGenerator : public Generator
 public:
     using Generator::Generator;
 
-    std::shared_ptr<common::VPA> run() override;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() override;
 
 private:
     void generateTransition();

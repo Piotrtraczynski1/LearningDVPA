@@ -30,8 +30,8 @@ public:
     State s1{1};
     State s2{2};
 
-    std::shared_ptr<Transition> transitionOne;
-    std::shared_ptr<Transition> transitionTwo;
+    std::shared_ptr<Transition<AutomatonKind::Normal>> transitionOne;
+    std::shared_ptr<Transition<AutomatonKind::Normal>> transitionTwo;
 
     std::shared_ptr<Converter> converter;
 
@@ -39,8 +39,8 @@ public:
 
     void SetUp() override
     {
-        transitionOne = std::make_shared<Transition>();
-        transitionTwo = std::make_shared<Transition>();
+        transitionOne = std::make_shared<Transition<AutomatonKind::Normal>>();
+        transitionTwo = std::make_shared<Transition<AutomatonKind::Normal>>();
 
         transitionOne->add(initialState, LS{0}, s1);
         transitionOne->add(s1, LS{0}, s1);
@@ -51,17 +51,18 @@ public:
     }
 
     void init(
-        std::shared_ptr<VPA> vpa, uint16_t numCalls, uint16_t numReturns, uint16_t numLocals,
-        uint16_t numOfStackSymbols)
+        std::shared_ptr<VPA<AutomatonKind::Normal>> vpa, uint16_t numCalls, uint16_t numReturns,
+        uint16_t numLocals, uint16_t numOfStackSymbols)
     {
         converter =
             std::make_shared<Converter>(vpa, numCalls, numReturns, numLocals, numOfStackSymbols);
         sut = std::make_shared<Teacher>(vpa, converter);
     }
 
-    std::shared_ptr<common::Word> equivalenceQuery(common::VPA &secondVpa, Converter &sut)
+    std::shared_ptr<common::Word>
+    equivalenceQuery(common::VPA<AutomatonKind::Normal> &secondVpa, Converter &sut)
     {
-        common::VPA combinedVpa{sut.combineVPA(secondVpa)};
+        common::VPA<AutomatonKind::Combined> combinedVpa{sut.combineVPA(secondVpa)};
         std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
 
         auto cfgOutput{cfg->isEmpty()};
@@ -71,10 +72,10 @@ public:
 
 TEST_F(TestTeacherSimple, equivalenceQuery)
 {
-    std::shared_ptr<common::VPA> vpa =
-        std::make_shared<common::VPA>(*transitionOne, initialState, std::vector<uint16_t>{1}, 2);
-    std::shared_ptr<common::VPA> hypothesis =
-        std::make_shared<common::VPA>(*transitionTwo, initialState, std::vector<uint16_t>{2}, 3);
+    auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transitionOne, initialState, std::vector<uint16_t>{1}, 2);
+    auto hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transitionTwo, initialState, std::vector<uint16_t>{2}, 3);
 
     init(vpa, 0, 0, 1, 1);
 
@@ -85,8 +86,8 @@ TEST_F(TestTeacherSimple, equivalenceQuery)
 
 TEST_F(TestTeacherSimple, equivalenceQuery2)
 {
-    std::shared_ptr<common::VPA> vpa =
-        std::make_shared<common::VPA>(*transitionOne, initialState, std::vector<uint16_t>{1}, 2);
+    auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transitionOne, initialState, std::vector<uint16_t>{1}, 2);
 
     init(vpa, 0, 0, 1, 1);
 
@@ -97,8 +98,8 @@ TEST_F(TestTeacherSimple, equivalenceQuery2)
 
 TEST_F(TestTeacherSimple, equivalenceQuer3)
 {
-    std::shared_ptr<common::VPA> vpa =
-        std::make_shared<common::VPA>(*transitionTwo, initialState, std::vector<uint16_t>{2}, 3);
+    auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transitionTwo, initialState, std::vector<uint16_t>{2}, 3);
     init(vpa, 0, 0, 1, 1);
 
     common::Word res{*sut->equivalenceQuery(vpa)};
@@ -117,19 +118,19 @@ public:
     LS ls{0};
     common::symbol::StackSymbol ss{1};
 
-    std::shared_ptr<Transition> vpaTransition;
-    std::shared_ptr<common::VPA> vpa;
+    std::shared_ptr<Transition<AutomatonKind::Normal>> vpaTransition;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
     std::shared_ptr<Converter> converter;
 
     std::shared_ptr<Teacher> sut;
 
-    std::shared_ptr<Transition> hypothesisTransition;
-    std::shared_ptr<common::VPA> hypothesis;
+    std::shared_ptr<Transition<AutomatonKind::Normal>> hypothesisTransition;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
 
     void SetUp() override
     {
-        vpaTransition = std::make_shared<Transition>();
-        hypothesisTransition = std::make_shared<Transition>();
+        vpaTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        hypothesisTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
     }
 
     void init(const uint16_t c, const uint16_t r, const uint16_t l, const uint16_t ss)
@@ -142,7 +143,8 @@ public:
 
     void initSut(const std::vector<uint16_t> &acceptingStates, const uint16_t numOfStates)
     {
-        vpa = std::make_shared<common::VPA>(*vpaTransition, initial, acceptingStates, numOfStates);
+        vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+            *vpaTransition, initial, acceptingStates, numOfStates);
         converter = std::make_shared<Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
 
@@ -151,7 +153,7 @@ public:
 
     void initHypothesis(const std::vector<uint16_t> &acceptingStates, const uint16_t numOfStates)
     {
-        hypothesis = std::make_shared<common::VPA>(
+        hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             *hypothesisTransition, initial, acceptingStates, numOfStates);
     }
 };

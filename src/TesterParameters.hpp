@@ -24,7 +24,7 @@ struct TesterParameters
     uint16_t maxTestingWordLength;
 
     double density;
-    double acceptingStatesDensity{0.3};
+    double acceptingStatesDensity{0.6};
 
     uint16_t numOfModules{0};
 
@@ -36,16 +36,16 @@ struct TesterParameters
 };
 
 constexpr TesterParameters RandomTestParameters{
-    .minNumOfStates = 2,
-    .maxNumOfStates = 6,
-    .minNumOfCalls = 1,
-    .maxNumOfCalls = 4,
-    .minNumOfLocals = 1,
-    .maxNumOfLocals = 8,
-    .minNumOfReturns = 1,
-    .maxNumOfReturns = 4,
-    .minNumOfStackSymbols = 2,
-    .maxNumOfStackSymbols = 6,
+    .minNumOfStates = 4,
+    .maxNumOfStates = 5,
+    .minNumOfCalls = 4,
+    .maxNumOfCalls = 5,
+    .minNumOfLocals = 4,
+    .maxNumOfLocals = 5,
+    .minNumOfReturns = 4,
+    .maxNumOfReturns = 5,
+    .minNumOfStackSymbols = 6,
+    .maxNumOfStackSymbols = 7,
     .numOfRandomTestingWords = 10000,
     .maxTestingWordLength = 30,
     .density = 0.8,

@@ -25,12 +25,13 @@ class AutomataGenerator
     std::shared_ptr<Selectors> selectors;
     std::shared_ptr<TestWords> testWords;
 
-    common::transition::Transition transition;
+    common::transition::Transition<AutomatonKind::Normal> transition;
 
-    common::Word witnesses[utils::MaxNumOfAutomatonStates + 1] = {};
+    common::Word witnesses[AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates] = {};
 
-    uint16_t forcedSelector[utils::MaxNumOfAutomatonStates][utils::MaxNumOfCombinedStackSymbols]
-                           [utils::MaxNumOfCombinedAutomatonLetters] = {};
+    uint16_t forcedSelector[AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates]
+                           [AutomatonSize<AutomatonKind::Normal>::MaxNumOfLetters]
+                           [AutomatonSize<AutomatonKind::Normal>::MaxNumOfLetters] = {};
 
 public:
     AutomataGenerator(
@@ -40,7 +41,7 @@ public:
         : oracle{oracle}, selectors{selectors}, testWords{testWords}, numOfCalls{calls},
           numOfReturns{returns}, numOfLocals{locals}, numOfStackSymbols{stackSymbols} {};
 
-    std::shared_ptr<common::VPA> generate();
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> generate();
 
     uint16_t findEquivalentSelector(const common::Word &word);
     uint16_t findEquivalentSelector(

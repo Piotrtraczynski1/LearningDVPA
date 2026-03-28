@@ -21,8 +21,8 @@ public:
         const uint16_t numOfReturns_, const uint16_t numOfStackSymbols_, const double density_,
         const double acceptingStatesDensity_, const uint16_t numOfModules_);
 
-    virtual std::shared_ptr<common::VPA> run() = 0;
-    virtual bool generatorSpecificCheck(std::shared_ptr<common::VPA> hypothesis);
+    virtual std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() = 0;
+    virtual bool generatorSpecificCheck(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
     virtual learner::Srs getSrs();
 
 protected:
@@ -41,7 +41,7 @@ protected:
 
     uint16_t numOfModules;
 
-    std::shared_ptr<common::transition::Transition> transition;
+    std::shared_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
 
     common::transition::State initialState{0};
     std::vector<uint16_t> acceptingStates{0};

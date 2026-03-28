@@ -5,7 +5,7 @@
 
 namespace learner
 {
-std::shared_ptr<common::VPA> AutomataGenerator::generate()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> AutomataGenerator::generate()
 {
     TIME_MARKER("[AutomataGenerator]: generateAutomaton");
     LOG("[AutomataGenerator]: Generating Automaton");
@@ -13,7 +13,7 @@ std::shared_ptr<common::VPA> AutomataGenerator::generate()
     clearGenerator();
     buildTransition();
 
-    return std::make_shared<common::VPA>(common::VPA{
+    return std::make_shared<common::VPA<AutomatonKind::Normal>>(common::VPA<AutomatonKind::Normal>{
         transition, selectors->getState(0), selectors->getAcceptingStates(), selectors->size()});
 }
 

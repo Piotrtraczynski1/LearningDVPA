@@ -16,7 +16,7 @@ namespace learner
 {
 class Learner
 {
-    std::shared_ptr<common::VPA> hypothesis;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
 
     const uint16_t numOfCalls;
     const uint16_t numOfLocals;
@@ -34,7 +34,7 @@ public:
     Learner(
         teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL,
         uint16_t numOfS, Srs srs = {});
-    std::shared_ptr<common::VPA> run();
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> run();
 
 private:
     void handleCounterExample(std::shared_ptr<common::Word> counterExample);

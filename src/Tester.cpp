@@ -48,7 +48,7 @@ void Tester::run()
     }
 }
 
-std::shared_ptr<common::VPA> Tester::runLearner()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
 {
     converter = std::make_shared<teacher::Converter>(
         vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
@@ -198,7 +198,7 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
     return std::make_shared<common::Word>(word);
 }
 
-void Tester::testOutput(const std::shared_ptr<common::VPA> hypothesis)
+void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     TIME_MARKER("[Tester]: testOutput");
     if (not generator->generatorSpecificCheck(hypothesis))
@@ -263,14 +263,16 @@ void Tester::printUt()
     vpa->printUt(outputFile);
 }
 
-void Tester::printAutomaton(const std::shared_ptr<common::VPA> automaton, const std::string &name)
+void Tester::printAutomaton(
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> automaton, const std::string &name)
 {
     outputFile << "\n" + name + ":\n";
     automaton->print(outputFile);
 }
 
 void Tester::saveFailedTestData(
-    const std::shared_ptr<common::Word> testWord, const std::shared_ptr<common::VPA> hypothesis)
+    const std::shared_ptr<common::Word> testWord,
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     setOutputFile();
     outputFile << "test_" << numOfExecutedTests << " details:\n\n";
@@ -284,7 +286,8 @@ void Tester::saveFailedTestData(
     outputFile.close();
 }
 
-void Tester::saveTestData(const std::shared_ptr<common::VPA> hypothesis, const std::string &msg)
+void Tester::saveTestData(
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const std::string &msg)
 {
     setOutputFile();
     outputFile << msg + "\n";

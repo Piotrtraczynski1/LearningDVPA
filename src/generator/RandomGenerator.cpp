@@ -3,11 +3,11 @@
 
 namespace generator
 {
-std::shared_ptr<common::VPA> RandomGenerator::run()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> RandomGenerator::run()
 {
     generateTransition();
     selectAcceptingStates();
-    return std::make_shared<common::VPA>(*transition, initialState, acceptingStates, numOfStates);
+    return std::make_shared<common::VPA<AutomatonKind::Normal>>(*transition, initialState, acceptingStates, numOfStates);
 }
 
 void RandomGenerator::generateTransition()

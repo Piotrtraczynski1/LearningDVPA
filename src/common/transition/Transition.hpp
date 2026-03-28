@@ -3,9 +3,8 @@
 #include <map>
 
 #include "common/symbol/Symbols.hpp"
+#include "common/transition/AutomatonSize.hpp"
 #include "common/transition/CoArgument.hpp"
-
-#include "utils/Constants.hpp"
 
 namespace teacher
 {
@@ -14,13 +13,15 @@ class Converter;
 
 namespace common::transition
 {
+template <AutomatonKind Kind = AutomatonKind::Normal>
 class Transition
 {
+    using Size = AutomatonSize<Kind>;
+
     friend class teacher::Converter;
-    CoArgument callT[utils::MaxNumOfCombinedAutomatonStates][utils::MaxNumOfLetters];
-    State returnT[utils::MaxNumOfCombinedAutomatonStates][utils::MaxNumOfCombinedStackSymbols]
-                 [utils::MaxNumOfCombinedAutomatonLetters];
-    State localT[utils::MaxNumOfCombinedAutomatonStates][utils::MaxNumOfLetters];
+    CoArgument callT[Size::MaxNumOfStates][Size::MaxNumOfLetters];
+    State returnT[Size::MaxNumOfStates][Size::MaxNumOfStackSymbols][Size::MaxNumOfLetters];
+    State localT[Size::MaxNumOfStates][Size::MaxNumOfLetters];
 
 public:
     Transition();

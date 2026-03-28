@@ -19,7 +19,7 @@ class Tester
 {
     const TesterParameters &params;
 
-    std::shared_ptr<common::VPA> vpa;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
     std::unique_ptr<generator::Generator> generator;
 
 public:
@@ -37,22 +37,26 @@ private:
     void setOutputDirectoryPath();
     void setOutputFile();
     void printTestDetails(std::ostream &os = std::cout);
-    void printAutomaton(const std::shared_ptr<common::VPA> automaton, const std::string &name);
+    void printAutomaton(
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> automaton,
+        const std::string &name);
     void printUt();
 
     void prepareTest();
-    std::shared_ptr<common::VPA> runLearner();
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> runLearner();
     void runSupervisedTest();
     RunResult runTestWithTimeout();
 
     std::shared_ptr<common::Word> generateRandomWord(uint16_t length);
-    void testOutput(const std::shared_ptr<common::VPA> hypothesis);
+    void testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
     void printTestStats();
     void saveFailedTestData(
         const std::shared_ptr<common::Word> testWord,
-        const std::shared_ptr<common::VPA> hypothesis);
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
     void saveFailedTestData(std::string errMsg);
-    void saveTestData(const std::shared_ptr<common::VPA> hypothesis, const std::string &msg);
+    void saveTestData(
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
+        const std::string &msg);
 
     uint64_t numOfExecutedTests{0};
     uint64_t numOfFailedTests{0};
@@ -76,6 +80,6 @@ private:
 struct RunResult
 {
     ExitCode exitCode;
-    std::shared_ptr<common::VPA> hyp;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hyp;
     std::chrono::milliseconds elapsed{};
 };

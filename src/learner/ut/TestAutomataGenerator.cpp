@@ -27,7 +27,7 @@ class TestAutomataGenerator : public ::testing::Test
 public:
     void init()
     {
-        vpa = std::make_shared<VPA>(transition, initial, acceptingStates, numOfStates);
+        vpa = std::make_shared<VPA<AutomatonKind::Normal>>(transition, initial, acceptingStates, numOfStates);
         converter = std::make_shared<teacher::Converter>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
         oracle = std::make_shared<teacher::Teacher>(vpa, converter);
@@ -52,8 +52,8 @@ public:
 
     common::Word emptyControlLetter{common::Stack{common::symbol::StackSymbol::BOTTOM}};
 
-    std::shared_ptr<VPA> vpa;
-    Transition transition;
+    std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
+    Transition<AutomatonKind::Normal> transition;
     std::shared_ptr<teacher::Converter> converter;
     std::shared_ptr<teacher::Teacher> oracle;
 
@@ -71,7 +71,7 @@ public:
         numOfStates = 4;
         acceptingStates = std::vector<uint16_t>{0, 2};
 
-        transition = Transition{};
+        transition = Transition<AutomatonKind::Normal>{};
 
         transition.add(initial, cs, s1, ss);
         transition.add(s1, cs, s2, ss);
@@ -101,7 +101,7 @@ public:
 
 TEST_F(TestAutomataGeneratorFourStatesReducedToTwo, automataSimulationStep1)
 {
-    std::shared_ptr<VPA> automata{sut->generate()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> automata{sut->generate()};
 
     EXPECT_EQ(automata->acceptingStates.at(0), true);
     EXPECT_EQ(automata->acceptingStates.at(1), false);
@@ -117,7 +117,7 @@ public:
         acceptingStates = std::vector<uint16_t>{0, 3};
         numOfStates = 5;
 
-        transition = Transition{};
+        transition = Transition<AutomatonKind::Normal>{};
 
         transition.add(initial, cs, s1, ss);
         transition.add(initial, ls, s1);
@@ -150,7 +150,7 @@ public:
 
 TEST_F(TestAutomataGenerator1, automataSimulationStep1)
 {
-    std::shared_ptr<VPA> automata{sut->generate()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> automata{sut->generate()};
 
     common::Word counterExample{*oracle->equivalenceQuery(automata)};
 
@@ -171,7 +171,7 @@ TEST_F(TestAutomataGenerator1, automataSimulationStep2)
     selectors->addSelector({cs}, false);
     selectors->addSelector({cs, rs, cs, cs, rs, rs, ls, rs}, true);
 
-    std::shared_ptr<VPA> automata{sut->generate()};
+    std::shared_ptr<VPA<AutomatonKind::Normal>> automata{sut->generate()};
 
     common::Word counterExample{*oracle->equivalenceQuery(automata)};
 

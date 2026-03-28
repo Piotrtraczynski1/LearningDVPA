@@ -13,7 +13,7 @@ class TestTransition : public ::testing::Test
 public:
     void SetUp() override
     {
-        sut = std::make_unique<Transition>();
+        sut = std::make_unique<Transition<AutomatonKind::Normal>>();
         sut->add(initialState, callSymbol, callState, StackSymbol{2});
         sut->add(initialState, StackSymbol{1}, returnSymbol, returnState);
         sut->add(initialState, localSymbol, localState);
@@ -30,7 +30,7 @@ public:
 
     CoArgument coArgCall{callState, StackSymbol{2}};
 
-    std::unique_ptr<Transition> sut;
+    std::unique_ptr<Transition<AutomatonKind::Normal>> sut;
 };
 
 TEST_F(TestTransition, CallSymbolArgumentFound)

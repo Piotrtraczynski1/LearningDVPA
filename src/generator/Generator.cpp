@@ -16,10 +16,10 @@ void Generator::setConfig(
     acceptingStatesDensity = acceptingStatesDensity_;
     numOfModules = numOfModules_;
 
-    transition = std::make_shared<common::transition::Transition>();
+    transition = std::make_shared<common::transition::Transition<AutomatonKind::Normal>>();
 }
 
-bool Generator::generatorSpecificCheck(std::shared_ptr<common::VPA> hypothesis)
+bool Generator::generatorSpecificCheck(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     return numOfStates + 1 >= hypothesis->getNumOfStates(); // +1 for explicit sink state
 }

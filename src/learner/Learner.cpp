@@ -20,7 +20,7 @@ Learner::Learner(
     setInitialState();
 };
 
-std::shared_ptr<common::VPA> Learner::run()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> Learner::run()
 {
     TIME_MARKER("[Learner]: Learner::run");
     std::shared_ptr<common::Word> counterExample;

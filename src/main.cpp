@@ -47,11 +47,12 @@ void runECdaGenerator(const uint16_t numOfTests)
 
 int main()
 {
-    constexpr uint16_t numOfTests{5000};
+    constexpr uint16_t numOfTests{50000};
 
     // std::srand(std::time(0));
-    std::srand(1);
-    runECdaGenerator(numOfTests);
+    std::srand(164);
+    runRandomGenerator(numOfTests);
+    // runECdaGenerator(numOfTests);
 
     return 0;
 }

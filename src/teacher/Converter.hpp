@@ -16,26 +16,27 @@ namespace teacher
 {
 class Converter
 {
-    const std::shared_ptr<VPA> vpa;
+    const std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
     std::shared_ptr<cfg::Cfg> cfg;
 
 public:
     Converter(
-        const std::shared_ptr<VPA> vpa, uint16_t numCalls, uint16_t numReturns, uint16_t numLocals,
-        uint16_t stackSymbolsNumber)
+        const std::shared_ptr<VPA<AutomatonKind::Normal>> vpa, uint16_t numCalls,
+        uint16_t numReturns, uint16_t numLocals, uint16_t stackSymbolsNumber)
         : vpa{vpa}, numOfCalls{numCalls}, numOfReturns{numReturns}, numOfLocals{numLocals},
           numOfStackSymbols{stackSymbolsNumber} {};
 
-    VPA combineVPA(const VPA &secondVpa);
-    std::shared_ptr<cfg::Cfg> convertVpaToCfg(const VPA &vpa);
+    VPA<AutomatonKind::Combined> combineVPA(const VPA<AutomatonKind::Normal> &secondVpa);
+    std::shared_ptr<cfg::Cfg> convertVpaToCfg(const VPA<AutomatonKind::Combined> &vpa);
 
 private:
-    common::transition::Transition transition;
+    common::transition::Transition<AutomatonKind::Combined> transition;
 
-    void addCalls(uint16_t state, const VPA &secondVpa);
-    void addLocals(uint16_t state, const VPA &secondVpa);
-    void addReturns(uint16_t state, uint16_t stackSymbol, const VPA &secondVpa);
-    bool isAcceptingState(uint16_t state, const VPA &secondVpa) const;
+    void addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
+    void addLocals(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
+    void
+    addReturns(uint16_t state, uint16_t stackSymbol, const VPA<AutomatonKind::Normal> &secondVpa);
+    bool isAcceptingState(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa) const;
 
     common::symbol::StackSymbol combineStackSymbols(uint16_t s1, uint16_t s2) const;
     common::transition::State combineStates(uint16_t s1, uint16_t s2) const;
@@ -47,9 +48,9 @@ private:
     void insertNonTerminalIfNeeded(const cfg::NonTerminal nonTerminal);
     std::tuple<size_t, size_t> calculateEstimatedCfgSize();
 
-    void addCommonProjections(const VPA &vpa);
+    void addCommonProjections(const VPA<AutomatonKind::Combined> &vpa);
     void addCallProjections(
-        const common::transition::CoArgument (&callT)[utils::MaxNumOfLetters],
+        const common::transition::CoArgument (&callT)[utils::MaxNumOfCombinedAutomatonLetters],
         const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
         const common::transition::State state2);
     void addReturnProjections(
@@ -57,7 +58,7 @@ private:
         const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
         const common::transition::State state2);
     void addLocalProjections(
-        const common::transition::State (&localT)[utils::MaxNumOfLetters],
+        const common::transition::State (&localT)[utils::MaxNumOfCombinedAutomatonLetters],
         const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
         const common::transition::State state2);
 

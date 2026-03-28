@@ -17,9 +17,30 @@ using namespace teacher::cfg;
 
 namespace teacher
 {
-TEST(Converter, combineVpaAndConvertVpaToCfg)
+
+class TestConverter : public ::testing::Test
 {
+public:
+    void SetUp() override
+    {
+        transition = std::make_shared<Transition<AutomatonKind::Normal>>();
+        secondTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
+    }
+
     State initialState{0};
+
+    std::shared_ptr<Transition<AutomatonKind::Normal>> transition;
+    std::shared_ptr<Transition<AutomatonKind::Normal>> secondTransition;
+
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
+    std::shared_ptr<common::VPA<AutomatonKind::Combined>> combinedVpa;
+
+    std::shared_ptr<Converter> sut;
+};
+
+TEST_F(TestConverter, combineVpaAndConvertVpaToCfg)
+{
     State s1{1}, s2{2};
 
     CallSymbol callSymbol{0};
@@ -27,9 +48,6 @@ TEST(Converter, combineVpaAndConvertVpaToCfg)
     ReturnSymbol returnSymbol{0};
 
     StackSymbol stackSymbol{1};
-
-    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
-    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
 
     transition->add(initialState, callSymbol, s1, stackSymbol);
     transition->add(s1, callSymbol, s2, stackSymbol);
@@ -59,39 +77,39 @@ TEST(Converter, combineVpaAndConvertVpaToCfg)
     secondTransition->add(s1, localSymbol, s2);
     secondTransition->add(s2, localSymbol, s1);
 
-    common::VPA vpa{*transition, initialState, {0, 2}, 3};
+    vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transition, initialState, std::vector<uint16_t>{0, 2}, 3);
 
-    Converter sut{std::make_shared<common::VPA>(vpa), 1, 1, 1, 2};
+    sut = std::make_shared<Converter>(vpa, 1, 1, 1, 2);
 
-    common::VPA hypothesis{*secondTransition, initialState, {0, 2}, 3};
+    hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *secondTransition, initialState, std::vector<uint16_t>{0, 2}, 3);
 
-    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+    combinedVpa =
+        std::make_shared<common::VPA<AutomatonKind::Combined>>(sut->combineVPA(*hypothesis));
 
     common::Word belongingWord{CallSymbol{0}, LocalSymbol{0}};
     common::Word bothTrue{CallSymbol{0}, CallSymbol{0}};
     common::Word bothFalse{
         CallSymbol{0}, CallSymbol{0}, ReturnSymbol{0}, ReturnSymbol{0}, ReturnSymbol{0}};
 
-    EXPECT_TRUE(combinedVpa.checkWord(belongingWord));
-    EXPECT_FALSE(combinedVpa.checkWord(bothTrue));
-    EXPECT_FALSE(combinedVpa.checkWord(bothFalse));
+    EXPECT_TRUE(combinedVpa->checkWord(belongingWord));
+    EXPECT_FALSE(combinedVpa->checkWord(bothTrue));
+    EXPECT_FALSE(combinedVpa->checkWord(bothFalse));
 
-    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    std::shared_ptr<cfg::Cfg> cfg{sut->convertVpaToCfg(*combinedVpa)};
     auto cfgOutput{cfg->isEmpty()};
     ASSERT_TRUE((*cfgOutput).has_value());
 }
 
-TEST(Converter, combineVpaAndConvertVpaToCfg2)
+TEST_F(TestConverter, combineVpaAndConvertVpaToCfg2)
 {
-    State initialState{0};
     State s0{0}, s1{1}, s2{2}, s3{3};
 
     CallSymbol c0{0};
     ReturnSymbol r0{0}, r1{1};
 
     StackSymbol ssB{0}, ss{1};
-
-    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
 
     transition->add(initialState, c0, s1, ss);
     transition->add(s1, c0, initialState, ss);
@@ -107,33 +125,34 @@ TEST(Converter, combineVpaAndConvertVpaToCfg2)
     transition->add(s3, ssB, r0, s0);
     transition->add(s3, ss, r1, s0);
 
-    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
-
     secondTransition->add(initialState, c0, initialState, ss);
     secondTransition->add(initialState, ssB, r0, initialState);
 
-    common::VPA vpa{*transition, initialState, {0, 1}, 4};
-    common::VPA hypothesis{*secondTransition, initialState, {0}, 1};
+    vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transition, initialState, std::vector<uint16_t>{0, 1}, 4);
+    hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *secondTransition, initialState, std::vector<uint16_t>{0}, 1);
 
-    Converter sut{std::make_shared<common::VPA>(vpa), 1, 2, 0, 2};
+    sut = std::make_shared<Converter>(vpa, 1, 2, 0, 2);
 
-    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+    combinedVpa =
+        std::make_shared<common::VPA<AutomatonKind::Combined>>(sut->combineVPA(*hypothesis));
 
     common::Word expectTrue{c0, c0, c0, c0, c0, r1};
 
-    EXPECT_TRUE(combinedVpa.checkWord(expectTrue));
+    EXPECT_TRUE(combinedVpa->checkWord(expectTrue));
 
-    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    std::shared_ptr<cfg::Cfg> cfg{sut->convertVpaToCfg(*combinedVpa)};
     auto cfgOutput{cfg->isEmpty()};
     ASSERT_TRUE((*cfgOutput).has_value());
 }
 
-TEST(Converter, combineVpaAndConvertVpaToCfg3)
+TEST_F(TestConverter, combineVpaAndConvertVpaToCfg3)
 {
     using CS = common::symbol::CallSymbol;
     using RS = common::symbol::ReturnSymbol;
 
-    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
+    auto transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     uint16_t numOfStates = 4;
     auto acceptingStates = std::vector<uint16_t>{0, 1};
@@ -141,7 +160,7 @@ TEST(Converter, combineVpaAndConvertVpaToCfg3)
     uint16_t numOfCalls = 1;
     uint16_t numOfReturns = 1;
     uint16_t numOfLocals = 0;
-    transition = std::make_shared<Transition>();
+    transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     // CallTransitions:
     transition->add(State{0}, CS{0}, State{3}, StackSymbol{1});
@@ -159,7 +178,7 @@ TEST(Converter, combineVpaAndConvertVpaToCfg3)
     transition->add(State{3}, StackSymbol{0}, RS{0}, State{2});
     transition->add(State{3}, StackSymbol{1}, RS{0}, State{0});
 
-    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
+    auto secondTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     // CallTransitions:
     secondTransition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -174,31 +193,34 @@ TEST(Converter, combineVpaAndConvertVpaToCfg3)
     secondTransition->add(State{2}, StackSymbol{0}, RS{0}, State{0});
     secondTransition->add(State{2}, StackSymbol{1}, RS{0}, State{0});
 
-    common::VPA vpa{*transition, State{0}, acceptingStates, numOfStates};
-    common::VPA hypothesis{*secondTransition, State{0}, {0}, 3};
+    vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transition, initialState, acceptingStates, numOfStates);
+    hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *secondTransition, initialState, std::vector<uint16_t>{0}, 3);
 
-    Converter sut{std::make_shared<common::VPA>(vpa), 1, 1, 0, 2};
+    sut = std::make_shared<Converter>(vpa, 1, 1, 0, 2);
 
-    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+    combinedVpa =
+        std::make_shared<common::VPA<AutomatonKind::Combined>>(sut->combineVPA(*hypothesis));
 
     common::Word expectFalse{CS{0}, RS{0}, RS{0}, RS{0}};
 
-    EXPECT_TRUE(vpa.checkWord(expectFalse));
-    EXPECT_TRUE(hypothesis.checkWord(expectFalse));
-    EXPECT_FALSE(combinedVpa.checkWord(expectFalse));
+    EXPECT_TRUE(vpa->checkWord(expectFalse));
+    EXPECT_TRUE(hypothesis->checkWord(expectFalse));
+    EXPECT_FALSE(combinedVpa->checkWord(expectFalse));
 
-    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    std::shared_ptr<cfg::Cfg> cfg{sut->convertVpaToCfg(*combinedVpa)};
     auto cfgOutput{cfg->isEmpty()};
     ASSERT_TRUE((*cfgOutput).has_value());
 }
 
-TEST(Converter, combineVpaAndConvertVpaToCfg4)
+TEST_F(TestConverter, combineVpaAndConvertVpaToCfg4)
 {
     using CS = common::symbol::CallSymbol;
     using RS = common::symbol::ReturnSymbol;
     using LS = common::symbol::LocalSymbol;
 
-    std::shared_ptr<Transition> transition = std::make_shared<Transition>();
+    auto transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     uint16_t numOfStates = 5;
     auto acceptingStates = std::vector<uint16_t>{0, 3};
@@ -206,7 +228,7 @@ TEST(Converter, combineVpaAndConvertVpaToCfg4)
     uint16_t numOfCalls = 1;
     uint16_t numOfReturns = 1;
     uint16_t numOfLocals = 1;
-    transition = std::make_shared<Transition>();
+    transition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     // CallTransitions:
     transition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -233,7 +255,7 @@ TEST(Converter, combineVpaAndConvertVpaToCfg4)
     transition->add(State{3}, LS{0}, State{3});
     transition->add(State{4}, LS{0}, State{2});
 
-    std::shared_ptr<Transition> secondTransition = std::make_shared<Transition>();
+    auto secondTransition = std::make_shared<Transition<AutomatonKind::Normal>>();
 
     // CallTransitions:
     secondTransition->add(State{0}, CS{0}, State{1}, StackSymbol{1});
@@ -253,22 +275,24 @@ TEST(Converter, combineVpaAndConvertVpaToCfg4)
     secondTransition->add(State{1}, LS{0}, State{1});
     secondTransition->add(State{2}, LS{0}, State{2});
 
-    common::VPA vpa{*transition, State{0}, acceptingStates, numOfStates};
-    common::VPA hypothesis{*secondTransition, State{0}, {0}, 3};
+    vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *transition, initialState, acceptingStates, numOfStates);
+    hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
+        *secondTransition, initialState, std::vector<uint16_t>{0}, 3);
 
-    Converter sut{
-        std::make_shared<common::VPA>(vpa), numOfCalls, numOfReturns, numOfLocals,
-        numOfStackSymbols};
+    sut =
+        std::make_shared<Converter>(vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
 
-    common::VPA combinedVpa{sut.combineVPA(hypothesis)};
+    combinedVpa =
+        std::make_shared<common::VPA<AutomatonKind::Combined>>(sut->combineVPA(*hypothesis));
 
     common::Word expectTrue{CS{0}, CS{0}, CS{0}, RS{0}, RS{0}, RS{0}, LS{0}, RS{0}};
 
-    EXPECT_TRUE(vpa.checkWord(expectTrue));
-    EXPECT_FALSE(hypothesis.checkWord(expectTrue));
-    EXPECT_TRUE(combinedVpa.checkWord(expectTrue));
+    EXPECT_TRUE(vpa->checkWord(expectTrue));
+    EXPECT_FALSE(hypothesis->checkWord(expectTrue));
+    EXPECT_TRUE(combinedVpa->checkWord(expectTrue));
 
-    std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
+    std::shared_ptr<cfg::Cfg> cfg{sut->convertVpaToCfg(*combinedVpa)};
     auto cfgOutput{cfg->isEmpty()};
     ASSERT_TRUE((*cfgOutput).has_value());
 }

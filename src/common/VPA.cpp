@@ -3,8 +3,9 @@
 
 namespace common
 {
-VPA::VPA(
-    transition::Transition &transition, transition::State initial,
+template <AutomatonKind Kind>
+VPA<Kind>::VPA(
+    transition::Transition<Kind> &transition, transition::State initial,
     const std::vector<uint16_t> &accStates, uint16_t numStates)
     : delta{transition}, initialState{initial}, acceptingStates{}, numOfStates{numStates}
 {
@@ -15,7 +16,8 @@ VPA::VPA(
     }
 }
 
-bool VPA::checkWord(const Word &word)
+template <AutomatonKind Kind>
+bool VPA<Kind>::checkWord(const Word &word)
 {
     setInitialState();
     for (auto letter : word)
@@ -61,7 +63,8 @@ bool VPA::checkWord(const Word &word)
     return acceptingStates[state];
 }
 
-VPA &VPA::operator=(const VPA &vpa)
+template <AutomatonKind Kind>
+VPA<Kind> &VPA<Kind>::operator=(const VPA<Kind> &vpa)
 {
     delta = vpa.delta;
     state = vpa.state;
@@ -69,4 +72,7 @@ VPA &VPA::operator=(const VPA &vpa)
     stack = vpa.stack;
     return *this;
 }
+
+template class VPA<AutomatonKind::Normal>;
+template class VPA<AutomatonKind::Combined>;
 } // namespace common

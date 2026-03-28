@@ -13,7 +13,8 @@ SrsChecker::SrsChecker(
 {
 }
 
-common::Word SrsChecker::check(const std::shared_ptr<common::VPA> hypothesis) const
+common::Word
+SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis) const
 {
     for (const auto &srsRule : srs)
     {
@@ -36,7 +37,7 @@ common::Word SrsChecker::check(const std::shared_ptr<common::VPA> hypothesis) co
 }
 
 common::Word SrsChecker::checkConfigurationsConsistency(
-    const std::shared_ptr<common::VPA> hypothesis, const common::Word &lhs,
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &lhs,
     const common::Word &rhs) const
 {
     hypothesis->checkWord(lhs);

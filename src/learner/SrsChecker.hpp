@@ -27,11 +27,11 @@ public:
         std::shared_ptr<Selectors> selectors_, std::shared_ptr<TestWords> testWords_, Srs srs_,
         teacher::Teacher &oracle_);
 
-    common::Word check(const std::shared_ptr<common::VPA> hypothesis) const;
+    common::Word check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis) const;
 
 private:
     common::Word checkConfigurationsConsistency(
-        const std::shared_ptr<common::VPA> hypothesis, const common::Word &lhs,
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &lhs,
         const common::Word &rhs) const;
 };
 } // namespace learner

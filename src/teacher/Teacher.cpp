@@ -23,12 +23,12 @@ common::Stack Teacher::stackContentQuery(const common::Word &word) const
     return vpa->stack;
 }
 
-std::shared_ptr<common::Word>
-Teacher::equivalenceQuery(const std::shared_ptr<common::VPA> hypothesis) const
+std::shared_ptr<common::Word> Teacher::equivalenceQuery(
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis) const
 {
     TIME_MARKER("[Teacher]: equivalenceQuery");
 
-    common::VPA combinedVpa{converter->combineVPA(*hypothesis)};
+    common::VPA<AutomatonKind::Combined> combinedVpa{converter->combineVPA(*hypothesis)};
     std::shared_ptr<cfg::Cfg> cfg{converter->convertVpaToCfg(combinedVpa)};
     auto cfgOutput{cfg->isEmpty()};
 

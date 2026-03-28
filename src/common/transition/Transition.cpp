@@ -4,69 +4,77 @@
 
 namespace common::transition
 {
-Transition::Transition()
+template <AutomatonKind Kind>
+Transition<Kind>::Transition()
 {
     clear();
 }
 
-void Transition::clear()
+template <AutomatonKind Kind>
+void Transition<Kind>::clear()
 {
     std::fill(
-        &callT[0][0],
-        &callT[0][0] + utils::MaxNumOfCombinedAutomatonStates * utils::MaxNumOfLetters,
+        &callT[0][0], &callT[0][0] + Size::MaxNumOfStates * Size::MaxNumOfLetters,
         CoArgument{State::INVALID, symbol::StackSymbol::INVALID});
 
     std::fill(
         &returnT[0][0][0],
-        &returnT[0][0][0] + utils::MaxNumOfCombinedAutomatonStates *
-                                utils::MaxNumOfCombinedStackSymbols *
-                                utils::MaxNumOfCombinedAutomatonLetters,
+        &returnT[0][0][0] +
+            Size::MaxNumOfStates * Size::MaxNumOfStackSymbols * Size::MaxNumOfLetters,
         State::INVALID);
 
     std::fill(
-        &localT[0][0],
-        &localT[0][0] + utils::MaxNumOfCombinedAutomatonStates * utils::MaxNumOfLetters,
+        &localT[0][0], &localT[0][0] + Size::MaxNumOfStates * Size::MaxNumOfLetters,
         State::INVALID);
 }
 
-void Transition::add(State s1, symbol::CallSymbol c, State s2, symbol::StackSymbol stackSymbol)
+template <AutomatonKind Kind>
+void Transition<Kind>::add(
+    State s1, symbol::CallSymbol c, State s2, symbol::StackSymbol stackSymbol)
 {
     callT[s1][c] = CoArgument{s2, stackSymbol};
 }
 
-void Transition::add(State s1, symbol::LocalSymbol l, State s2)
+template <AutomatonKind Kind>
+void Transition<Kind>::add(State s1, symbol::LocalSymbol l, State s2)
 {
     localT[s1][l] = s2;
 }
 
-void Transition::add(State s1, symbol::StackSymbol stackSymbol, symbol::ReturnSymbol r, State s2)
+template <AutomatonKind Kind>
+void Transition<Kind>::add(
+    State s1, symbol::StackSymbol stackSymbol, symbol::ReturnSymbol r, State s2)
 {
     returnT[s1][stackSymbol][r] = s2;
 }
 
-CoArgument Transition::operator()(State s, symbol::CallSymbol c)
+template <AutomatonKind Kind>
+CoArgument Transition<Kind>::operator()(State s, symbol::CallSymbol c)
 {
     return callT[s][c];
 }
 
-State Transition::operator()(State s, symbol::LocalSymbol l)
+template <AutomatonKind Kind>
+State Transition<Kind>::operator()(State s, symbol::LocalSymbol l)
 {
     return localT[s][l];
 }
 
-State Transition::operator()(State s, symbol::StackSymbol stackSymbol, symbol::ReturnSymbol r)
+template <AutomatonKind Kind>
+State Transition<Kind>::operator()(State s, symbol::StackSymbol stackSymbol, symbol::ReturnSymbol r)
 {
     return returnT[s][stackSymbol][r];
 }
 
-void Transition::print(std::ostream &os) const
+template <AutomatonKind Kind>
+void Transition<Kind>::print(std::ostream &os) const
 {
     os << "transition: [state, 'stackSymbol', alphabetSymbol] = [state, "
           "'stackSymbol']\n";
     os << "CallTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
+    for (uint16_t state = 0; state < Size::MaxNumOfStates; state++)
     {
-        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        for (uint16_t letter = 0; letter < Size::MaxNumOfLetters; letter++)
         {
             if (callT[state][letter].state != State::INVALID)
             {
@@ -77,11 +85,11 @@ void Transition::print(std::ostream &os) const
     }
 
     os << "ReturnTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
+    for (uint16_t state = 0; state < Size::MaxNumOfStates; state++)
     {
-        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        for (uint16_t letter = 0; letter < Size::MaxNumOfLetters; letter++)
         {
-            for (uint16_t stack = 0; stack < utils::MaxNumOfCombinedStackSymbols; stack++)
+            for (uint16_t stack = 0; stack < Size::MaxNumOfStackSymbols; stack++)
             {
                 if (returnT[state][stack][letter] != State::INVALID)
                 {
@@ -93,9 +101,9 @@ void Transition::print(std::ostream &os) const
     }
 
     os << "LocalTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
+    for (uint16_t state = 0; state < Size::MaxNumOfStates; state++)
     {
-        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        for (uint16_t letter = 0; letter < Size::MaxNumOfLetters; letter++)
         {
             if (localT[state][letter] != State::INVALID)
             {
@@ -106,12 +114,13 @@ void Transition::print(std::ostream &os) const
     }
 }
 
-void Transition::printUt(std::ostream &os) const
+template <AutomatonKind Kind>
+void Transition<Kind>::printUt(std::ostream &os) const
 {
     os << "//CallTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
+    for (uint16_t state = 0; state < Size::MaxNumOfStates; state++)
     {
-        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        for (uint16_t letter = 0; letter < Size::MaxNumOfLetters; letter++)
         {
             if (callT[state][letter].state != State::INVALID)
             {
@@ -123,11 +132,11 @@ void Transition::printUt(std::ostream &os) const
     }
 
     os << "\n//ReturnTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
+    for (uint16_t state = 0; state < Size::MaxNumOfStates; state++)
     {
-        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        for (uint16_t letter = 0; letter < Size::MaxNumOfLetters; letter++)
         {
-            for (uint16_t stack = 0; stack < utils::MaxNumOfCombinedStackSymbols; stack++)
+            for (uint16_t stack = 0; stack < Size::MaxNumOfStackSymbols; stack++)
             {
                 if (returnT[state][stack][letter] != State::INVALID)
                 {
@@ -140,9 +149,9 @@ void Transition::printUt(std::ostream &os) const
     }
 
     os << "\n//LocalTransitions: " << std::endl;
-    for (uint16_t state = 0; state < utils::MaxNumOfCombinedAutomatonStates; state++)
+    for (uint16_t state = 0; state < Size::MaxNumOfStates; state++)
     {
-        for (uint16_t letter = 0; letter < utils::MaxNumOfLetters; letter++)
+        for (uint16_t letter = 0; letter < Size::MaxNumOfLetters; letter++)
         {
             if (localT[state][letter] != State::INVALID)
             {
@@ -152,4 +161,7 @@ void Transition::printUt(std::ostream &os) const
         }
     }
 }
+
+template class Transition<AutomatonKind::Normal>;
+template class Transition<AutomatonKind::Combined>;
 } // namespace common::transition

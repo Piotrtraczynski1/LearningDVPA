@@ -28,7 +28,7 @@ uint16_t CdaGenerator::randRange(const uint16_t a, const uint16_t b) const
     return a + (rand() % (b - a));
 }
 
-std::shared_ptr<common::VPA> CdaGenerator::run()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> CdaGenerator::run()
 {
     validateGeneratorConfig();
     clear();
@@ -37,7 +37,7 @@ std::shared_ptr<common::VPA> CdaGenerator::run()
 
     generateTransition();
     selectAcceptingStates();
-    return std::make_shared<common::VPA>(*transition, initialState, acceptingStates, numOfStates);
+    return std::make_shared<common::VPA<AutomatonKind::Normal>>(*transition, initialState, acceptingStates, numOfStates);
 }
 
 void CdaGenerator::clear()
