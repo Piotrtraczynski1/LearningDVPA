@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_HARD_DIAGNOSTICS "Enable debug checks" OFF)
-option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(RANDOM_EQUIVALENCE_QUERY "Enable random equivalence query" OFF)
 
 if (BUILD_TESTS)
@@ -26,20 +25,6 @@ endif()
 if(RANDOM_EQUIVALENCE_QUERY)
     add_compile_definitions(RANDOM_EQUIVALENCE_QUERY)
 endif()
-
-if (BUILD_BENCHMARKS)
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
-
-    FetchContent_Declare(
-      googlebenchmark
-      GIT_REPOSITORY https://github.com/google/benchmark.git
-      GIT_TAG v1.9.1
-    )
-
-    FetchContent_MakeAvailable(googlebenchmark)
-endif()
-
 
 if (ENABLE_HARD_DIAGNOSTICS)
     add_compile_options(
@@ -60,10 +45,5 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/src)
 add_subdirectory(src)
 
-if(NOT BUILD_BENCHMARKS)
-    add_executable(run src/main.cpp src/Tester.cpp)
-    target_link_libraries(run PRIVATE common teacher learner utils generator helper) #parser
-else()
-    add_executable(run src/benchmark/benchMain.cpp src/Tester.cpp)
-    target_link_libraries(run PRIVATE common teacher learner utils generator benchmark::benchmark)
-endif()
+add_executable(run src/main.cpp src/Tester.cpp)
+target_link_libraries(run PRIVATE common teacher learner utils generator helper benchmark) #parser

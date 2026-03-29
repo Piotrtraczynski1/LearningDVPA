@@ -10,6 +10,7 @@ enum class Command
     MeVpa,
     eCda,
     Custom,
+    Benchmark,
     Help,
     InvalidNumOfArg,
     Unknown

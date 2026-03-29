@@ -38,19 +38,19 @@ struct TesterParameters
 #ifndef RANDOM_EQUIVALENCE_QUERY
 
 constexpr TesterParameters RandomTestParameters{
-    .minNumOfStates = 3,
-    .maxNumOfStates = 6,
-    .minNumOfCalls = 1,
-    .maxNumOfCalls = 3,
-    .minNumOfLocals = 1,
+    .minNumOfStates = 5,
+    .maxNumOfStates = 8,
+    .minNumOfCalls = 3,
+    .maxNumOfCalls = 4,
+    .minNumOfLocals = 3,
     .maxNumOfLocals = 4,
-    .minNumOfReturns = 1,
-    .maxNumOfReturns = 3,
+    .minNumOfReturns = 3,
+    .maxNumOfReturns = 4,
     .minNumOfStackSymbols = 2,
-    .maxNumOfStackSymbols = 6,
+    .maxNumOfStackSymbols = 2,
     .numOfRandomTestingWords = 10000,
     .maxTestingWordLength = 30,
-    .density = 0.8,
+    .density = 0.7,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};

@@ -1,5 +1,6 @@
 #include "Tester.hpp"
 #include "TesterParameters.hpp"
+#include "benchmark/BenchmarkRunner.hpp"
 #include "generator/Generators.hpp"
 #include "helper/Command.hpp"
 #include "helper/ExampleRun.hpp"
@@ -47,33 +48,44 @@ void runECdaGenerator(const uint16_t numOfTests)
         ECdaTestParameters}
         .run();
 }
+
+void runBenchmark(const std::string &scenarioName)
+{
+    benchmark::BenchmarkRunner{scenarioName}.run();
+}
 } // namespace
 
 int main(int argc, char *argv[])
 {
-    auto [command, seed, numOfTests] = helper::parseInput(argc, argv);
-
-    std::srand(seed);
+    auto [command, seed, numOfTests, scenarioName] = helper::parseInput(argc, argv);
 
     switch (command)
     {
     case (helper::Command::Random):
+        std::srand(seed);
         runRandomGenerator(numOfTests);
         break;
     case (helper::Command::Cda):
+        std::srand(seed);
         runCdaGenerator(numOfTests);
         break;
     case (helper::Command::SeVpa):
+        std::srand(seed);
         runSeVpaGenerator(numOfTests);
         break;
     case (helper::Command::MeVpa):
+        std::srand(seed);
         runMeVpaGenerator(numOfTests);
         break;
     case (helper::Command::eCda):
+        std::srand(seed);
         runECdaGenerator(numOfTests);
         break;
     case (helper::Command::Custom):
         helper::runExample();
+        break;
+    case (helper::Command::Benchmark):
+        runBenchmark(scenarioName);
         break;
     case (helper::Command::Help):
         helper::printHelp();
