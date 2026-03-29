@@ -19,6 +19,8 @@ public:
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() override final;
 
 protected:
+    void selectAcceptingStates() override;
+
     uint16_t randRange(const uint16_t a, const uint16_t b) const;
 
     void clear();

@@ -21,7 +21,9 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> AutomataGenerator::generate(
 void AutomataGenerator::clearGenerator()
 {
     transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
-    std::fill(&witnesses[0], &witnesses[0] + utils::MaxNumOfAutomatonStates + 1, common::Word{});
+    std::fill(
+        &witnesses[0], &witnesses[0] + AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates,
+        common::Word{});
 }
 
 void AutomataGenerator::buildTransition()
@@ -129,7 +131,8 @@ void AutomataGenerator::setWitness(
 {
     if (successor != 0 and witnesses[successor] == common::Word{})
     {
-        // TODO: Why not selector??
+        // TODO: Using witness sometimes generates redundant states, while the selector does not.
+
         // witnesses[successor] = witnesses[selectorIndex] + suffix;
         witnesses[successor] = (*selectors)[successor];
     }

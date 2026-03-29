@@ -62,7 +62,7 @@ add_subdirectory(src)
 
 if(NOT BUILD_BENCHMARKS)
     add_executable(run src/main.cpp src/Tester.cpp)
-    target_link_libraries(run PRIVATE common teacher learner utils generator) #parser
+    target_link_libraries(run PRIVATE common teacher learner utils generator helper) #parser
 else()
     add_executable(run src/benchmark/benchMain.cpp src/Tester.cpp)
     target_link_libraries(run PRIVATE common teacher learner utils generator benchmark::benchmark)

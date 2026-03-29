@@ -65,6 +65,18 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> CdaGenerator::run()
         std::move(transition), initialState, acceptingStates, numOfStates);
 }
 
+void CdaGenerator::selectAcceptingStates()
+{
+    constexpr uint16_t initialModule{0};
+    for (const auto state : modules[initialModule])
+    {
+        if (shouldAccept())
+        {
+            acceptingStates.push_back(state);
+        }
+    }
+}
+
 void CdaGenerator::clear()
 {
     transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();

@@ -7,5 +7,5 @@ add_library(generator STATIC
     ECdaGenerator.cpp
 )
 
-target_link_libraries(generator PRIVATE common utils common learner teacher)
+target_link_libraries(generator PRIVATE common utils learner teacher)
  

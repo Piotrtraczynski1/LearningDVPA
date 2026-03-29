@@ -5,6 +5,7 @@
 #include "learner/srs/SrsChecker.hpp"
 #include "teacher/Converter.hpp"
 #include "teacher/EquivalenceCheck.hpp"
+#include "utils/TimeMarker.hpp"
 #include "utils/log.hpp"
 
 namespace learner::srs
@@ -22,6 +23,9 @@ SrsChecker::SrsChecker(
 
 common::Word SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
+    TIME_MARKER("[SrsChecker]: check consistency with SRS");
+    LOG("[SrsChecker]: check consistency with SRS");
+
     prepareWellMatchedWords(hypothesis);
 
     for (const auto &word : wellMatchedWords)
@@ -75,6 +79,8 @@ common::Word SrsChecker::prepareCounterexample(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &word,
     const SrsRule &srsRule)
 {
+    TIME_MARKER("[SrsChecker]: counterexample found");
+    LOG("[SrsChecker]: counterexample found");
     common::Word firstCandidate{};
     common::Word secondCandidate{};
 
