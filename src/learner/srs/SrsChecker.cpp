@@ -4,8 +4,7 @@
 #include "learner/srs/ConvertedAutomata.hpp"
 #include "learner/srs/SrsChecker.hpp"
 #include "teacher/Converter.hpp"
-#include "teacher/cfg/Calculator.hpp"
-#include "teacher/cfg/Cfg.hpp"
+#include "teacher/EquivalenceCheck.hpp"
 #include "utils/log.hpp"
 
 namespace learner::srs
@@ -56,14 +55,9 @@ void SrsChecker::prepareWellMatchedWords(
 
 common::Word SrsChecker::checkEquivalence(const ConvertedAutomata &convertedAutomata)
 {
-    auto converter = std::make_unique<teacher::Converter>(
+    auto converter = std::make_shared<teacher::Converter>(
         convertedAutomata.lAutomaton, numOfCalls, numOfReturns, numOfLocals + 1, numOfStackSymbols);
-    common::VPA<AutomatonKind::Combined> combinedVpa{
-        converter->combineVPA(*convertedAutomata.rAutomaton)};
-    std::shared_ptr<teacher::cfg::Cfg> cfg{converter->convertVpaToCfg(combinedVpa)};
-    auto cfgOutput{cfg->isEmpty()};
-    std::shared_ptr<common::Word> output{
-        teacher::cfg::Calculator::convertCfgOutputToWord(*cfgOutput)};
+    auto output = teacher::equivalenceCheck(converter, convertedAutomata.rAutomaton);
 
     common::Symbol leftoverSymbol{common::symbol::ReturnSymbol{numOfReturns}};
     for (uint16_t i = 0; i < output->size(); i++)

@@ -1,5 +1,7 @@
 /.vscode
 /build
+/build-random
 /build-debug
 /build-bench
+/build-bench-random
 out.log

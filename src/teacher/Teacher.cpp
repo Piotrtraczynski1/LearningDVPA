@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "common/VPA.hpp"
+#include "teacher/EquivalenceCheck.hpp"
 #include "teacher/Teacher.hpp"
-#include "teacher/cfg/Calculator.hpp"
 #include "utils/ExitCode.hpp"
 #include "utils/TimeMarker.hpp"
 
@@ -27,12 +27,9 @@ std::shared_ptr<common::Word> Teacher::equivalenceQuery(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis) const
 {
     TIME_MARKER("[Teacher]: equivalenceQuery");
+    LOG("[Teacher]: equivalenceQuery hypothesis numOfStates: %u", hypothesis->getNumOfStates());
 
-    common::VPA<AutomatonKind::Combined> combinedVpa{converter->combineVPA(*hypothesis)};
-    std::shared_ptr<cfg::Cfg> cfg{converter->convertVpaToCfg(combinedVpa)};
-    auto cfgOutput{cfg->isEmpty()};
-
-    std::shared_ptr<common::Word> output{cfg::Calculator::convertCfgOutputToWord(*cfgOutput)};
+    auto output = equivalenceCheck(converter, hypothesis);
 
     if (output->size() == 0)
     {
@@ -50,8 +47,7 @@ std::shared_ptr<common::Word> Teacher::equivalenceQuery(
 
     ERR("[Teacher]: CFG output is incorrect!");
     std::cout << *output << ", vpa: " << vpa->checkWord(*output)
-              << ", hypothesis: " << hypothesis->checkWord(*output)
-              << ", combined: " << combinedVpa.checkWord(*output) << std::endl;
+              << ", hypothesis: " << hypothesis->checkWord(*output) << std::endl;
     exit(toExit(ExitCode::EQUIVALENCEQUERY));
 }
 } // namespace teacher

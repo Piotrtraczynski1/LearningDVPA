@@ -16,6 +16,10 @@ namespace teacher
 {
 class Converter
 {
+    friend std::shared_ptr<common::Word> equivalenceCheck(
+        std::shared_ptr<teacher::Converter> converter,
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa);
+
     const std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
     std::shared_ptr<cfg::Cfg> cfg;
 

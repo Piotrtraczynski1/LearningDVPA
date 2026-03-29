@@ -4,6 +4,7 @@ set -euo pipefail
 
 BUILD_DIR="build"
 EXTRA_FLAGS="-DENABLE_HARD_DIAGNOSTICS=OFF"
+RANDOM_EQ_FLAG=""
 
 if [[ "${1-}" == "-d" ]]; then
   EXTRA_FLAGS="-DENABLE_HARD_DIAGNOSTICS=ON"
@@ -11,21 +12,31 @@ if [[ "${1-}" == "-d" ]]; then
   shift
 fi
 
+if [[ "${1-}" == "-randomEQ" ]]; then
+  RANDOM_EQ_FLAG="-DRANDOM_EQUIVALENCE_QUERY=ON"
+  BUILD_DIR="${BUILD_DIR}-random"
+  shift
+fi
+
 build_code() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF $EXTRA_FLAGS $RANDOM_EQ_FLAG ..
     cmake --build .
     cd ..
 }
 
 build_benchmark() {
-    BUILD_DIR="build-bench"
+    if [[ -n "$RANDOM_EQ_FLAG" ]]; then
+        BUILD_DIR="build-bench-random"
+    else
+        BUILD_DIR="build-bench"
+    fi
 
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
 
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=ON $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_BENCHMARKS=ON $EXTRA_FLAGS $RANDOM_EQ_FLAG    ..
     cmake --build . --target run
 
     cd ..

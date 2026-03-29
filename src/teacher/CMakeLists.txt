@@ -7,6 +7,7 @@ add_subdirectory(cfg)
 add_library(teacher STATIC
     Teacher.cpp
     Converter.cpp
+    EquivalenceCheck.cpp
 )
 
 target_link_libraries(teacher PRIVATE common cfg utils)

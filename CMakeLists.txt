@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_HARD_DIAGNOSTICS "Enable debug checks" OFF)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
+option(RANDOM_EQUIVALENCE_QUERY "Enable random equivalence query" OFF)
 
 if (BUILD_TESTS)
     FetchContent_Declare(
@@ -20,6 +21,10 @@ if (BUILD_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     enable_testing()
+endif()
+
+if(RANDOM_EQUIVALENCE_QUERY)
+    add_compile_definitions(RANDOM_EQUIVALENCE_QUERY)
 endif()
 
 if (BUILD_BENCHMARKS)
