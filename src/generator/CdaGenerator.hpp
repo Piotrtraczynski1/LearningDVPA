@@ -22,7 +22,9 @@ protected:
     uint16_t randRange(const uint16_t a, const uint16_t b) const;
 
     void clear();
-    virtual void validateGeneratorConfig();
+    void validateGeneratorConfig(
+        uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_,
+        uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_) override;
 
     virtual void selectTargetsForCalls();
 

@@ -10,7 +10,10 @@ class MeVpaGenerator : public CdaGenerator
 public:
     using CdaGenerator::CdaGenerator;
 
-    void validateGeneratorConfig() override;
+    void validateGeneratorConfig(
+        [[maybe_unused]] uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
+        [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
+        [[maybe_unused]] uint16_t &numOfStackSymbols_) override;
 
     common::symbol::StackSymbol selectStackSymbol(
         const uint16_t module, [[maybe_unused]] const uint16_t callId) const override;

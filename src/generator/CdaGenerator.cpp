@@ -8,18 +8,43 @@
 
 namespace generator
 {
-void CdaGenerator::validateGeneratorConfig()
+void CdaGenerator::validateGeneratorConfig(
+    uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
+    [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
+    uint16_t &numOfStackSymbols_)
 {
     if (numOfStates < numOfModules)
     {
-        ERR("[CdaGenerator]: Number of states is lower than number of modules!");
-        exit(toExit(ExitCode::GENERATOR));
+        if (numOfModules > utils::MaxNumOfAutomatonStates)
+        {
+            ERR("[CdaGenerator]: numOfModules (%u) is greater than MaxNumOfAutomatonStates!",
+                numOfModules);
+            exit(toExit(ExitCode::GENERATOR));
+        }
+        WRN("[CdaGenerator] numOfStates (%u) is less than numOfModules (%u). Adjusting numOfStates "
+            "to %u",
+            numOfStates, numOfModules, numOfModules);
+        numOfStates_ = numOfModules;
+        numOfStates = numOfModules;
     }
 
     if (numOfStackSymbols != numOfModules * numOfCalls + 1)
     {
-        ERR("[CdaGenerator]: Invalid number of stack symbols!");
-        exit(toExit(ExitCode::GENERATOR));
+        const uint16_t expectedNumOfStackSymbols{
+            static_cast<uint16_t>(numOfModules * numOfCalls + 1)};
+        if (expectedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
+        {
+            ERR("[CdaGenerator]: expectedNumOfStackSymbols (%u) is greater than "
+                "MaxNumOfStackSymbols!",
+                expectedNumOfStackSymbols);
+            exit(toExit(ExitCode::GENERATOR));
+        }
+        WRN("[CdaGenerator]: numOfStackSymbols (%u) should be equal numOfModules (%u) * "
+            "numOfCalls "
+            "(%u) + 1. Adjusting numOfStackSymbols to: %u",
+            numOfStackSymbols, numOfModules, numOfCalls, expectedNumOfStackSymbols);
+        numOfStackSymbols_ = expectedNumOfStackSymbols;
+        numOfStackSymbols = expectedNumOfStackSymbols;
     }
 }
 
@@ -30,7 +55,6 @@ uint16_t CdaGenerator::randRange(const uint16_t a, const uint16_t b) const
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> CdaGenerator::run()
 {
-    validateGeneratorConfig();
     clear();
     selectModules();
     selectTargetsForCalls();

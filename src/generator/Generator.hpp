@@ -17,8 +17,8 @@ public:
     Generator() = default;
 
     void setConfig(
-        const uint16_t numOfStates_, const uint16_t numOfCalls_, const uint16_t numOfLocals_,
-        const uint16_t numOfReturns_, const uint16_t numOfStackSymbols_, const double density_,
+        uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_,
+        uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_, const double density_,
         const double acceptingStatesDensity_, const uint16_t numOfModules_);
 
     virtual std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() = 0;
@@ -28,6 +28,9 @@ public:
 
 protected:
     virtual void selectAcceptingStates();
+    virtual void validateGeneratorConfig(
+        uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_,
+        uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_);
 
     bool skipTransition();
     bool shouldAccept();

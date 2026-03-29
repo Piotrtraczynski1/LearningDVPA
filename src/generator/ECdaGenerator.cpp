@@ -8,25 +8,51 @@
 
 namespace generator
 {
-void ECdaGenerator::validateGeneratorConfig()
+void ECdaGenerator::validateGeneratorConfig(
+    uint16_t &numOfStates_, uint16_t &numOfCalls_, [[maybe_unused]] uint16_t &numOfLocals_,
+    [[maybe_unused]] uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_)
 {
     if (numOfStates < numOfModules)
     {
-        ERR("[ECdaGenerator]: Number of states is lower than number of modules!");
-        exit(toExit(ExitCode::GENERATOR));
+        if (numOfModules > utils::MaxNumOfAutomatonStates)
+        {
+            ERR("[ECdaGenerator]: numOfModules (%u) is greater than MaxNumOfAutomatonStates!",
+                numOfModules);
+            exit(toExit(ExitCode::GENERATOR));
+        }
+        WRN("[ECdaGenerator] numOfStates (%u) is less than numOfModules (%u). Adjusting "
+            "numOfStates "
+            "to %u",
+            numOfStates, numOfModules, numOfModules);
+        numOfStates_ = numOfModules;
+        numOfStates = numOfModules;
     }
 
     if (not(numOfCalls < numOfModules))
     {
-        ERR("[ECdaGenerator]: Number of calls should be lower than number of modules!");
-        exit(toExit(ExitCode::GENERATOR));
+        const uint16_t validNumOfCalls{static_cast<uint16_t>(numOfModules - 1)};
+        WRN("[ECdaGenerator]: numOfCalls (%u) should be lower than number of modules (%u)! "
+            "Adjusting numOfCalls to %u",
+            numOfCalls, numOfModules, validNumOfCalls);
+        numOfCalls_ = validNumOfCalls;
+        numOfCalls = validNumOfCalls;
     }
 
-    if (numOfStackSymbols !=
-        numOfModules + 1) // TODO: numOfStackSymbols > numOfModules (require notification to Tester)
+    if (numOfStackSymbols != numOfModules + 1)
     {
-        ERR("[ECdaGenerator]: Invalid number of stack symbols!");
-        exit(toExit(ExitCode::GENERATOR));
+        const uint16_t expectedNumOfStackSymbols{static_cast<uint16_t>(numOfModules + 1)};
+        if (expectedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
+        {
+            ERR("[ECdaGenerator]: expectedNumOfStackSymbols (%u) is greater than "
+                "MaxNumOfStackSymbols!",
+                expectedNumOfStackSymbols);
+            exit(toExit(ExitCode::GENERATOR));
+        }
+        WRN("[ECdaGenerator]: numOfStackSymbols (%u) should be equal numOfModules (%u)"
+            " + 1. Adjusting numOfStackSymbols to: %u",
+            numOfStackSymbols, numOfModules, expectedNumOfStackSymbols);
+        numOfStackSymbols_ = expectedNumOfStackSymbols;
+        numOfStackSymbols = expectedNumOfStackSymbols;
     }
 }
 

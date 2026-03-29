@@ -4,18 +4,42 @@
 
 namespace generator
 {
-void MeVpaGenerator::validateGeneratorConfig()
+
+void MeVpaGenerator::validateGeneratorConfig(
+    uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
+    [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
+    uint16_t &numOfStackSymbols_)
 {
     if (numOfStates < numOfModules)
     {
-        ERR("[MeVpaGenerator]: Number of states is lower than number of modules!");
-        exit(toExit(ExitCode::GENERATOR));
+        if (numOfModules > utils::MaxNumOfAutomatonStates)
+        {
+            ERR("[MeVpaGenerator]: numOfModules (%u) is greater than MaxNumOfAutomatonStates!",
+                numOfModules);
+            exit(toExit(ExitCode::GENERATOR));
+        }
+        WRN("[MeVpaGenerator] numOfStates (%u) is less than numOfModules (%u). Adjusting "
+            "numOfStates "
+            "to %u",
+            numOfStates, numOfModules, numOfModules);
+        numOfStates_ = numOfModules;
+        numOfStates = numOfModules;
     }
-
     if (numOfStackSymbols != numOfModules + 1)
     {
-        ERR("[MeVpaGenerator]: Invalid number of stack symbols!");
-        exit(toExit(ExitCode::GENERATOR));
+        const uint16_t expectedNumOfStackSymbols{static_cast<uint16_t>(numOfModules + 1)};
+        if (expectedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
+        {
+            ERR("[MeVpaGenerator]: expectedNumOfStackSymbols (%u) is greater than "
+                "MaxNumOfStackSymbols!",
+                expectedNumOfStackSymbols);
+            exit(toExit(ExitCode::GENERATOR));
+        }
+        WRN("[MeVpaGenerator]: numOfStackSymbols (%u) should be equal numOfModules (%u)"
+            " + 1. Adjusting numOfStackSymbols to: %u",
+            numOfStackSymbols, numOfModules, expectedNumOfStackSymbols);
+        numOfStackSymbols_ = expectedNumOfStackSymbols;
+        numOfStackSymbols = expectedNumOfStackSymbols;
     }
 }
 

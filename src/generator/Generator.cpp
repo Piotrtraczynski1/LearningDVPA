@@ -3,9 +3,9 @@
 namespace generator
 {
 void Generator::setConfig(
-    const uint16_t numOfStates_, const uint16_t numOfCalls_, const uint16_t numOfLocals_,
-    const uint16_t numOfReturns_, const uint16_t numOfStackSymbols_, const double density_,
-    const double acceptingStatesDensity_, const uint16_t numOfModules_)
+    uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_, uint16_t &numOfReturns_,
+    uint16_t &numOfStackSymbols_, const double density_, const double acceptingStatesDensity_,
+    const uint16_t numOfModules_)
 {
     numOfStates = numOfStates_;
     numOfCalls = numOfCalls_;
@@ -15,6 +15,9 @@ void Generator::setConfig(
     density = density_;
     acceptingStatesDensity = acceptingStatesDensity_;
     numOfModules = numOfModules_;
+
+    validateGeneratorConfig(
+        numOfStates_, numOfCalls_, numOfLocals_, numOfReturns_, numOfStackSymbols_);
 
     transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
 }
@@ -39,6 +42,14 @@ void Generator::selectAcceptingStates()
             acceptingStates.push_back(i);
         }
     }
+}
+
+void Generator::validateGeneratorConfig(
+    [[maybe_unused]] uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
+    [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
+    [[maybe_unused]] uint16_t &numOfStackSymbols_)
+{
+    return;
 }
 
 bool Generator::skipTransition()

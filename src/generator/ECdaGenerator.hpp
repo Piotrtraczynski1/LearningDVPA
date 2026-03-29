@@ -9,7 +9,9 @@ class ECdaGenerator : public CdaGenerator
 public:
     using CdaGenerator::CdaGenerator;
 
-    void validateGeneratorConfig() override;
+    void validateGeneratorConfig(
+        uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_,
+        uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_) override;
     void selectTargetsForCalls() override;
 
     common::symbol::StackSymbol selectStackSymbol(
