@@ -9,14 +9,18 @@
 
 namespace teacher
 {
+class AutomataCombiner;
 class Converter;
-}
+class EmptinessChecker;
+} // namespace teacher
 
 namespace common::transition
 {
 template <AutomatonKind Kind = AutomatonKind::Normal>
 class Transition
 {
+    friend class teacher::AutomataCombiner;
+    friend class teacher::EmptinessChecker;
     friend class teacher::Converter;
 
     using Size = AutomatonSize<Kind>;

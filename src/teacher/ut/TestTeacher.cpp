@@ -2,11 +2,9 @@
 #include <memory>
 
 #include "teacher/Teacher.hpp"
-#include "teacher/cfg/Calculator.hpp"
 
 using namespace common::transition;
 using namespace common::symbol;
-using namespace teacher::cfg;
 
 namespace teacher
 {
@@ -54,11 +52,9 @@ public:
     std::shared_ptr<common::Word> equivalenceQuery(
         common::VPA<AutomatonKind::Normal> &secondVpa, Converter &sut)
     {
-        common::VPA<AutomatonKind::Combined> combinedVpa{sut.combineVPA(secondVpa)};
-        std::shared_ptr<cfg::Cfg> cfg{sut.convertVpaToCfg(combinedVpa)};
-
-        auto cfgOutput{cfg->isEmpty()};
-        return cfg::Calculator::convertCfgOutputToWord(*cfgOutput);
+        std::unique_ptr<common::VPA<AutomatonKind::Combined>> combinedVpa{
+            sut.combineVPA(secondVpa)};
+        return sut.convertVpaToCfg(*combinedVpa);
     }
 };
 

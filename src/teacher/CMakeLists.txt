@@ -2,12 +2,13 @@ if(BUILD_TESTS)
     add_subdirectory(ut)
 endif()
 
-add_subdirectory(cfg)
 
 add_library(teacher STATIC
+    AutomataCombiner.cpp
+    EmptinessChecker.cpp
     Teacher.cpp
     Converter.cpp
     EquivalenceCheck.cpp
 )
 
-target_link_libraries(teacher PRIVATE common cfg utils)
+target_link_libraries(teacher PRIVATE common utils)

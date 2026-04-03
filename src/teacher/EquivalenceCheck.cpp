@@ -3,20 +3,15 @@
 
 #ifndef RANDOM_EQUIVALENCE_QUERY
 
-#include "teacher/cfg/Calculator.hpp"
-#include "teacher/cfg/Cfg.hpp"
-
 namespace teacher
 {
 std::shared_ptr<common::Word> equivalenceCheck(
     std::shared_ptr<teacher::Converter> converter,
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa)
 {
-    common::VPA<AutomatonKind::Combined> combinedVpa{converter->combineVPA(*vpa)};
-    std::shared_ptr<cfg::Cfg> cfg{converter->convertVpaToCfg(combinedVpa)};
-    auto cfgOutput{cfg->isEmpty()};
+    auto combinedVpa{converter->combineVPA(*vpa)};
 
-    return cfg::Calculator::convertCfgOutputToWord(*cfgOutput);
+    return converter->convertVpaToCfg(*combinedVpa);
 }
 } // namespace teacher
 

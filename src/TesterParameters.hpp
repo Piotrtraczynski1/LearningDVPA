@@ -38,8 +38,8 @@ struct TesterParameters
 #ifndef RANDOM_EQUIVALENCE_QUERY
 
 constexpr TesterParameters RandomTestParameters{
-    .minNumOfStates = 5,
-    .maxNumOfStates = 8,
+    .minNumOfStates = 20,
+    .maxNumOfStates = 25,
     .minNumOfCalls = 3,
     .maxNumOfCalls = 4,
     .minNumOfLocals = 3,

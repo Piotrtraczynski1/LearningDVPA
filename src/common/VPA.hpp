@@ -11,10 +11,12 @@
 #include "symbol/Symbols.hpp"
 #include "transition/Transition.hpp"
 
-namespace teacher::cfg
+namespace teacher
 {
+class AutomataCombiner;
 class Converter;
-}
+class EmptinessChecker;
+} // namespace teacher
 
 namespace learner::srs
 {
@@ -26,6 +28,8 @@ namespace common
 template <AutomatonKind Kind = AutomatonKind::Normal>
 class VPA
 {
+    friend class teacher::AutomataCombiner;
+    friend class teacher::EmptinessChecker;
     friend class teacher::Converter;
     friend class learner::srs::AutomataConverter;
 

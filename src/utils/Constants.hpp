@@ -6,7 +6,7 @@
 
 namespace utils
 {
-constexpr uint16_t MaxNumOfAutomatonStates{20};
+constexpr uint16_t MaxNumOfAutomatonStates{40};
 constexpr uint16_t MaxNumOfLetters{20};
 constexpr uint16_t MaxNumOfStackSymbols{20};
 
@@ -15,11 +15,6 @@ constexpr uint16_t MaxNumOfCombinedAutomatonStates{
 constexpr uint16_t MaxNumOfCombinedAutomatonLetters{MaxNumOfLetters + 1};
 constexpr uint16_t MaxNumOfCombinedStackSymbols{
     (MaxNumOfStackSymbols + 1) * (MaxNumOfStackSymbols + 1) + 1};
-
-constexpr uint16_t Q{MaxNumOfCombinedAutomatonStates + 1};
-constexpr uint16_t S{MaxNumOfCombinedStackSymbols + 2};
-
-constexpr uint32_t MaxNumOfNonTerminals{Q * Q * S};
 } // namespace utils
 
 #else
@@ -39,11 +34,6 @@ constexpr uint16_t MaxNumOfStackSymbols{50};
 constexpr uint16_t MaxNumOfCombinedAutomatonStates{maxValue};
 constexpr uint16_t MaxNumOfCombinedAutomatonLetters{maxValue};
 constexpr uint16_t MaxNumOfCombinedStackSymbols{maxValue};
-
-constexpr uint16_t Q{dummyValue};
-constexpr uint16_t S{dummyValue};
-
-constexpr uint32_t MaxNumOfNonTerminals{dummyValue};
 } // namespace utils
 
 #endif

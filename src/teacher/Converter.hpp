@@ -7,7 +7,8 @@
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
 #include "common/symbol/Symbols.hpp"
-#include "teacher/cfg/Cfg.hpp"
+#include "teacher/AutomataCombiner.hpp"
+#include "teacher/EmptinessChecker.hpp"
 #include "utils/Constants.hpp"
 
 using namespace common;
@@ -21,50 +22,25 @@ class Converter
         std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa);
 
     const std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
-    std::shared_ptr<cfg::Cfg> cfg;
+
+    AutomataCombiner combiner;
+    EmptinessChecker emptinessChecker;
 
 public:
     Converter(
-        const std::shared_ptr<VPA<AutomatonKind::Normal>> &vpa, uint16_t numCalls,
-        uint16_t numReturns, uint16_t numLocals, uint16_t stackSymbolsNumber)
-        : vpa{vpa}, numOfCalls{numCalls}, numOfReturns{numReturns}, numOfLocals{numLocals},
-          numOfStackSymbols{stackSymbolsNumber} {};
+        const std::shared_ptr<VPA<AutomatonKind::Normal>> &vpa, uint16_t numCallsArg,
+        uint16_t numReturnsArg, uint16_t numLocalsArg, uint16_t stackSymbolsNumber)
+        : vpa{vpa}, numOfCalls{numCallsArg}, numOfReturns{numReturnsArg}, numOfLocals{numLocalsArg},
+          numOfStackSymbols{stackSymbolsNumber},
+          combiner{vpa, numCallsArg, numReturnsArg, numLocalsArg, stackSymbolsNumber},
+          emptinessChecker{numCallsArg, numReturnsArg, numLocalsArg} {};
 
-    VPA<AutomatonKind::Combined> combineVPA(const VPA<AutomatonKind::Normal> &secondVpa);
-    std::shared_ptr<cfg::Cfg> convertVpaToCfg(const VPA<AutomatonKind::Combined> &vpa);
+    std::unique_ptr<VPA<AutomatonKind::Combined>> combineVPA(
+        const VPA<AutomatonKind::Normal> &secondVpa);
+    std::shared_ptr<common::Word> convertVpaToCfg(const VPA<AutomatonKind::Combined> &vpa);
 
 private:
-    std::unique_ptr<common::transition::Transition<AutomatonKind::Combined>> transition;
-
-    void addCalls(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
-    void addLocals(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa);
-    void addReturns(
-        uint16_t state, uint16_t stackSymbol, const VPA<AutomatonKind::Normal> &secondVpa);
-    bool isAcceptingState(uint16_t state, const VPA<AutomatonKind::Normal> &secondVpa) const;
-
-    common::symbol::StackSymbol combineStackSymbols(uint16_t s1, uint16_t s2) const;
-    common::transition::State combineStates(uint16_t s1, uint16_t s2) const;
-    std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol>
-    convertCombinedStackSymbolIntoSymbols(uint16_t stackSymbol) const;
-    std::pair<common::transition::State, common::transition::State> convertCombinedStateIntoStates(
-        uint16_t state) const;
-
-    void insertNonTerminalIfNeeded(const cfg::NonTerminal nonTerminal);
     std::tuple<size_t, size_t> calculateEstimatedCfgSize();
-
-    void addCommonProductions(const VPA<AutomatonKind::Combined> &vpa);
-    void addCallProductions(
-        const common::transition::CoArgument (&callT)[utils::MaxNumOfCombinedAutomatonLetters],
-        const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
-        const common::transition::State state2);
-    void addReturnProductions(
-        const common::transition::State (&returnT)[utils::MaxNumOfCombinedAutomatonLetters],
-        const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
-        const common::transition::State state2);
-    void addLocalProductions(
-        const common::transition::State (&localT)[utils::MaxNumOfCombinedAutomatonLetters],
-        const cfg::NonTerminal nonTerminal, const common::symbol::StackSymbol stackSymbol,
-        const common::transition::State state2);
 
     uint16_t numOfCalls;
     uint16_t numOfReturns;
@@ -73,8 +49,5 @@ private:
 
     uint16_t combinedVpaNumOfStates;
     uint16_t combinedVpaNumOfStackSymbols;
-
-    std::bitset<utils::MaxNumOfNonTerminals> seenNonTerminals{};
-    std::queue<cfg::NonTerminal> nonTerminalsQueue{};
 };
 } // namespace teacher

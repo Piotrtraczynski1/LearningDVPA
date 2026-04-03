@@ -152,7 +152,7 @@ TEST_F(TestAutomataGenerator1, automataSimulationStep1)
     EXPECT_EQ(automata->checkWord(common::Word{ls}), false);
     EXPECT_EQ(automata->checkWord(common::Word{cs}), false);
 
-    common::Word expectedCounterExample{cs, cs, cs, rs, rs, rs, ls, rs};
+    common::Word expectedCounterExample{cs, cs, ls, rs, rs, ls, rs};
     EXPECT_EQ(counterExample, expectedCounterExample);
     EXPECT_NE(automata->checkWord(counterExample), vpa->checkWord(counterExample));
 }
@@ -173,7 +173,7 @@ TEST_F(TestAutomataGenerator1, automataSimulationStep2)
     EXPECT_EQ(automata->checkWord(common::Word{ls}), false);
     EXPECT_EQ(automata->checkWord(common::Word{cs}), false);
 
-    common::Word expectedCounterExample{cs, cs, cs, rs, rs, rs, ls, rs};
+    common::Word expectedCounterExample{cs, cs, ls, rs, rs, ls, rs};
 
     EXPECT_EQ(counterExample, expectedCounterExample);
     EXPECT_NE(automata->checkWord(counterExample), vpa->checkWord(counterExample));
