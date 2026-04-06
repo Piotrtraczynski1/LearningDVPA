@@ -13,8 +13,9 @@ namespace benchmark::scenario
 class IncreasingNumOfStatesBase : public Scenario
 {
     static constexpr int seed{50};
-    static constexpr uint16_t numOfIterations{15};
+    static constexpr uint16_t numOfIterationsIn1Dim{18};
     static constexpr uint16_t numOfTestsInSingleIteration{100};
+    const std::string dim1Name{"numOfStates"};
 
 protected:
     TesterParameters parameters{
@@ -30,19 +31,20 @@ protected:
         .maxNumOfStackSymbols = 2,
         .numOfRandomTestingWords = 0,
         .maxTestingWordLength = 30,
-        .density = 1,
-        .acceptingStatesDensity = 0.5,
+        .density = 1, // TODO density = 1 drastically decreased number of queries
+        .acceptingStatesDensity = 0.3,
         .savePassedTestData = false,
         .supervisedMode = false,
         .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
 public:
     int getSeed() override;
-    uint16_t getNumOfIterations() override;
+    uint16_t getNumOfIterationsIn1Dim() override;
+    std::string getDim1Name() override;
+    uint16_t getDim1Details() override;
     uint16_t getNumOfTestsInSingleIteration() override;
     void runSingleIteration() override;
-
-private:
-    void prepareNextIteration();
+    void prepareNextIterationDim1() override;
+    void resetDim1() override;
 };
 } // namespace benchmark::scenario

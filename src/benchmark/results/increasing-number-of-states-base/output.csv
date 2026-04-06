@@ -1,0 +1,51 @@
+dim4Name;dim4Details;dim3Name;dim3Details;dim2Name;dim2Details;dim1Name;dim1Details;marker;time;executions;avg_time_per_execution
+not applicable;0;not applicable;0;not applicable;0;numOfStates;2;[Teacher]: membershipQuery;0;17;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;2;[Teacher]: stackContentQuery;0;18;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;2;[Teacher]: equivalenceQuery;25884;1;25884
+not applicable;0;not applicable;0;not applicable;0;numOfStates;2;[SrsChecker]: check consistency with SRS;1;1;1
+not applicable;0;not applicable;0;not applicable;0;numOfStates;2;[AutomataGenerator]: generateAutomaton;20;1;20
+not applicable;0;not applicable;0;not applicable;0;numOfStates;3;[Teacher]: membershipQuery;0;57.8;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;3;[Teacher]: stackContentQuery;0;46.2;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;3;[Teacher]: equivalenceQuery;30164;1.2;25136
+not applicable;0;not applicable;0;not applicable;0;numOfStates;3;[SrsChecker]: check consistency with SRS;1;1.2;1
+not applicable;0;not applicable;0;not applicable;0;numOfStates;3;[AutomataGenerator]: generateAutomaton;38;1.2;32
+not applicable;0;not applicable;0;not applicable;0;numOfStates;4;[Teacher]: membershipQuery;0;221.3;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;4;[Teacher]: stackContentQuery;0;166.3;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;4;[Teacher]: equivalenceQuery;40817;1.7;24010
+not applicable;0;not applicable;0;not applicable;0;numOfStates;4;[SrsChecker]: check consistency with SRS;2;1.7;1
+not applicable;0;not applicable;0;not applicable;0;numOfStates;4;[AutomataGenerator]: generateAutomaton;124;1.7;73
+not applicable;0;not applicable;0;not applicable;0;numOfStates;5;[Teacher]: membershipQuery;0;197.4;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;5;[Teacher]: stackContentQuery;0;149.5;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;5;[Teacher]: equivalenceQuery;30295;1.4;21639
+not applicable;0;not applicable;0;not applicable;0;numOfStates;5;[SrsChecker]: check consistency with SRS;2;1.4;1
+not applicable;0;not applicable;0;not applicable;0;numOfStates;5;[AutomataGenerator]: generateAutomaton;116;1.4;83
+not applicable;0;not applicable;0;not applicable;0;numOfStates;6;[Teacher]: membershipQuery;0;709.4;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;6;[Teacher]: stackContentQuery;0;557.4;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;6;[Teacher]: equivalenceQuery;42987;2.1;20470
+not applicable;0;not applicable;0;not applicable;0;numOfStates;6;[SrsChecker]: check consistency with SRS;3;2.1;1
+not applicable;0;not applicable;0;not applicable;0;numOfStates;6;[AutomataGenerator]: generateAutomaton;384;2.1;183
+not applicable;0;not applicable;0;not applicable;0;numOfStates;7;[Teacher]: membershipQuery;3;2945.1;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;7;[Teacher]: stackContentQuery;1;2261.4;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;7;[Teacher]: equivalenceQuery;51064;4.7;10864
+not applicable;0;not applicable;0;not applicable;0;numOfStates;7;[SrsChecker]: check consistency with SRS;10;4.7;2
+not applicable;0;not applicable;0;not applicable;0;numOfStates;7;[AutomataGenerator]: generateAutomaton;1598;4.7;340
+not applicable;0;not applicable;0;not applicable;0;numOfStates;8;[Teacher]: membershipQuery;1;1714;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;8;[Teacher]: stackContentQuery;0;1340.8;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;8;[Teacher]: equivalenceQuery;25594;2.5;10237
+not applicable;0;not applicable;0;not applicable;0;numOfStates;8;[SrsChecker]: check consistency with SRS;4;2.5;1
+not applicable;0;not applicable;0;not applicable;0;numOfStates;8;[AutomataGenerator]: generateAutomaton;916;2.5;366
+not applicable;0;not applicable;0;not applicable;0;numOfStates;9;[Teacher]: membershipQuery;8;6842;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;9;[Teacher]: stackContentQuery;3;5478.2;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;9;[Teacher]: equivalenceQuery;80632;5.4;14931
+not applicable;0;not applicable;0;not applicable;0;numOfStates;9;[SrsChecker]: check consistency with SRS;13;5.4;2
+not applicable;0;not applicable;0;not applicable;0;numOfStates;9;[AutomataGenerator]: generateAutomaton;3757;5.4;695
+not applicable;0;not applicable;0;not applicable;0;numOfStates;10;[Teacher]: membershipQuery;13;11537.4;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;10;[Teacher]: stackContentQuery;3;8821.8;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;10;[Teacher]: equivalenceQuery;280934;7;40133
+not applicable;0;not applicable;0;not applicable;0;numOfStates;10;[SrsChecker]: check consistency with SRS;15;7;2
+not applicable;0;not applicable;0;not applicable;0;numOfStates;10;[AutomataGenerator]: generateAutomaton;5626;7;803
+not applicable;0;not applicable;0;not applicable;0;numOfStates;11;[Teacher]: membershipQuery;13;16589;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;11;[Teacher]: stackContentQuery;8;12997.2;0
+not applicable;0;not applicable;0;not applicable;0;numOfStates;11;[Teacher]: equivalenceQuery;492191;7.8;63101
+not applicable;0;not applicable;0;not applicable;0;numOfStates;11;[SrsChecker]: check consistency with SRS;20;7.8;2
+not applicable;0;not applicable;0;not applicable;0;numOfStates;11;[AutomataGenerator]: generateAutomaton;8967;7.8;1149

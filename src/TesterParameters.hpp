@@ -24,7 +24,7 @@ struct TesterParameters
     uint16_t maxTestingWordLength;
 
     double density;
-    double acceptingStatesDensity{0.6};
+    double acceptingStatesDensity{0.4};
 
     uint16_t numOfModules{0};
 
@@ -38,19 +38,19 @@ struct TesterParameters
 #ifndef RANDOM_EQUIVALENCE_QUERY
 
 constexpr TesterParameters RandomTestParameters{
-    .minNumOfStates = 20,
-    .maxNumOfStates = 25,
-    .minNumOfCalls = 3,
-    .maxNumOfCalls = 4,
-    .minNumOfLocals = 3,
-    .maxNumOfLocals = 4,
-    .minNumOfReturns = 3,
-    .maxNumOfReturns = 4,
+    .minNumOfStates = 3,
+    .maxNumOfStates = 6,
+    .minNumOfCalls = 1,
+    .maxNumOfCalls = 1,
+    .minNumOfLocals = 1,
+    .maxNumOfLocals = 1,
+    .minNumOfReturns = 1,
+    .maxNumOfReturns = 1,
     .minNumOfStackSymbols = 2,
     .maxNumOfStackSymbols = 2,
-    .numOfRandomTestingWords = 10000,
-    .maxTestingWordLength = 30,
-    .density = 0.7,
+    .numOfRandomTestingWords = 65000,
+    .maxTestingWordLength = 10,
+    .density = 1,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
