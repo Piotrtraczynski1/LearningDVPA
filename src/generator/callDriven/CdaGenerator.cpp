@@ -2,7 +2,7 @@
 #include <numeric>
 #include <random>
 
-#include "generator/CdaGenerator.hpp"
+#include "generator/callDriven/CdaGenerator.hpp"
 #include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 

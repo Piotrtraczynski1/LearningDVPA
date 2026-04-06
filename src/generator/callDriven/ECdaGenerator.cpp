@@ -2,7 +2,7 @@
 #include <random>
 #include <vector>
 
-#include "generator/ECdaGenerator.hpp"
+#include "generator/callDriven/ECdaGenerator.hpp"
 #include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 

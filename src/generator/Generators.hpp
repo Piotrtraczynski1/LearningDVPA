@@ -1,7 +1,7 @@
 #pragma once
 
-#include "generator/CdaGenerator.hpp"
-#include "generator/ECdaGenerator.hpp"
-#include "generator/MeVpaGenerator.hpp"
 #include "generator/RandomGenerator.hpp"
-#include "generator/SeVpaGenerator.hpp"
+#include "generator/callDriven/CdaGenerator.hpp"
+#include "generator/callDriven/ECdaGenerator.hpp"
+#include "generator/callDriven/MeVpaGenerator.hpp"
+#include "generator/callDriven/SeVpaGenerator.hpp"
