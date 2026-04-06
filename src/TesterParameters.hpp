@@ -55,6 +55,25 @@ constexpr TesterParameters RandomTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
+constexpr TesterParameters CombinedTestParameters{
+    .minNumOfStates = 3,
+    .maxNumOfStates = 4,
+    .minNumOfCalls = 2,
+    .maxNumOfCalls = 5,
+    .minNumOfLocals = 2,
+    .maxNumOfLocals = 5,
+    .minNumOfReturns = 2,
+    .maxNumOfReturns = 5,
+    .minNumOfStackSymbols = 2,
+    .maxNumOfStackSymbols = 5,
+    .numOfRandomTestingWords = 65000,
+    .maxTestingWordLength = 10,
+    .density = 0.9,
+    .useSrs = true,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
 constexpr TesterParameters CdaTestParameters{
     .minNumOfStates = 3,
     .maxNumOfStates = 8,

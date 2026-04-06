@@ -279,45 +279,45 @@ using Accepting = std::vector<uint16_t>;
 const std::vector<TestSrsCheckerParams> testSrsCheckerParams{
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{L{0}}, .r = W{L{1}}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{L{0}}, .right = W{L{1}}}}
         },
         .acceptingStates = {1, 2}
     }, 
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{C{0}}, .r = W{R{0}}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{C{0}}, .right = W{R{0}}}}
         },
         .acceptingStates = {0, 4}
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .r = W{R{0}, R{0}, R{0}, R{0}, R{0}}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .right = W{R{0}, R{0}, R{0}, R{0}, R{0}}}}
         },
         .acceptingStates = {0, 1, 2, 3, 4}
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .r = W{R{0}, R{0}, R{0}, R{0}, R{0}}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .right = W{R{0}, R{0}, R{0}, R{0}, R{0}}}}
         },
         .acceptingStates = {5}
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{L{1}}, .r = W{L{2}}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{L{1}}, .right = W{L{2}}}}
         },
         .acceptingStates = {0, 1, 2, 3, 4, 5},
         .acceptingEmpty = true
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{L{1}}, .r = W{L{2}}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{L{1}}, .right = W{L{2}}}}
         },
         .acceptingStates = {},
         .rejectingEmpty = true
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRule{.l = W{}, .r = W{}}
+            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{}, .right = W{}}}
         },
         .acceptingStates = {1, 3, 4},
         .rejectingEmpty = true,

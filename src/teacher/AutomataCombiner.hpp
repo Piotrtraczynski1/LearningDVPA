@@ -10,6 +10,7 @@
 
 namespace teacher
 {
+template <AutomatonKind Kind = AutomatonKind::Normal>
 class AutomataCombiner
 {
     const uint16_t numOfCalls;
@@ -22,14 +23,14 @@ class AutomataCombiner
 
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
 
-    std::unique_ptr<common::transition::Transition<AutomatonKind::Combined>> transition;
+    std::unique_ptr<common::transition::Transition<Kind>> transition;
 
 public:
     AutomataCombiner(
         const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &vpa, uint16_t numCalls,
         uint16_t numReturns, uint16_t numLocals, uint16_t stackSymbolsNumber);
 
-    std::unique_ptr<common::VPA<AutomatonKind::Combined>> combineVPA(
+    std::unique_ptr<common::VPA<Kind>> combineVPA(
         const common::VPA<AutomatonKind::Normal> &secondVpa);
 
 private:

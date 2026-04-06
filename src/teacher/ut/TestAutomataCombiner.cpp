@@ -34,7 +34,7 @@ public:
 
         firstVpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             std::move(transition), initialState, acceptingStates, numOfStates);
-        sut = std::make_shared<AutomataCombiner>(
+        sut = std::make_shared<AutomataCombiner<AutomatonKind::Combined>>(
             firstVpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
 
         initTestWords();
@@ -135,7 +135,7 @@ public:
     std::vector<uint16_t> acceptingStates = {1, 3, 4};
     std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> firstVpa;
-    std::shared_ptr<AutomataCombiner> sut;
+    std::shared_ptr<AutomataCombiner<AutomatonKind::Combined>> sut;
 };
 
 TEST_F(TestAutomataCombiner, default1)

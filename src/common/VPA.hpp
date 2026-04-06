@@ -13,6 +13,7 @@
 
 namespace teacher
 {
+template <AutomatonKind Kind>
 class AutomataCombiner;
 class Converter;
 class EmptinessChecker;
@@ -28,7 +29,8 @@ namespace common
 template <AutomatonKind Kind = AutomatonKind::Normal>
 class VPA
 {
-    friend class teacher::AutomataCombiner;
+    friend class teacher::AutomataCombiner<AutomatonKind::Normal>;
+    friend class teacher::AutomataCombiner<AutomatonKind::Combined>;
     friend class teacher::EmptinessChecker;
     friend class teacher::Converter;
     friend class learner::srs::AutomataConverter;

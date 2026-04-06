@@ -17,8 +17,8 @@ ConvertedAutomata AutomataConverter::run(
     init(hypothesis);
     const auto numOfStates{hypothesis->getNumOfStates()};
 
-    addTransitionsForSpecialSymbol(convertedAutomata.lAutomaton, srsRule.l, numOfStates);
-    addTransitionsForSpecialSymbol(convertedAutomata.rAutomaton, srsRule.r, numOfStates);
+    addTransitionsForSpecialSymbol(convertedAutomata.lAutomaton, srsRule.left, numOfStates);
+    addTransitionsForSpecialSymbol(convertedAutomata.rAutomaton, srsRule.right, numOfStates);
 
     return convertedAutomata;
 }

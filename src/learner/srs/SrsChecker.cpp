@@ -32,7 +32,11 @@ common::Word SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::
     {
         for (const auto &rule : srs)
         {
-            SrsRule srsRule{.l = word, .r = rule.l + word + rule.r};
+            SrsRule srsRule{
+                .left = rule.left.left + (rule.left.takesParams ? word : common::Word{}) +
+                        rule.left.right,
+                .right = rule.right.left + (rule.right.takesParams ? word : common::Word{}) +
+                         rule.right.right};
             ConvertedAutomata convertedAutomata{converter.run(hypothesis, srsRule)};
             auto word{checkEquivalence(convertedAutomata)};
             if (word != emptyWord)
@@ -81,6 +85,9 @@ common::Word SrsChecker::prepareCounterexample(
 {
     TIME_MARKER("[SrsChecker]: counterexample found");
     LOG("[SrsChecker]: counterexample found");
+
+    std::cout << "found! Srs: left: " << srsRule.left << ", right: " << srsRule.right << std::endl;
+
     common::Word firstCandidate{};
     common::Word secondCandidate{};
 
@@ -88,8 +95,8 @@ common::Word SrsChecker::prepareCounterexample(
     {
         if (symbol == specialSymbol)
         {
-            firstCandidate += srsRule.l;
-            secondCandidate += srsRule.r;
+            firstCandidate += srsRule.left;
+            secondCandidate += srsRule.right;
         }
         else
         {

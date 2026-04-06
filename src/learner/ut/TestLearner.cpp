@@ -954,8 +954,13 @@ public:
         transition->add(State{5}, LS{1}, State{5});
 
         srs::Srs srs{};
-        srs.push_back(srs::SrsRule{{LS{0}, LS{1}, LS{0}}, {}});
-        srs.push_back(srs::SrsRule{{LS{1}}, {}});
+        srs.push_back(
+            srs::SrsRuleTmp{
+                .left = {.left{LS{0}, LS{1}, LS{0}}, .takesParams = false},
+                .right = {.takesParams = false}});
+        srs.push_back(
+            srs::SrsRuleTmp{
+                .left = {.left = {LS{1}}, .takesParams = false}, .right = {.takesParams = false}});
         init(srs);
     }
 };

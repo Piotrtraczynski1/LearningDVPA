@@ -4,17 +4,19 @@
 
 namespace teacher
 {
-AutomataCombiner::AutomataCombiner(
+template <AutomatonKind Kind>
+AutomataCombiner<Kind>::AutomataCombiner(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &vpa, uint16_t numCalls,
     uint16_t numReturns, uint16_t numLocals, uint16_t stackSymbolsNumber)
     : vpa{vpa}, numOfCalls{numCalls}, numOfReturns{numReturns}, numOfLocals{numLocals},
       numOfStackSymbols{stackSymbolsNumber} {};
 
-std::unique_ptr<common::VPA<AutomatonKind::Combined>> AutomataCombiner::combineVPA(
+template <AutomatonKind Kind>
+std::unique_ptr<common::VPA<Kind>> AutomataCombiner<Kind>::combineVPA(
     const common::VPA<AutomatonKind::Normal> &hypothesis)
 {
     TIME_MARKER("[Converter]: combineVPA");
-    transition = std::make_unique<common::transition::Transition<AutomatonKind::Combined>>();
+    transition = std::make_unique<common::transition::Transition<Kind>>();
 
     combinedVpaNumOfStates =
         static_cast<uint16_t>((vpa->numOfStates + 1) * (hypothesis.numOfStates + 1)); // +1 for sink
@@ -57,17 +59,14 @@ std::unique_ptr<common::VPA<AutomatonKind::Combined>> AutomataCombiner::combineV
 
     auto init = combineStates(vpa->initialState, hypothesis.initialState);
 
-    auto tmp = common::VPA<AutomatonKind::Combined>{
+    return std::make_unique<common::VPA<Kind>>(
         std::move(transition), init, acceptingStates,
-        static_cast<uint16_t>(combinedVpaNumOfStates + 1)};
-
-    return std::make_unique<common::VPA<AutomatonKind::Combined>>(std::move(tmp));
-    // return std::make_unique<common::VPA<AutomatonKind::Combined>>(
-    //     std::move(transition), init, acceptingStates,
-    //     static_cast<uint16_t>(combinedVpaNumOfStates + 1)); // +1 for poping stack state
+        static_cast<uint16_t>(combinedVpaNumOfStates + 1)); // +1 for poping stack state
 }
 
-void AutomataCombiner::addCalls(uint16_t state, const common::VPA<AutomatonKind::Normal> &secondVpa)
+template <AutomatonKind Kind>
+void AutomataCombiner<Kind>::addCalls(
+    uint16_t state, const common::VPA<AutomatonKind::Normal> &secondVpa)
 {
     for (uint16_t call = 0; call < numOfCalls; call++)
     {
@@ -100,7 +99,8 @@ void AutomataCombiner::addCalls(uint16_t state, const common::VPA<AutomatonKind:
     }
 }
 
-void AutomataCombiner::addLocals(
+template <AutomatonKind Kind>
+void AutomataCombiner<Kind>::addLocals(
     uint16_t state, const common::VPA<AutomatonKind::Normal> &secondVpa)
 {
     for (uint16_t local = 0; local < numOfLocals; local++)
@@ -124,7 +124,8 @@ void AutomataCombiner::addLocals(
     }
 }
 
-void AutomataCombiner::addReturns(
+template <AutomatonKind Kind>
+void AutomataCombiner<Kind>::addReturns(
     uint16_t state, uint16_t stackSymbol, const common::VPA<AutomatonKind::Normal> &secondVpa)
 {
     for (uint16_t ret = 0; ret < numOfReturns; ret++)
@@ -154,7 +155,8 @@ void AutomataCombiner::addReturns(
     }
 }
 
-bool AutomataCombiner::isAcceptingState(
+template <AutomatonKind Kind>
+bool AutomataCombiner<Kind>::isAcceptingState(
     uint16_t state, const common::VPA<AutomatonKind::Normal> &secondVpa) const
 {
     std::pair<common::transition::State, common::transition::State> states{
@@ -162,8 +164,10 @@ bool AutomataCombiner::isAcceptingState(
 
     return vpa->acceptingStates.at(states.first) ^ secondVpa.acceptingStates.at(states.second);
 }
-std::pair<common::transition::State, common::transition::State> AutomataCombiner::
-    convertCombinedStateIntoStates(uint16_t state) const
+
+template <AutomatonKind Kind>
+std::pair<common::transition::State, common::transition::State> AutomataCombiner<
+    Kind>::convertCombinedStateIntoStates(uint16_t state) const
 {
     const uint16_t numOfStates{static_cast<uint16_t>(vpa->numOfStates + 1)};
     return {
@@ -171,8 +175,9 @@ std::pair<common::transition::State, common::transition::State> AutomataCombiner
         common::transition::State{static_cast<uint16_t>(state / numOfStates)}};
 }
 
-std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol> AutomataCombiner::
-    convertCombinedStackSymbolIntoSymbols(uint16_t stackSymbol) const
+template <AutomatonKind Kind>
+std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol> AutomataCombiner<
+    Kind>::convertCombinedStackSymbolIntoSymbols(uint16_t stackSymbol) const
 {
     if (stackSymbol == common::symbol::StackSymbol::BOTTOM)
     {
@@ -185,12 +190,15 @@ std::pair<common::symbol::StackSymbol, common::symbol::StackSymbol> AutomataComb
             static_cast<uint16_t>((stackSymbol / (numOfStackSymbols + 1)))}};
 }
 
-common::transition::State AutomataCombiner::combineStates(uint16_t s1, uint16_t s2) const
+template <AutomatonKind Kind>
+common::transition::State AutomataCombiner<Kind>::combineStates(uint16_t s1, uint16_t s2) const
 {
     return common::transition::State{static_cast<uint16_t>(s2 * (vpa->numOfStates + 1) + s1)};
 }
 
-common::symbol::StackSymbol AutomataCombiner::combineStackSymbols(uint16_t s1, uint16_t s2) const
+template <AutomatonKind Kind>
+common::symbol::StackSymbol AutomataCombiner<Kind>::combineStackSymbols(
+    uint16_t s1, uint16_t s2) const
 {
     if (s1 == common::symbol::StackSymbol::BOTTOM)
     {
@@ -200,4 +208,6 @@ common::symbol::StackSymbol AutomataCombiner::combineStackSymbols(uint16_t s1, u
     return common::symbol::StackSymbol{static_cast<uint16_t>((s2 * (numOfStackSymbols + 1)) + s1)};
 }
 
+template class AutomataCombiner<AutomatonKind::Normal>;
+template class AutomataCombiner<AutomatonKind::Combined>;
 } // namespace teacher

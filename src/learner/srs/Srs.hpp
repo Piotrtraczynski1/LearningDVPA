@@ -6,11 +6,24 @@
 
 namespace learner::srs
 {
-struct SrsRule
+struct SrsRuleTmp
 {
-    common::Word l;
-    common::Word r;
+    struct Side
+    {
+        common::Word left{};
+        common::Word right{};
+        bool takesParams{true};
+    };
+
+    Side left;
+    Side right;
 };
 
-using Srs = std::vector<SrsRule>;
+struct SrsRule
+{
+    common::Word left;
+    common::Word right;
+};
+
+using Srs = std::vector<SrsRuleTmp>;
 } // namespace learner::srs

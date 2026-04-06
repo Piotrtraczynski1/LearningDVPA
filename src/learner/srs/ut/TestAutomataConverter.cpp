@@ -73,13 +73,13 @@ public:
         for (const auto &prefix : prefixes)
         {
             ASSERT_EQ(
-                hypothesis->checkWord(prefix + rule.l),
+                hypothesis->checkWord(prefix + rule.left),
                 convertedAutomata.lAutomaton->checkWord(prefix + common::Word{specialSymbol}))
-                << "prefix: " << prefix << ", l = " << rule.l;
+                << "prefix: " << prefix << ", l = " << rule.left;
             ASSERT_EQ(
-                hypothesis->checkWord(prefix + rule.r),
+                hypothesis->checkWord(prefix + rule.right),
                 convertedAutomata.rAutomaton->checkWord(prefix + common::Word{specialSymbol}))
-                << "prefix: " << prefix << ", r = " << rule.r;
+                << "prefix: " << prefix << ", r = " << rule.right;
         }
     }
 
@@ -99,8 +99,8 @@ public:
 TEST_F(TestAutomataConverter, defaultTest1)
 {
     SrsRule rule{
-        .l = common::Word{LocalSymbol{0}, LocalSymbol{1}},
-        .r = common::Word{CallSymbol{0}, ReturnSymbol{0}}};
+        .left = common::Word{LocalSymbol{0}, LocalSymbol{1}},
+        .right = common::Word{CallSymbol{0}, ReturnSymbol{0}}};
 
     ConvertedAutomata convertedAutomata{sut.run(hypothesis, rule)};
     testResult(convertedAutomata, rule);
@@ -109,8 +109,8 @@ TEST_F(TestAutomataConverter, defaultTest1)
 TEST_F(TestAutomataConverter, defaultTest2)
 {
     SrsRule rule{
-        .l = common::Word{CallSymbol{0}, LocalSymbol{0}, LocalSymbol{1}, ReturnSymbol{0}},
-        .r = common::Word{
+        .left = common::Word{CallSymbol{0}, LocalSymbol{0}, LocalSymbol{1}, ReturnSymbol{0}},
+        .right = common::Word{
             CallSymbol{0}, ReturnSymbol{0}, CallSymbol{0}, ReturnSymbol{0}, LocalSymbol{1},
             CallSymbol{0}, ReturnSymbol{0}}};
 

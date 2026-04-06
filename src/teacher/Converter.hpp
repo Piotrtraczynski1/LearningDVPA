@@ -23,7 +23,7 @@ class Converter
 
     const std::shared_ptr<VPA<AutomatonKind::Normal>> vpa;
 
-    AutomataCombiner combiner;
+    AutomataCombiner<AutomatonKind::Combined> combiner;
     EmptinessChecker emptinessChecker;
 
 public:

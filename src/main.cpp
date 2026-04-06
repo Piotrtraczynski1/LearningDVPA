@@ -49,6 +49,14 @@ void runECdaGenerator(const uint16_t numOfTests)
         .run();
 }
 
+void runCombinedGenerator(const uint16_t numOfTests)
+{
+    Tester{
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::CombinedGenerator()),
+        CombinedTestParameters}
+        .run();
+}
+
 void runBenchmark(const std::string &scenarioName)
 {
     benchmark::BenchmarkRunner{scenarioName}.run();
@@ -64,6 +72,10 @@ int main(int argc, char *argv[])
     case (helper::Command::Random):
         std::srand(seed);
         runRandomGenerator(numOfTests);
+        break;
+    case (helper::Command::Combined):
+        std::srand(seed);
+        runCombinedGenerator(numOfTests);
         break;
     case (helper::Command::Cda):
         std::srand(seed);
