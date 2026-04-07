@@ -19,6 +19,7 @@ public:
 
         hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             std::move(transition), initialState, acceptingStates, numOfStates);
+        sut = std::make_shared<AutomataConverter>(hypothesis);
     }
 
     void initTransition()
@@ -93,7 +94,7 @@ public:
 
     std::vector<common::Word> prefixes{};
 
-    AutomataConverter sut{specialSymbol};
+    std::shared_ptr<AutomataConverter> sut;
 };
 
 TEST_F(TestAutomataConverter, defaultTest1)
@@ -102,8 +103,9 @@ TEST_F(TestAutomataConverter, defaultTest1)
         .left = common::Word{LocalSymbol{0}, LocalSymbol{1}},
         .right = common::Word{CallSymbol{0}, ReturnSymbol{0}}};
 
-    ConvertedAutomata convertedAutomata{sut.run(hypothesis, rule)};
-    testResult(convertedAutomata, rule);
+    sut->addNewRule(specialSymbol, rule);
+    auto convertedAutomata{sut->getConvertedAutomata()};
+    testResult(*convertedAutomata, rule);
 }
 
 TEST_F(TestAutomataConverter, defaultTest2)
@@ -114,8 +116,9 @@ TEST_F(TestAutomataConverter, defaultTest2)
             CallSymbol{0}, ReturnSymbol{0}, CallSymbol{0}, ReturnSymbol{0}, LocalSymbol{1},
             CallSymbol{0}, ReturnSymbol{0}}};
 
-    ConvertedAutomata convertedAutomata{sut.run(hypothesis, rule)};
-    testResult(convertedAutomata, rule);
+    sut->addNewRule(specialSymbol, rule);
+    auto convertedAutomata{sut->getConvertedAutomata()};
+    testResult(*convertedAutomata, rule);
 }
 
 } // namespace learner::srs

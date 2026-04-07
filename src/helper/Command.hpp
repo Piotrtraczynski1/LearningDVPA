@@ -6,6 +6,7 @@ enum class Command
 {
     Random,
     Combined,
+    Comments,
     Cda,
     SeVpa,
     MeVpa,

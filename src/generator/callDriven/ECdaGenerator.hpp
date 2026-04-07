@@ -2,7 +2,7 @@
 
 #include "generator/callDriven/CdaGenerator.hpp"
 
-namespace generator
+namespace generator::callDriven
 {
 class ECdaGenerator : public CdaGenerator
 {

@@ -1,6 +1,6 @@
 #include "generator/callDriven/SeVpaGenerator.hpp"
 
-namespace generator
+namespace generator::callDriven
 {
 void SeVpaGenerator::validateGeneratorConfig(
     [[maybe_unused]] uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,

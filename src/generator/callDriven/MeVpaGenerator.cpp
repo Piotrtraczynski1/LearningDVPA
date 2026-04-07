@@ -2,7 +2,7 @@
 #include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 
-namespace generator
+namespace generator::callDriven
 {
 
 void MeVpaGenerator::validateGeneratorConfig(

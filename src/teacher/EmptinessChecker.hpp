@@ -17,11 +17,11 @@ class EmptinessChecker
 
     enum class WitnessKind
     {
-        Call,
-        Return,
-        ReturnBottom,
-        Local,
-        Empty
+        Call = 0,
+        Return = 1,
+        ReturnBottom = 2,
+        Local = 3,
+        Empty = 4
     };
 
     struct Witness

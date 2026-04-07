@@ -8,3 +8,4 @@
 #include "generator/callDriven/SeVpaGenerator.hpp"
 
 #include "generator/srs/CombinedGenerator.hpp"
+#include "generator/srs/CommentsGenerator.hpp"

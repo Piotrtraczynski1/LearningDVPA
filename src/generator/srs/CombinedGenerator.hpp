@@ -5,7 +5,7 @@
 #include "generator/Generator.hpp"
 #include "learner/srs/Srs.hpp"
 
-namespace generator
+namespace generator::srs
 {
 class CombinedGenerator : public Generator
 {

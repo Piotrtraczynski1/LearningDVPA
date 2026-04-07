@@ -9,7 +9,7 @@
 #include "generator/Generator.hpp"
 #include "utils/Constants.hpp"
 
-namespace generator
+namespace generator::callDriven
 {
 class CdaGenerator : public Generator
 {

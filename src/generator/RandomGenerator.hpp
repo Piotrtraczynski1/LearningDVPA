@@ -17,9 +17,10 @@ public:
 
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() override;
 
-private:
+protected:
     void generateTransition();
 
+private:
     void addCalls(common::transition::State state);
     void addLocals(common::transition::State state);
     void addReturns(common::transition::State state);

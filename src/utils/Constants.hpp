@@ -6,8 +6,8 @@
 
 namespace utils
 {
-constexpr uint16_t MaxNumOfAutomatonStates{50};
-constexpr uint16_t MaxNumOfLetters{20};
+constexpr uint16_t MaxNumOfAutomatonStates{100};
+constexpr uint16_t MaxNumOfLetters{50};
 constexpr uint16_t MaxNumOfStackSymbols{40};
 
 constexpr uint16_t MaxNumOfCombinedAutomatonStates{

@@ -119,11 +119,9 @@ void EmptinessChecker::addInitialGenerativeNonTerminals(
     {
         if (vpa->acceptingStates[state])
         {
-            for (uint16_t stackSymbol = 0; stackSymbol < numOfStackSymbols; stackSymbol++)
-            {
-                addNonTerminalIfNeeded(
-                    state, stackSymbol, state, Witness{.kind = WitnessKind::Empty});
-            }
+            addNonTerminalIfNeeded(
+                state, common::symbol::StackSymbol::BOTTOM, state,
+                Witness{.kind = WitnessKind::Empty});
         }
 
         for (uint16_t returnSymbol = 0; returnSymbol <= numOfReturns; returnSymbol++)
@@ -160,7 +158,7 @@ void EmptinessChecker::addNonTerminalIfNeeded(
 void EmptinessChecker::addGenerativeLocals(const NonTerminal generative)
 {
     const auto [leftState, stackSymbol, rightState] = decodeNonTerminal(generative);
-    for (const auto& parent : localParents[leftState])
+    for (const auto &parent : localParents[leftState])
     {
         addNonTerminalIfNeeded(
             parent.state, stackSymbol, rightState,
@@ -229,6 +227,19 @@ void EmptinessChecker::addGenerativeCalls(const NonTerminal generative)
 void EmptinessChecker::buildExample(const NonTerminal nonTerminal, common::Word &example)
 {
     const auto &witness{witnesses[nonTerminal]};
+
+    // const auto [leftState, stackSymbol, rightState] = decodeNonTerminal(nonTerminal);
+    // const auto [c1leftState, c1stackSymbol, c1rightState] =
+    // decodeNonTerminal(witness.firstChild); const auto [c2leftState, c2stackSymbol, c2rightState]
+    // = decodeNonTerminal(witness.secondChild);
+
+    // std::cout << "buildExample: witnessKind: " << (uint16_t)witness.kind
+    //           << ", symbol: " << witness.symbol << ", [" << leftState << ", " << stackSymbol <<
+    //           ", "
+    //           << rightState << "] leftChild: [" << c1leftState << ", " << c1stackSymbol << ", "
+    //           << c1rightState << "], rightChild: [" << c2leftState << ", " << c2stackSymbol << ",
+    //           "
+    //           << c2rightState << "]" << std::endl;
 
     switch (witness.kind)
     {

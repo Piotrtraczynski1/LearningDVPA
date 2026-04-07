@@ -20,7 +20,8 @@ void runRandomGenerator(const uint16_t numOfTests)
 void runCdaGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::CdaGenerator()),
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::callDriven::CdaGenerator()),
         CdaTestParameters}
         .run();
 }
@@ -28,7 +29,8 @@ void runCdaGenerator(const uint16_t numOfTests)
 void runSeVpaGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::SeVpaGenerator()),
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::callDriven::SeVpaGenerator()),
         SeVpaTestParameters}
         .run();
 }
@@ -36,7 +38,8 @@ void runSeVpaGenerator(const uint16_t numOfTests)
 void runMeVpaGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::MeVpaGenerator()),
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::callDriven::MeVpaGenerator()),
         MeVpaTestParameters}
         .run();
 }
@@ -44,7 +47,8 @@ void runMeVpaGenerator(const uint16_t numOfTests)
 void runECdaGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::ECdaGenerator()),
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::callDriven::ECdaGenerator()),
         ECdaTestParameters}
         .run();
 }
@@ -52,8 +56,16 @@ void runECdaGenerator(const uint16_t numOfTests)
 void runCombinedGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::CombinedGenerator()),
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CombinedGenerator()),
         CombinedTestParameters}
+        .run();
+}
+
+void runCommentsGenerator(const uint16_t numOfTests)
+{
+    Tester{
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CommentsGenerator()),
+        CommentsTestParameters}
         .run();
 }
 
@@ -76,6 +88,10 @@ int main(int argc, char *argv[])
     case (helper::Command::Combined):
         std::srand(seed);
         runCombinedGenerator(numOfTests);
+        break;
+    case (helper::Command::Comments):
+        std::srand(seed);
+        runCommentsGenerator(numOfTests);
         break;
     case (helper::Command::Cda):
         std::srand(seed);

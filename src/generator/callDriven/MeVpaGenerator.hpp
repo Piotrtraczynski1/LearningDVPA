@@ -3,7 +3,7 @@
 #include "generator/callDriven/CdaGenerator.hpp"
 #include "utils/Constants.hpp"
 
-namespace generator
+namespace generator::callDriven
 {
 class MeVpaGenerator : public CdaGenerator
 {

@@ -4,7 +4,7 @@
 #include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 
-namespace generator
+namespace generator::srs
 {
 void CombinedGenerator::validateGeneratorConfig(
     uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,

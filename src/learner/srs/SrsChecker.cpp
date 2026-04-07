@@ -1,4 +1,5 @@
-#include <cstdint>
+#include <algorithm>
+#include <numeric>
 #include <queue>
 
 #include "learner/srs/ConvertedAutomata.hpp"
@@ -14,19 +15,35 @@ SrsChecker::SrsChecker(
     const Srs srsArg, const teacher::Teacher &oracleArg, const uint16_t numOfCallsArg,
     const uint16_t numOfReturnArg, const uint16_t numOfLocalsArg,
     const uint16_t numOfStackSymbolsArg)
-    : srs{srsArg}, oracle{oracleArg}, converter{common::symbol::LocalSymbol{numOfLocalsArg}},
-      numOfCalls{numOfCallsArg}, numOfReturns{numOfReturnArg}, numOfLocals{numOfLocalsArg},
-      numOfStackSymbols{numOfStackSymbolsArg},
-      specialSymbol{common::symbol::LocalSymbol{numOfLocalsArg}}
+    : srs{srsArg}, oracle{oracleArg}, numOfCalls{numOfCallsArg}, numOfReturns{numOfReturnArg},
+      numOfLocals{numOfLocalsArg}, numOfStackSymbols{numOfStackSymbolsArg}
 {
 }
 
-common::Word SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
+common::Word SrsChecker::check(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     TIME_MARKER("[SrsChecker]: check consistency with SRS");
     LOG("[SrsChecker]: check consistency with SRS");
 
+    converter = std::make_shared<AutomataConverter>(hypothesis);
+    specialSymbolToRule.clear();
     prepareWellMatchedWords(hypothesis);
+    uint16_t specialSymbol{buildConvertedAutomata()};
+
+    auto convertedAutomata{converter->getConvertedAutomata()};
+    auto word{checkEquivalence(convertedAutomata, specialSymbol)};
+
+    if (word != emptyWord)
+    {
+        return prepareCounterexample(hypothesis, word);
+    }
+
+    return common::Word{};
+}
+
+uint16_t SrsChecker::buildConvertedAutomata()
+{
+    uint16_t specialSymbol{numOfLocals};
 
     for (const auto &word : wellMatchedWords)
     {
@@ -37,35 +54,204 @@ common::Word SrsChecker::check(const std::shared_ptr<common::VPA<AutomatonKind::
                         rule.left.right,
                 .right = rule.right.left + (rule.right.takesParams ? word : common::Word{}) +
                          rule.right.right};
-            ConvertedAutomata convertedAutomata{converter.run(hypothesis, srsRule)};
-            auto word{checkEquivalence(convertedAutomata)};
-            if (word != emptyWord)
+            converter->addNewRule(specialSymbol, srsRule);
+            specialSymbolToRule[specialSymbol] = srsRule;
+            specialSymbol++;
+            if (specialSymbol == utils::MaxNumOfLetters)
             {
-                return prepareCounterexample(hypothesis, word, srsRule);
+                WRN("[SrsChecker]: max number of letters reached! Some Srs Rules will be "
+                    "discarded!");
+                return specialSymbol;
             }
         }
     }
 
-    return common::Word{};
+    return specialSymbol;
 }
 
 void SrsChecker::prepareWellMatchedWords(
-    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     wellMatchedWords.clear();
+    nodes.clear();
+    numOfStates = hypothesis->getNumOfStates();
+    minScore = numOfStates;
 
-    // TODO
+    auto candidates = std::make_unique<std::queue<Node>>();
+    candidates->push(makeIdentityNode());
+    nodes.push_back(candidates->front());
+
+    uint16_t numOfRevealedNodes{1};
+
     for (uint16_t localId = 0; localId < numOfLocals; localId++)
     {
-        wellMatchedWords.push_back(common::Word{common::symbol::LocalSymbol{localId}});
+        auto newNode{makeLocalNode(hypothesis, localId)};
+        if (tryInsertNode(newNode))
+        {
+            candidates->push(newNode);
+        }
+    }
+
+    while (not candidates->empty() and numOfRevealedNodes < MaxNumOfRevealedNodes)
+    {
+        Node node{candidates->front()};
+        candidates->pop();
+
+        for (uint16_t callId = 0; callId < numOfCalls; callId++)
+        {
+            for (uint16_t returnId = 0; returnId < numOfReturns; returnId++)
+            {
+                auto newNode{wrapNode(hypothesis, node, callId, returnId)};
+                if (tryInsertNode(newNode))
+                {
+                    candidates->push(newNode);
+                }
+            }
+        }
+
+        const auto numOfNodes{nodes.size()};
+        for (uint16_t nodeId = 0; nodeId < numOfNodes; nodeId++)
+        {
+            auto newNode{composeNodes(node, nodes[nodeId])};
+            if (tryInsertNode(newNode))
+            {
+                candidates->push(newNode);
+            }
+        }
+
+        numOfRevealedNodes++;
+    }
+
+    wellMatchedWords.reserve(nodes.size());
+    for (const auto &node : nodes)
+    {
+        wellMatchedWords.push_back(node.word);
+    }
+
+    LOG("[SrsChecker]: prepared %lu well-matched words", wellMatchedWords.size());
+}
+
+SrsChecker::Node SrsChecker::makeLocalNode(
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const uint16_t localId)
+{
+    std::vector<uint16_t> nextState(numOfStates, common::transition::State::INVALID);
+    common::Word word{common::symbol::LocalSymbol{localId}};
+
+    for (uint16_t state = 0; state < numOfStates; state++)
+    {
+        hypothesis->state = common::transition::State{state};
+        hypothesis->readWord(word);
+        nextState[state] = hypothesis->state;
+    }
+
+    return Node{.nextState = nextState, .word = word};
+}
+
+SrsChecker::Node SrsChecker::wrapNode(
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const Node &node,
+    const uint16_t callId, const uint16_t returnId)
+{
+    std::vector<uint16_t> nextState(numOfStates, common::transition::State::INVALID);
+    common::Word word{
+        common::Word{common::symbol::CallSymbol{callId}} + node.word +
+        common::Word{common::symbol::ReturnSymbol{returnId}}};
+
+    for (uint16_t state = 0; state < numOfStates; state++)
+    {
+        hypothesis->state = common::transition::State{state};
+        hypothesis->readWord(word);
+        nextState[state] = hypothesis->state;
+    }
+
+    return Node{.nextState = nextState, .word = word};
+}
+
+SrsChecker::Node SrsChecker::composeNodes(const Node &firstNode, const Node &secondNode)
+{
+    std::vector<uint16_t> nextState(numOfStates, common::transition::State::INVALID);
+
+    for (uint16_t state = 0; state < numOfStates; state++)
+    {
+        if (firstNode.nextState[state] == common::transition::State::INVALID)
+        {
+            continue;
+        }
+        nextState[state] = secondNode.nextState[firstNode.nextState[state]];
+    }
+
+    return Node{.nextState = nextState, .word = firstNode.word + secondNode.word};
+}
+
+bool SrsChecker::tryInsertNode(Node &newNode)
+{
+    calcScore(newNode);
+    if (newNode.score == 0)
+    {
+        return false;
+    }
+
+    if (nodes.size() < MaxNumOfNodes)
+    {
+        nodes.push_back(newNode);
+        minScore = std::min(minScore, newNode.score);
+        return true;
+    }
+
+    if (minScore >= newNode.score)
+    {
+        return false;
+    }
+
+    for (auto &node : nodes)
+    {
+        if (node.score == minScore)
+        {
+            node = newNode;
+            break;
+        }
+    }
+
+    minScore = numOfStates;
+    for (auto &node : nodes)
+    {
+        minScore = std::min(minScore, node.score);
+    }
+    return true;
+}
+
+uint16_t SrsChecker::calcDist(
+    const std::vector<uint16_t> &first, const std::vector<uint16_t> &second)
+{
+    uint16_t dist{0};
+    for (uint16_t state = 0; state < numOfStates; state++)
+    {
+        dist += (first[state] != second[state]);
+    }
+    return dist;
+}
+
+void SrsChecker::calcScore(Node &newNode)
+{
+    newNode.score = numOfStates;
+    for (const auto &node : nodes)
+    {
+        newNode.score = std::min(newNode.score, calcDist(newNode.nextState, node.nextState));
     }
 }
 
-common::Word SrsChecker::checkEquivalence(const ConvertedAutomata &convertedAutomata)
+SrsChecker::Node SrsChecker::makeIdentityNode()
+{
+    std::vector<uint16_t> next(numOfStates);
+    std::iota(next.begin(), next.end(), 0);
+    return Node{.nextState = next, .word = common::Word{}, .score = numOfStates};
+}
+
+common::Word SrsChecker::checkEquivalence(
+    const std::shared_ptr<ConvertedAutomata> convertedAutomata, const uint16_t specialSymbol)
 {
     auto converter = std::make_shared<teacher::Converter>(
-        convertedAutomata.lAutomaton, numOfCalls, numOfReturns, numOfLocals + 1, numOfStackSymbols);
-    auto output = teacher::equivalenceCheck(converter, convertedAutomata.rAutomaton);
+        convertedAutomata->lAutomaton, numOfCalls, numOfReturns, specialSymbol, numOfStackSymbols);
+    auto output = teacher::equivalenceCheck(converter, convertedAutomata->rAutomaton);
 
     common::Symbol leftoverSymbol{common::symbol::ReturnSymbol{numOfReturns}};
     for (uint16_t i = 0; i < output->size(); i++)
@@ -80,23 +266,33 @@ common::Word SrsChecker::checkEquivalence(const ConvertedAutomata &convertedAuto
 }
 
 common::Word SrsChecker::prepareCounterexample(
-    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &word,
-    const SrsRule &srsRule)
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &word)
 {
     TIME_MARKER("[SrsChecker]: counterexample found");
     LOG("[SrsChecker]: counterexample found");
 
-    std::cout << "found! Srs: left: " << srsRule.left << ", right: " << srsRule.right << std::endl;
+    std::cout << "found! word: " << word << std::endl;
 
     common::Word firstCandidate{};
     common::Word secondCandidate{};
 
     for (const auto &symbol : word)
     {
-        if (symbol == specialSymbol)
+        if (symbol.index() == common::LocalSymbolVariant)
         {
-            firstCandidate += srsRule.left;
-            secondCandidate += srsRule.right;
+            const auto specialSymbol =
+                static_cast<uint16_t>(std::get<common::symbol::LocalSymbol>(symbol));
+            if (specialSymbol >= numOfLocals)
+            {
+                const auto srsRule = specialSymbolToRule[specialSymbol];
+                firstCandidate += srsRule.left;
+                secondCandidate += srsRule.right;
+            }
+            else
+            {
+                firstCandidate += symbol;
+                secondCandidate += symbol;
+            }
         }
         else
         {

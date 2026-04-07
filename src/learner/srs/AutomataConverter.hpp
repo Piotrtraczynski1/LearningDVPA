@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #include "common/Word.hpp"
 #include "common/symbol/Symbols.hpp"
@@ -11,21 +12,21 @@ namespace learner::srs
 {
 class AutomataConverter
 {
-    common::symbol::LocalSymbol specialSymbol;
-    ConvertedAutomata convertedAutomata;
+    std::shared_ptr<ConvertedAutomata> convertedAutomata;
+    const uint16_t numOfStates;
 
 public:
-    AutomataConverter(common::symbol::LocalSymbol specialSymbolArg);
+    AutomataConverter(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis);
 
-    ConvertedAutomata run(
-        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis,
-        const SrsRule &srsRule);
+    void addNewRule(const uint16_t specialSymbol, const SrsRule &srsRule);
+
+    std::shared_ptr<ConvertedAutomata> getConvertedAutomata();
 
 private:
     void init(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis);
 
     void addTransitionsForSpecialSymbol(
         std::shared_ptr<common::VPA<AutomatonKind::Normal>> &automaton, const common::Word &word,
-        const uint16_t numOfStates);
+        const uint16_t specialSymbol);
 };
 } // namespace learner::srs

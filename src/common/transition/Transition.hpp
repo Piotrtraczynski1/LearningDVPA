@@ -15,6 +15,11 @@ class Converter;
 class EmptinessChecker;
 } // namespace teacher
 
+namespace learner::srs
+{
+class SrsChecker;
+}
+
 namespace common::transition
 {
 template <AutomatonKind Kind = AutomatonKind::Normal>
@@ -24,6 +29,7 @@ class Transition
     friend class teacher::AutomataCombiner<AutomatonKind::Combined>;
     friend class teacher::EmptinessChecker;
     friend class teacher::Converter;
+    friend class learner::srs::SrsChecker;
 
     using Size = AutomatonSize<Kind>;
 

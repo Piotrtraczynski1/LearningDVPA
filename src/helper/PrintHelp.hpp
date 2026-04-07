@@ -20,6 +20,8 @@ Generators:
     sevpa      run tests with SeVPA generator
     mevpa      run tests with MeVPA generator
     ecda       run tests with eCDA generator
+    combined   run test with combined generator
+    comments   run test with comments generator
     
 Other commands:
     bench      run benchmark for selected scenario
