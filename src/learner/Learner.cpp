@@ -139,7 +139,7 @@ void Learner::addNewAndSetForcedSelectorIfNeeded(const common::Word &v, const co
     const auto successor{addNewSelectorIfNeeded(v + a)};
     if (a[0].index() == common::ReturnSymbolVariant)
     {
-        const auto returnSymbol{std::get<symbol::ReturnSymbol>(a[0])};
+        const auto returnSymbol{std::get<common::symbol::ReturnSymbol>(a[0])};
         hypothesis->checkWord(v);
         generator.addForcedSelector(
             hypothesis->state, hypothesis->stack.top(), returnSymbol, successor);

@@ -88,7 +88,7 @@ constexpr TesterParameters CommentsTestParameters{
     .numOfRandomTestingWords = 65000,
     .maxTestingWordLength = 10,
     .density = 0.9,
-    .useSrs = false,
+    .useSrs = true,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};

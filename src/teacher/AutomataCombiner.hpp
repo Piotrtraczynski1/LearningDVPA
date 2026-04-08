@@ -13,6 +13,11 @@ namespace teacher
 template <AutomatonKind Kind = AutomatonKind::Normal>
 class AutomataCombiner
 {
+    friend std::shared_ptr<common::Word> equivalenceCheck(
+        std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
+        std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa);
+
     const uint16_t numOfCalls;
     const uint16_t numOfReturns;
     const uint16_t numOfLocals;
@@ -30,7 +35,7 @@ public:
         const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &vpa, uint16_t numCalls,
         uint16_t numReturns, uint16_t numLocals, uint16_t stackSymbolsNumber);
 
-    std::unique_ptr<common::VPA<Kind>> combineVPA(
+    std::shared_ptr<common::VPA<Kind>> combineVPA(
         const common::VPA<AutomatonKind::Normal> &secondVpa);
 
 private:

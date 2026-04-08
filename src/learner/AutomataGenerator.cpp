@@ -176,7 +176,8 @@ bool AutomataGenerator::checkRightCongruenceWithEmptyControlLetters(
 {
     for (int i = 0; i < testWords->size(); i++)
     {
-        if (std::get<Stack>((*testWords)[i][0]).top() != common::symbol::StackSymbol::BOTTOM)
+        if (std::get<common::Stack>((*testWords)[i][0]).top() !=
+            common::symbol::StackSymbol::BOTTOM)
         {
             continue;
         }
@@ -198,7 +199,7 @@ bool AutomataGenerator::checkRightCongruenceWithReturnLetter(
 {
     for (int i = 0; i < testWords->size(); i++)
     {
-        common::Stack controlLetter{std::get<Stack>((*testWords)[i][0])};
+        common::Stack controlLetter{std::get<common::Stack>((*testWords)[i][0])};
         common::Word word{(*testWords)[i]};
         word.erase(word.begin());
 

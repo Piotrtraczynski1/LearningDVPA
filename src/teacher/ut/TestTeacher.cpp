@@ -23,8 +23,6 @@ public:
     std::unique_ptr<Transition<AutomatonKind::Normal>> transitionOne;
     std::unique_ptr<Transition<AutomatonKind::Normal>> transitionTwo;
 
-    std::shared_ptr<Converter> converter;
-
     std::shared_ptr<Teacher> sut;
 
     void SetUp() override
@@ -41,20 +39,10 @@ public:
     }
 
     void init(
-        std::shared_ptr<VPA<AutomatonKind::Normal>> vpa, uint16_t numCalls, uint16_t numReturns,
-        uint16_t numLocals, uint16_t numOfStackSymbols)
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, uint16_t numCalls,
+        uint16_t numReturns, uint16_t numLocals, uint16_t numOfStackSymbols)
     {
-        converter =
-            std::make_shared<Converter>(vpa, numCalls, numReturns, numLocals, numOfStackSymbols);
-        sut = std::make_shared<Teacher>(vpa, converter);
-    }
-
-    std::shared_ptr<common::Word> equivalenceQuery(
-        common::VPA<AutomatonKind::Normal> &secondVpa, Converter &sut)
-    {
-        std::unique_ptr<common::VPA<AutomatonKind::Combined>> combinedVpa{
-            sut.combineVPA(secondVpa)};
-        return sut.convertVpaToCfg(*combinedVpa);
+        sut = std::make_shared<Teacher>(vpa, numCalls, numReturns, numLocals, numOfStackSymbols);
     }
 };
 
@@ -108,7 +96,6 @@ public:
 
     std::unique_ptr<Transition<AutomatonKind::Normal>> vpaTransition;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa;
-    std::shared_ptr<Converter> converter;
 
     std::shared_ptr<Teacher> sut;
 
@@ -133,10 +120,9 @@ public:
     {
         vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             std::move(vpaTransition), initial, acceptingStates, numOfStates);
-        converter = std::make_shared<Converter>(
-            vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
 
-        sut = std::make_shared<Teacher>(vpa, converter);
+        sut = std::make_shared<Teacher>(
+            vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
     }
 
     void initHypothesis(const std::vector<uint16_t> &acceptingStates, const uint16_t numOfStates)

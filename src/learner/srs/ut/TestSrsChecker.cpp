@@ -17,7 +17,7 @@ constexpr uint16_t numOfReturns{2};
 constexpr uint16_t numOfLocals{3};
 constexpr uint16_t numOfStackSymbols{3};
 constexpr uint16_t numOfStates{6};
-constexpr transition::State initialState{0};
+constexpr common::transition::State initialState{0};
 } // namespace
 
 struct TestSrsCheckerParams
@@ -171,7 +171,6 @@ public:
 
     std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
-    std::shared_ptr<teacher::Converter> converter;
     std::shared_ptr<teacher::Teacher> oracle;
     std::vector<uint16_t> acceptingStates{};
 
@@ -190,10 +189,8 @@ public:
         vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             std::move(rejectingTransition), initialState, std::vector<uint16_t>{}, 1);
 
-        converter = std::make_shared<teacher::Converter>(
+        oracle = std::make_shared<teacher::Teacher>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
-
-        oracle = std::make_shared<teacher::Teacher>(vpa, converter);
     }
 
     void checkOutput(common::Word output)
@@ -240,10 +237,8 @@ public:
         vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             std::move(acceptingTransition), initialState, std::vector<uint16_t>{0}, 1);
 
-        converter = std::make_shared<teacher::Converter>(
+        oracle = std::make_shared<teacher::Teacher>(
             vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
-
-        oracle = std::make_shared<teacher::Teacher>(vpa, converter);
     }
 
     void checkOutput(common::Word output)

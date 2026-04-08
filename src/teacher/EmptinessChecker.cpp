@@ -5,16 +5,17 @@
 namespace teacher
 {
 EmptinessChecker::EmptinessChecker(
-    uint16_t numCallsArg, uint16_t numReturnsArg, uint16_t numLocalsArg)
+    const uint16_t numCallsArg, const uint16_t numReturnsArg, const uint16_t numLocalsArg,
+    const uint16_t numOfStackSymbolsArg)
     : numOfCalls{numCallsArg}, numOfReturns{numReturnsArg}, numOfLocals{numLocalsArg}
 {
+    numOfStackSymbols = (numOfStackSymbolsArg + 1) * numOfStackSymbolsArg;
 }
 
-common::Word EmptinessChecker::check(
-    const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa,
-    const uint16_t stackSymbolsNumber)
+std::shared_ptr<common::Word> EmptinessChecker::check(
+    const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa)
 {
-    init(vpa, stackSymbolsNumber);
+    init(vpa);
 
     addInitialGenerativeNonTerminals(vpa);
 
@@ -42,19 +43,16 @@ common::Word EmptinessChecker::check(
             {
                 common::Word example{};
                 buildExample(start, example);
-                return example;
+                return std::make_shared<common::Word>(example);
             }
         }
     }
 
-    return common::Word{};
+    return std::make_shared<common::Word>();
 }
 
-void EmptinessChecker::init(
-    const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa,
-    const uint16_t stackSymbolsNumber)
+void EmptinessChecker::init(const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa)
 {
-    numOfStackSymbols = stackSymbolsNumber;
     numOfStates = vpa->getNumOfStates();
     generativeNonTerminals = std::queue<NonTerminal>{};
 

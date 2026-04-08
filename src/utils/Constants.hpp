@@ -26,13 +26,15 @@ namespace utils
 {
 namespace
 {
-constexpr uint16_t dummyValue{10};
 constexpr uint16_t maxValue{0xffff};
 } // namespace
 
 constexpr uint16_t MaxNumOfAutomatonStates{500};
 constexpr uint16_t MaxNumOfLetters{50};
 constexpr uint16_t MaxNumOfStackSymbols{50};
+
+constexpr uint16_t MaxNumOfRevealedWellMatchedWordsForSrsCheck{100};
+constexpr uint16_t MaxNumOfWellMatchedWordsForSrsCheck{40};
 
 constexpr uint16_t MaxNumOfCombinedAutomatonStates{maxValue};
 constexpr uint16_t MaxNumOfCombinedAutomatonLetters{maxValue};

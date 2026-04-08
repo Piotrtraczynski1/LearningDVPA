@@ -6,12 +6,13 @@
 namespace teacher
 {
 std::shared_ptr<common::Word> equivalenceCheck(
-    std::shared_ptr<teacher::Converter> converter,
+    std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
+    std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa)
 {
-    auto combinedVpa{converter->combineVPA(*vpa)};
+    auto combinedVpa{automataCombiner->combineVPA(*vpa)};
 
-    return converter->convertVpaToCfg(*combinedVpa);
+    return emptinessChecker->check(combinedVpa);
 }
 } // namespace teacher
 
@@ -22,7 +23,8 @@ std::shared_ptr<common::Word> equivalenceCheck(
 namespace teacher
 {
 std::shared_ptr<common::Word> equivalenceCheck(
-    std::shared_ptr<teacher::Converter> converter,
+    std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
+    [[maybe_unused]] std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa)
 {
     std::mt19937 rng(utils::equivalenceCheckSeed);
@@ -38,24 +40,24 @@ std::shared_ptr<common::Word> equivalenceCheck(
             switch (symbol)
             {
             case 0:
-                if (converter->numOfCalls != 0)
+                if (automataCombiner->numOfCalls != 0)
                 {
                     word += common::Word{common::symbol::CallSymbol{
-                        static_cast<uint16_t>(rng() % converter->numOfCalls)}};
+                        static_cast<uint16_t>(rng() % automataCombiner->numOfCalls)}};
                 }
                 break;
             case 1:
-                if (converter->numOfLocals != 0)
+                if (automataCombiner->numOfLocals != 0)
                 {
                     word += common::Word{common::symbol::LocalSymbol{
-                        static_cast<uint16_t>(rng() % converter->numOfLocals)}};
+                        static_cast<uint16_t>(rng() % automataCombiner->numOfLocals)}};
                 }
                 break;
             case 2:
-                if (converter->numOfReturns != 0)
+                if (automataCombiner->numOfReturns != 0)
                 {
                     word += common::Word{common::symbol::ReturnSymbol{
-                        static_cast<uint16_t>(rng() % converter->numOfReturns)}};
+                        static_cast<uint16_t>(rng() % automataCombiner->numOfReturns)}};
                 }
                 break;
             default:
@@ -71,7 +73,7 @@ std::shared_ptr<common::Word> equivalenceCheck(
         const uint16_t length{static_cast<uint16_t>(rng() % (utils::maxLengthRandomWord + 1))};
         std::shared_ptr<common::Word> testWord{generateRandomWord(length)};
 
-        if (converter->vpa->checkWord(*testWord) != vpa->checkWord(*testWord))
+        if (automataCombiner->vpa->checkWord(*testWord) != vpa->checkWord(*testWord))
         {
             return testWord;
         }

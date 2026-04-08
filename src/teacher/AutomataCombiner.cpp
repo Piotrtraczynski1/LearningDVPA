@@ -12,19 +12,17 @@ AutomataCombiner<Kind>::AutomataCombiner(
       numOfStackSymbols{stackSymbolsNumber} {};
 
 template <AutomatonKind Kind>
-std::unique_ptr<common::VPA<Kind>> AutomataCombiner<Kind>::combineVPA(
+std::shared_ptr<common::VPA<Kind>> AutomataCombiner<Kind>::combineVPA(
     const common::VPA<AutomatonKind::Normal> &hypothesis)
 {
-    TIME_MARKER("[Converter]: combineVPA");
+    TIME_MARKER("[AutomataCombiner]: combineVPA");
     transition = std::make_unique<common::transition::Transition<Kind>>();
 
     combinedVpaNumOfStates =
         static_cast<uint16_t>((vpa->numOfStates + 1) * (hypothesis.numOfStates + 1)); // +1 for sink
-    combinedVpaNumOfStackSymbols = static_cast<uint16_t>(
-        (numOfStackSymbols + 1) *
-        (numOfStackSymbols + 1)); // + 1 for bottom (numOfStackSymbols - 1 (Bottom) + 1 (Sink))
+    combinedVpaNumOfStackSymbols = (numOfStackSymbols + 1) * numOfStackSymbols;
 
-    LOG("[Converter]: combineVpa: numOfStates: %u, stackSymbolsNumber: %u",
+    LOG("[AutomataCombiner]: combineVpa: numOfStates: %u, stackSymbolsNumber: %u",
         combinedVpaNumOfStates + 1, combinedVpaNumOfStackSymbols);
 
     std::vector<uint16_t> acceptingStates{};
@@ -59,7 +57,7 @@ std::unique_ptr<common::VPA<Kind>> AutomataCombiner<Kind>::combineVPA(
 
     auto init = combineStates(vpa->initialState, hypothesis.initialState);
 
-    return std::make_unique<common::VPA<Kind>>(
+    return std::make_shared<common::VPA<Kind>>(
         std::move(transition), init, acceptingStates,
         static_cast<uint16_t>(combinedVpaNumOfStates + 1)); // +1 for poping stack state
 }

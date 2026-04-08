@@ -15,15 +15,14 @@ namespace teacher
 {
 template <AutomatonKind Kind>
 class AutomataCombiner;
-class Converter;
-class SrsChecker;
 class EmptinessChecker;
 } // namespace teacher
 
 namespace learner::srs
 {
 class SpecialSymbolAdder;
-}
+class SrsChecker;
+} // namespace learner::srs
 
 namespace common
 {
@@ -34,7 +33,6 @@ class VPA
     friend class teacher::AutomataCombiner<AutomatonKind::Combined>;
     friend class teacher::EmptinessChecker;
     friend class learner::srs::SrsChecker;
-    friend class teacher::Converter;
     friend class learner::srs::SpecialSymbolAdder;
 
     using Size = AutomatonSize<Kind>;

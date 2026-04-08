@@ -4,7 +4,8 @@
 
 #include "learner/srs/ConvertedAutomata.hpp"
 #include "learner/srs/SrsChecker.hpp"
-#include "teacher/Converter.hpp"
+#include "teacher/AutomataCombiner.hpp"
+#include "teacher/EmptinessChecker.hpp"
 #include "teacher/EquivalenceCheck.hpp"
 #include "utils/Constants.hpp"
 #include "utils/TimeMarker.hpp"
@@ -257,9 +258,12 @@ WellMatchedNode SrsChecker::makeIdentityNode()
 common::Word SrsChecker::checkEquivalence(
     const std::shared_ptr<ConvertedAutomata> convertedAutomata, const uint16_t specialSymbol)
 {
-    auto converter = std::make_shared<teacher::Converter>(
+    auto automataCombiner = std::make_shared<teacher::AutomataCombiner<AutomatonKind::Combined>>(
         convertedAutomata->lAutomaton, numOfCalls, numOfReturns, specialSymbol, numOfStackSymbols);
-    auto output = teacher::equivalenceCheck(converter, convertedAutomata->rAutomaton);
+    auto emptinessChecker = std::make_shared<teacher::EmptinessChecker>(
+        numOfCalls, numOfReturns, specialSymbol, numOfStackSymbols);
+    auto output = teacher::equivalenceCheck(
+        automataCombiner, emptinessChecker, convertedAutomata->rAutomaton);
 
     common::Symbol leftoverSymbol{common::symbol::ReturnSymbol{numOfReturns}};
     for (uint16_t i = 0; i < output->size(); i++)

@@ -83,9 +83,8 @@ void runExample()
     auto vpa = std::make_shared<common::VPA<AutomatonKind::Normal>>(
         std::move(transition), initialState, acceptingStates, numOfStates);
 
-    auto converter = std::make_shared<teacher::Converter>(
+    auto teacher = std::make_shared<teacher::Teacher>(
         vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
-    auto teacher = std::make_shared<teacher::Teacher>(vpa, converter);
 
     auto learner = std::make_shared<learner::Learner>(
         *teacher, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols, srs);

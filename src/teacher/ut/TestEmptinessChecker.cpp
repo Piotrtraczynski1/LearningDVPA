@@ -90,7 +90,7 @@ public:
     }
 
     std::unique_ptr<common::transition::Transition<AutomatonKind::Combined>> transition;
-    EmptinessChecker sut{numOfCalls, numOfReturns, numOfLocals};
+    EmptinessChecker sut{numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols};
 };
 
 TEST_F(TestEmptinessChecker, foursStatesAccept)
@@ -101,7 +101,7 @@ TEST_F(TestEmptinessChecker, foursStatesAccept)
 
     common::Word exptedExample{LocalSymbol{0}};
 
-    EXPECT_EQ(sut.check(vpa, numOfStackSymbols), exptedExample);
+    EXPECT_EQ(*sut.check(vpa), exptedExample);
 }
 
 TEST_F(TestEmptinessChecker, oneStateAccepts)
@@ -112,7 +112,7 @@ TEST_F(TestEmptinessChecker, oneStateAccepts)
 
     common::Word exptedExample{CallSymbol{1}, LocalSymbol{2}, ReturnSymbol{0}};
 
-    EXPECT_EQ(sut.check(vpa, numOfStackSymbols), exptedExample);
+    EXPECT_EQ(*sut.check(vpa), exptedExample);
 }
 
 TEST_F(TestEmptinessChecker, emptyLanguage)
@@ -123,7 +123,7 @@ TEST_F(TestEmptinessChecker, emptyLanguage)
 
     common::Word exptedExample{};
 
-    EXPECT_EQ(sut.check(vpa, numOfStackSymbols), exptedExample);
+    EXPECT_EQ(*sut.check(vpa), exptedExample);
 }
 
 } // namespace teacher

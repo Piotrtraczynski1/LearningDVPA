@@ -11,7 +11,6 @@ namespace teacher
 {
 template <AutomatonKind Kind>
 class AutomataCombiner;
-class Converter;
 class EmptinessChecker;
 } // namespace teacher
 
@@ -28,7 +27,6 @@ class Transition
     friend class teacher::AutomataCombiner<AutomatonKind::Normal>;
     friend class teacher::AutomataCombiner<AutomatonKind::Combined>;
     friend class teacher::EmptinessChecker;
-    friend class teacher::Converter;
     friend class learner::srs::SrsChecker;
 
     using Size = AutomatonSize<Kind>;

@@ -7,7 +7,6 @@ add_library(teacher STATIC
     AutomataCombiner.cpp
     EmptinessChecker.cpp
     Teacher.cpp
-    Converter.cpp
     EquivalenceCheck.cpp
 )
 

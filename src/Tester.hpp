@@ -72,7 +72,6 @@ private:
     uint16_t numOfReturns;
     uint16_t numOfStackSymbols;
 
-    std::shared_ptr<teacher::Converter> converter;
     std::shared_ptr<teacher::Teacher> teacher;
     std::shared_ptr<learner::Learner> learner;
 };

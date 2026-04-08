@@ -8,10 +8,6 @@ namespace teacher
 std::unique_ptr<VPA<AutomatonKind::Combined>> Converter::combineVPA(
     const VPA<AutomatonKind::Normal> &secondVpa)
 {
-    combinedVpaNumOfStackSymbols = static_cast<uint16_t>(
-        (numOfStackSymbols + 1) *
-        (numOfStackSymbols + 1)); // + 1 for bottom (numOfStackSymbols - 1 (Bottom) + 1 (Sink))
-
     return combiner.combineVPA(secondVpa);
 }
 
@@ -21,7 +17,7 @@ std::shared_ptr<common::Word> Converter::convertVpaToCfg(const VPA<AutomatonKind
     LOG("[Converter]: converting VPA to CFG");
 
     return std::make_shared<common::Word>(emptinessChecker.check(
-        std::make_shared<VPA<AutomatonKind::Combined>>(vpa), combinedVpaNumOfStackSymbols));
+        std::make_shared<VPA<AutomatonKind::Combined>>(vpa), numOfStackSymbols));
 }
 
 std::tuple<size_t, size_t> Converter::calculateEstimatedCfgSize()

@@ -8,6 +8,17 @@
 
 namespace teacher
 {
+Teacher::Teacher(
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> automaton, const uint16_t numCallsArg,
+    const uint16_t numReturnsArg, const uint16_t numLocalsArg, const uint16_t stackSymbolsNumber)
+    : vpa{automaton}
+{
+    automataCombiner = std::make_shared<teacher::AutomataCombiner<AutomatonKind::Combined>>(
+        automaton, numCallsArg, numReturnsArg, numLocalsArg, stackSymbolsNumber);
+    emptinessChecker = std::make_shared<teacher::EmptinessChecker>(
+        numCallsArg, numReturnsArg, numLocalsArg, stackSymbolsNumber);
+}
+
 bool Teacher::membershipQuery(const common::Word &word) const
 {
     TIME_MARKER("[Teacher]: membershipQuery");
@@ -29,7 +40,7 @@ std::shared_ptr<common::Word> Teacher::equivalenceQuery(
     TIME_MARKER("[Teacher]: equivalenceQuery");
     LOG("[Teacher]: equivalenceQuery hypothesis numOfStates: %u", hypothesis->getNumOfStates());
 
-    auto output = equivalenceCheck(converter, hypothesis);
+    auto output = equivalenceCheck(automataCombiner, emptinessChecker, hypothesis);
 
     if (output->size() == 0)
     {

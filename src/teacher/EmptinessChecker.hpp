@@ -25,16 +25,15 @@ class EmptinessChecker
     std::vector<std::vector<NonTerminal>> generativeByRightState;
 
 public:
-    EmptinessChecker(uint16_t numCallsArg, uint16_t numReturnsArg, uint16_t numLocalsArg);
+    EmptinessChecker(
+        const uint16_t numCallsArg, const uint16_t numReturnsArg, const uint16_t numLocalsArg,
+        const uint16_t numOfStackSymbolsArg);
 
-    common::Word check(
-        const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa,
-        const uint16_t stackSymbolsNumber);
+    std::shared_ptr<common::Word> check(
+        const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa);
 
 private:
-    void init(
-        const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa,
-        const uint16_t stackSymbolsNumber);
+    void init(const std::shared_ptr<common::VPA<AutomatonKind::Combined>> &vpa);
 
     void initParents(const common::VPA<AutomatonKind::Combined> &vpa);
 
