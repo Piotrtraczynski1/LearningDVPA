@@ -3,7 +3,7 @@ if(BUILD_TESTS)
 endif()
 
 add_library(srs STATIC
-    AutomataConverter.cpp
+    SpecialSymbolAdder.cpp
     SrsChecker.cpp
 )
 

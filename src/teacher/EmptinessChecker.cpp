@@ -58,7 +58,8 @@ void EmptinessChecker::init(
     numOfStates = vpa->getNumOfStates();
     generativeNonTerminals = std::queue<NonTerminal>{};
 
-    uint64_t maxNumOfNonTerminals{numOfStates * numOfStackSymbols * numOfStates};
+    uint64_t maxNumOfNonTerminals{
+        static_cast<uint64_t>(numOfStates) * numOfStackSymbols * numOfStates};
     generative.assign(maxNumOfNonTerminals, false);
     witnesses.assign(maxNumOfNonTerminals, Witness{});
 
@@ -82,7 +83,7 @@ void EmptinessChecker::initParents(const common::VPA<AutomatonKind::Combined> &v
             if (rightState != common::transition::State::INVALID)
             {
                 localParents[rightState].push_back(
-                    Parent{.state = leftState, .symbol = localSymbol});
+                    ParentStateAndSymbol{.state = leftState, .symbol = localSymbol});
             }
         }
 
@@ -94,7 +95,7 @@ void EmptinessChecker::initParents(const common::VPA<AutomatonKind::Combined> &v
             if (rightState != common::transition::State::INVALID)
             {
                 returnParents[rightState].push_back(
-                    Parent{.state = leftState, .symbol = returnSymbol});
+                    ParentStateAndSymbol{.state = leftState, .symbol = returnSymbol});
             }
         }
 
@@ -106,7 +107,7 @@ void EmptinessChecker::initParents(const common::VPA<AutomatonKind::Combined> &v
             {
                 // TODO add encoding funciton
                 callParents[coArg.state * numOfStackSymbols + coArg.stackSymbol].push_back(
-                    Parent{.state = leftState, .symbol = callSymbol});
+                    ParentStateAndSymbol{.state = leftState, .symbol = callSymbol});
             }
         }
     }

@@ -22,7 +22,7 @@ class EmptinessChecker;
 
 namespace learner::srs
 {
-class AutomataConverter;
+class SpecialSymbolAdder;
 }
 
 namespace common
@@ -35,7 +35,7 @@ class VPA
     friend class teacher::EmptinessChecker;
     friend class learner::srs::SrsChecker;
     friend class teacher::Converter;
-    friend class learner::srs::AutomataConverter;
+    friend class learner::srs::SpecialSymbolAdder;
 
     using Size = AutomatonSize<Kind>;
 

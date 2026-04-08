@@ -9,7 +9,7 @@ void CommentsGenerator::validateGeneratorConfig(
     uint16_t &numOfStates_, uint16_t &numOfCalls_, [[maybe_unused]] uint16_t &numOfLocals_,
     uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_)
 {
-    uint16_t adjustedNumOfStates{numOfStates * 2};
+    uint16_t adjustedNumOfStates{static_cast<uint16_t>(numOfStates * 2)};
     if (adjustedNumOfStates > utils::MaxNumOfAutomatonStates)
     {
         ERR("[CombinedGenerator]: numOfStates * 2 (%u) is greater than "
@@ -21,7 +21,7 @@ void CommentsGenerator::validateGeneratorConfig(
     LOG("[CombinedGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
     numOfStates_ = adjustedNumOfStates;
 
-    uint16_t adjustedNumOfStackSymbols{numOfStackSymbols + 1};
+    uint16_t adjustedNumOfStackSymbols{static_cast<uint16_t>(numOfStackSymbols + 1)};
     if (adjustedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
     {
         ERR("[CombinedGenerator]: numOfStackSymbols + 1 (%u) is "
@@ -34,7 +34,7 @@ void CommentsGenerator::validateGeneratorConfig(
     LOG("[CombinedGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
     numOfStackSymbols_ = adjustedNumOfStackSymbols;
 
-    uint16_t adjustedNumOfCalls{numOfCalls + 1};
+    uint16_t adjustedNumOfCalls{static_cast<uint16_t>(numOfCalls + 1)};
     if (adjustedNumOfCalls > utils::MaxNumOfLetters)
     {
         ERR("[CombinedGenerator]: numOfCalls + 1 (%u) is "
@@ -47,7 +47,7 @@ void CommentsGenerator::validateGeneratorConfig(
     LOG("[CombinedGenerator] adjusting numOfCalls to %u", adjustedNumOfCalls);
     numOfCalls_ = adjustedNumOfCalls;
 
-    uint16_t adjustedNumOfReturns{numOfReturns + 1};
+    uint16_t adjustedNumOfReturns{static_cast<uint16_t>(numOfReturns + 1)};
     if (adjustedNumOfReturns > utils::MaxNumOfLetters)
     {
         ERR("[CombinedGenerator]: numOfReturns + 1 (%u) is "
@@ -69,7 +69,7 @@ bool CommentsGenerator::generatorSpecificCheck(
 
 learner::srs::Srs CommentsGenerator::getSrs()
 {
-    return learner::srs::Srs{learner::srs::SrsRuleTmp{
+    return learner::srs::Srs{learner::srs::SrsRuleWithParams{
         .left =
             {.left = common::Word{common::symbol::CallSymbol{numOfCalls}},
              .right = common::Word{common::symbol::ReturnSymbol{numOfReturns}}},
@@ -93,7 +93,7 @@ void CommentsGenerator::addComments()
     const common::symbol::ReturnSymbol endComment{numOfReturns};
     for (uint16_t stateId = 0; stateId < numOfStates; stateId++)
     {
-        common::transition::State commentState{numOfStates + stateId};
+        common::transition::State commentState{static_cast<uint16_t>(numOfStates + stateId)};
 
         transition->add(
             common::transition::State{stateId}, startComment, commentState, stackSymbolComment);

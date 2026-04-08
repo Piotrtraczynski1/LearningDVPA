@@ -1,9 +1,5 @@
-add_library(scenario STATIC
-    ../../Tester.cpp
-    ./increasingNumOfStates/IncreasingNumOfStatesBase.cpp
-    ./increasingNumOfStates/IncreasingNumOfStatesAndCalls.cpp
-    ./increasingNumOfStates/IncreasingNumOfStatesAndReturns.cpp
-    ./increasingNumOfStates/IncreasingNumOfStatesAndLocals.cpp
-)
+add_subdirectory(increasingNumOfStates)
 
-target_link_libraries(scenario PRIVATE utils common generator learner teacher)
+add_library(scenario INTERFACE)
+
+target_link_libraries(scenario INTERFACE increasingNumOfStates)

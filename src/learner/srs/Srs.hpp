@@ -6,7 +6,7 @@
 
 namespace learner::srs
 {
-struct SrsRuleTmp
+struct SrsRuleWithParams
 {
     struct Side
     {
@@ -15,15 +15,15 @@ struct SrsRuleTmp
         bool takesParams{true};
     };
 
-    Side left;
-    Side right;
+    Side left{};
+    Side right{};
 };
 
 struct SrsRule
 {
-    common::Word left;
-    common::Word right;
+    common::Word left{};
+    common::Word right{};
 };
 
-using Srs = std::vector<SrsRuleTmp>;
+using Srs = std::vector<SrsRuleWithParams>;
 } // namespace learner::srs

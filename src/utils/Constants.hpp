@@ -6,9 +6,12 @@
 
 namespace utils
 {
-constexpr uint16_t MaxNumOfAutomatonStates{100};
-constexpr uint16_t MaxNumOfLetters{50};
-constexpr uint16_t MaxNumOfStackSymbols{40};
+constexpr uint16_t MaxNumOfAutomatonStates{30};
+constexpr uint16_t MaxNumOfLetters{30};
+constexpr uint16_t MaxNumOfStackSymbols{30};
+
+constexpr uint16_t MaxNumOfRevealedWellMatchedWordsForSrsCheck{100};
+constexpr uint16_t MaxNumOfWellMatchedWordsForSrsCheck{40};
 
 constexpr uint16_t MaxNumOfCombinedAutomatonStates{
     (MaxNumOfAutomatonStates + 2) * (MaxNumOfAutomatonStates + 1) + 2};

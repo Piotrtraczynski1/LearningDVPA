@@ -279,45 +279,45 @@ using Accepting = std::vector<uint16_t>;
 const std::vector<TestSrsCheckerParams> testSrsCheckerParams{
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{L{0}}, .right = W{L{1}}}}
+            SrsRuleWithParams{.right = {.left = W{L{0}}, .right = W{L{1}}}}
         },
         .acceptingStates = {1, 2}
     }, 
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{C{0}}, .right = W{R{0}}}}
+            SrsRuleWithParams{.right = {.left = W{C{0}}, .right = W{R{0}}}}
         },
         .acceptingStates = {0, 4}
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .right = W{R{0}, R{0}, R{0}, R{0}, R{0}}}}
+            SrsRuleWithParams{.right = {.left = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .right = W{R{0}, R{0}, R{0}, R{0}, R{0}}}}
         },
         .acceptingStates = {0, 1, 2, 3, 4}
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .right = W{R{0}, R{0}, R{0}, R{0}, R{0}}}}
+            SrsRuleWithParams{.right = {.left = W{C{0}, C{0}, C{0}, C{0}, C{0}}, .right = W{R{0}, R{0}, R{0}, R{0}, R{0}}}}
         },
         .acceptingStates = {5}
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{L{1}}, .right = W{L{2}}}}
+            SrsRuleWithParams{.right = {.left = W{L{1}}, .right = W{L{2}}}}
         },
         .acceptingStates = {0, 1, 2, 3, 4, 5},
         .acceptingEmpty = true
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{L{1}}, .right = W{L{2}}}}
+            SrsRuleWithParams{.right = {.left = W{L{1}}, .right = W{L{2}}}}
         },
         .acceptingStates = {},
         .rejectingEmpty = true
     },
     TestSrsCheckerParams{
         .srs = Srs{
-            SrsRuleTmp{.right = SrsRuleTmp::Side{.left = W{}, .right = W{}}}
+            SrsRuleWithParams{.right = {.left = W{}, .right = W{}}}
         },
         .acceptingStates = {1, 3, 4},
         .rejectingEmpty = true,

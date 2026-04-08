@@ -6,6 +6,7 @@
 #include "learner/srs/SrsChecker.hpp"
 #include "teacher/Converter.hpp"
 #include "teacher/EquivalenceCheck.hpp"
+#include "utils/Constants.hpp"
 #include "utils/TimeMarker.hpp"
 #include "utils/log.hpp"
 
@@ -22,15 +23,20 @@ SrsChecker::SrsChecker(
 
 common::Word SrsChecker::check(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
+    if (srs.empty())
+    {
+        return common::Word{};
+    }
+
     TIME_MARKER("[SrsChecker]: check consistency with SRS");
     LOG("[SrsChecker]: check consistency with SRS");
 
-    converter = std::make_shared<AutomataConverter>(hypothesis);
+    specialSymbolAdder = std::make_shared<SpecialSymbolAdder>(hypothesis);
     specialSymbolToRule.clear();
     prepareWellMatchedWords(hypothesis);
     uint16_t specialSymbol{buildConvertedAutomata()};
 
-    auto convertedAutomata{converter->getConvertedAutomata()};
+    auto convertedAutomata{specialSymbolAdder->getConvertedAutomata()};
     auto word{checkEquivalence(convertedAutomata, specialSymbol)};
 
     if (word != emptyWord)
@@ -54,7 +60,7 @@ uint16_t SrsChecker::buildConvertedAutomata()
                         rule.left.right,
                 .right = rule.right.left + (rule.right.takesParams ? word : common::Word{}) +
                          rule.right.right};
-            converter->addNewRule(specialSymbol, srsRule);
+            specialSymbolAdder->addNewRule(specialSymbol, srsRule);
             specialSymbolToRule[specialSymbol] = srsRule;
             specialSymbol++;
             if (specialSymbol == utils::MaxNumOfLetters)
@@ -77,7 +83,7 @@ void SrsChecker::prepareWellMatchedWords(
     numOfStates = hypothesis->getNumOfStates();
     minScore = numOfStates;
 
-    auto candidates = std::make_unique<std::queue<Node>>();
+    auto candidates = std::make_unique<std::queue<WellMatchedNode>>();
     candidates->push(makeIdentityNode());
     nodes.push_back(candidates->front());
 
@@ -92,9 +98,10 @@ void SrsChecker::prepareWellMatchedWords(
         }
     }
 
-    while (not candidates->empty() and numOfRevealedNodes < MaxNumOfRevealedNodes)
+    while (not candidates->empty() and
+           numOfRevealedNodes < utils::MaxNumOfRevealedWellMatchedWordsForSrsCheck)
     {
-        Node node{candidates->front()};
+        WellMatchedNode node{candidates->front()};
         candidates->pop();
 
         for (uint16_t callId = 0; callId < numOfCalls; callId++)
@@ -131,7 +138,7 @@ void SrsChecker::prepareWellMatchedWords(
     LOG("[SrsChecker]: prepared %lu well-matched words", wellMatchedWords.size());
 }
 
-SrsChecker::Node SrsChecker::makeLocalNode(
+WellMatchedNode SrsChecker::makeLocalNode(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const uint16_t localId)
 {
     std::vector<uint16_t> nextState(numOfStates, common::transition::State::INVALID);
@@ -144,11 +151,11 @@ SrsChecker::Node SrsChecker::makeLocalNode(
         nextState[state] = hypothesis->state;
     }
 
-    return Node{.nextState = nextState, .word = word};
+    return WellMatchedNode{.nextState = nextState, .word = word};
 }
 
-SrsChecker::Node SrsChecker::wrapNode(
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const Node &node,
+WellMatchedNode SrsChecker::wrapNode(
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const WellMatchedNode &node,
     const uint16_t callId, const uint16_t returnId)
 {
     std::vector<uint16_t> nextState(numOfStates, common::transition::State::INVALID);
@@ -163,10 +170,11 @@ SrsChecker::Node SrsChecker::wrapNode(
         nextState[state] = hypothesis->state;
     }
 
-    return Node{.nextState = nextState, .word = word};
+    return WellMatchedNode{.nextState = nextState, .word = word};
 }
 
-SrsChecker::Node SrsChecker::composeNodes(const Node &firstNode, const Node &secondNode)
+WellMatchedNode SrsChecker::composeNodes(
+    const WellMatchedNode &firstNode, const WellMatchedNode &secondNode)
 {
     std::vector<uint16_t> nextState(numOfStates, common::transition::State::INVALID);
 
@@ -179,10 +187,10 @@ SrsChecker::Node SrsChecker::composeNodes(const Node &firstNode, const Node &sec
         nextState[state] = secondNode.nextState[firstNode.nextState[state]];
     }
 
-    return Node{.nextState = nextState, .word = firstNode.word + secondNode.word};
+    return WellMatchedNode{.nextState = nextState, .word = firstNode.word + secondNode.word};
 }
 
-bool SrsChecker::tryInsertNode(Node &newNode)
+bool SrsChecker::tryInsertNode(WellMatchedNode &newNode)
 {
     calcScore(newNode);
     if (newNode.score == 0)
@@ -190,7 +198,7 @@ bool SrsChecker::tryInsertNode(Node &newNode)
         return false;
     }
 
-    if (nodes.size() < MaxNumOfNodes)
+    if (nodes.size() < utils::MaxNumOfWellMatchedWordsForSrsCheck)
     {
         nodes.push_back(newNode);
         minScore = std::min(minScore, newNode.score);
@@ -230,7 +238,7 @@ uint16_t SrsChecker::calcDist(
     return dist;
 }
 
-void SrsChecker::calcScore(Node &newNode)
+void SrsChecker::calcScore(WellMatchedNode &newNode)
 {
     newNode.score = numOfStates;
     for (const auto &node : nodes)
@@ -239,11 +247,11 @@ void SrsChecker::calcScore(Node &newNode)
     }
 }
 
-SrsChecker::Node SrsChecker::makeIdentityNode()
+WellMatchedNode SrsChecker::makeIdentityNode()
 {
     std::vector<uint16_t> next(numOfStates);
     std::iota(next.begin(), next.end(), 0);
-    return Node{.nextState = next, .word = common::Word{}, .score = numOfStates};
+    return WellMatchedNode{.nextState = next, .word = common::Word{}, .score = numOfStates};
 }
 
 common::Word SrsChecker::checkEquivalence(

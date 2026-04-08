@@ -955,11 +955,11 @@ public:
 
         srs::Srs srs{};
         srs.push_back(
-            srs::SrsRuleTmp{
+            srs::SrsRuleWithParams{
                 .left = {.left{LS{0}, LS{1}, LS{0}}, .takesParams = false},
                 .right = {.takesParams = false}});
         srs.push_back(
-            srs::SrsRuleTmp{
+            srs::SrsRuleWithParams{
                 .left = {.left = {LS{1}}, .takesParams = false}, .right = {.takesParams = false}});
         init(srs);
     }

@@ -2,11 +2,11 @@
 
 #include "common/transition/State.hpp"
 #include "common/transition/Transition.hpp"
-#include "learner/srs/AutomataConverter.hpp"
+#include "learner/srs/SpecialSymbolAdder.hpp"
 
 namespace learner::srs
 {
-AutomataConverter::AutomataConverter(
+SpecialSymbolAdder::SpecialSymbolAdder(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis)
     : numOfStates{hypothesis->getNumOfStates()}
 {
@@ -18,19 +18,18 @@ AutomataConverter::AutomataConverter(
         std::make_shared<common::VPA<AutomatonKind::Normal>>(*hypothesis);
 }
 
-void AutomataConverter::addNewRule(
-    const uint16_t specialSymbol, const SrsRule &srsRule)
+void SpecialSymbolAdder::addNewRule(const uint16_t specialSymbol, const SrsRule &srsRule)
 {
     addTransitionsForSpecialSymbol(convertedAutomata->lAutomaton, srsRule.left, specialSymbol);
     addTransitionsForSpecialSymbol(convertedAutomata->rAutomaton, srsRule.right, specialSymbol);
 }
 
-std::shared_ptr<ConvertedAutomata> AutomataConverter::getConvertedAutomata()
+std::shared_ptr<ConvertedAutomata> SpecialSymbolAdder::getConvertedAutomata()
 {
     return convertedAutomata;
 }
 
-void AutomataConverter::addTransitionsForSpecialSymbol(
+void SpecialSymbolAdder::addTransitionsForSpecialSymbol(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> &automaton, const common::Word &word,
     const uint16_t specialSymbol)
 {

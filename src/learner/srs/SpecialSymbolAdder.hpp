@@ -10,13 +10,13 @@
 
 namespace learner::srs
 {
-class AutomataConverter
+class SpecialSymbolAdder
 {
     std::shared_ptr<ConvertedAutomata> convertedAutomata;
     const uint16_t numOfStates;
 
 public:
-    AutomataConverter(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis);
+    SpecialSymbolAdder(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis);
 
     void addNewRule(const uint16_t specialSymbol, const SrsRule &srsRule);
 

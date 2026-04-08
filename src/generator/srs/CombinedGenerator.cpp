@@ -11,7 +11,7 @@ void CombinedGenerator::validateGeneratorConfig(
     [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
     uint16_t &numOfStackSymbols_)
 {
-    uint16_t adjustedNumOfStates{(numOfStates + 1) * (numOfStates + 1)};
+    uint16_t adjustedNumOfStates{static_cast<uint16_t>((numOfStates + 1) * (numOfStates + 1))};
     if (adjustedNumOfStates > utils::MaxNumOfAutomatonStates)
     {
         ERR("[CombinedGenerator]: (numOfStates + 1) * (numOfStates + 1) (%u) is greater than "
@@ -23,7 +23,8 @@ void CombinedGenerator::validateGeneratorConfig(
     LOG("[CombinedGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
     numOfStates_ = adjustedNumOfStates;
 
-    uint16_t adjustedNumOfStackSymbols{(numOfStackSymbols + 1) * (numOfStackSymbols + 1)};
+    uint16_t adjustedNumOfStackSymbols{
+        static_cast<uint16_t>((numOfStackSymbols + 1) * (numOfStackSymbols + 1))};
     if (adjustedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
     {
         ERR("[CombinedGenerator]: (numOfStackSymbols + 1) * (numOfStackSymbols + 1) (%u) is "
@@ -198,6 +199,8 @@ bool CombinedGenerator::firstVpaPredicate(const common::Symbol &symbol)
         return localId < localSplitPoint;
     }
     }
+    ERR("[CombinedGenerator] invalid symbol!");
+    return false;
 }
 
 bool CombinedGenerator::secondVpaPredicate(const common::Symbol &symbol)
@@ -220,6 +223,8 @@ bool CombinedGenerator::secondVpaPredicate(const common::Symbol &symbol)
         return localId >= localSplitPoint;
     }
     }
+    ERR("[CombinedGenerator] invalid symbol!");
+    return false;
 }
 
 learner::srs::Srs CombinedGenerator::getSrs()
@@ -236,7 +241,7 @@ learner::srs::Srs CombinedGenerator::getSrs()
                      secondReturn++)
                 {
                     srs.push_back(
-                        learner::srs::SrsRuleTmp{
+                        learner::srs::SrsRuleWithParams{
                             .left =
                                 {.left =
                                      {common::Word{common::symbol::CallSymbol{firstCall}} +
@@ -257,4 +262,4 @@ learner::srs::Srs CombinedGenerator::getSrs()
 
     return srs;
 }
-} // namespace generator
+} // namespace generator::srs

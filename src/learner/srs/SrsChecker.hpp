@@ -6,27 +6,18 @@
 
 #include "common/VPA.hpp"
 #include "common/Word.hpp"
-#include "learner/srs/AutomataConverter.hpp"
+#include "learner/srs/SpecialSymbolAdder.hpp"
 #include "learner/srs/Srs.hpp"
+#include "learner/srs/WellMatchedNode.hpp"
 #include "teacher/Teacher.hpp"
 
 namespace learner::srs
 {
 class SrsChecker
 {
-    static constexpr uint16_t MaxNumOfRevealedNodes{100};
-    static constexpr uint16_t MaxNumOfNodes{40};
-
-    struct Node
-    {
-        std::vector<uint16_t> nextState;
-        common::Word word;
-        uint16_t score;
-    };
-
     const Srs srs;
     const teacher::Teacher &oracle;
-    std::shared_ptr<AutomataConverter> converter;
+    std::shared_ptr<SpecialSymbolAdder> specialSymbolAdder;
     std::unordered_map<uint16_t, SrsRule> specialSymbolToRule;
 
     const uint16_t numOfCalls;
@@ -36,7 +27,7 @@ class SrsChecker
     uint16_t numOfStates{};
 
     std::vector<common::Word> wellMatchedWords{};
-    std::vector<Node> nodes{};
+    std::vector<WellMatchedNode> nodes{};
     uint16_t minScore{};
 
     const common::Word emptyWord{};
@@ -57,22 +48,23 @@ private:
 
     void prepareWellMatchedWords(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
 
-    Node makeLocalNode(
+    uint16_t calcDist(const std::vector<uint16_t> &first, const std::vector<uint16_t> &second);
+    void calcScore(WellMatchedNode &newNode);
+    WellMatchedNode makeIdentityNode();
+    bool tryInsertNode(WellMatchedNode &newNode);
+
+    WellMatchedNode makeLocalNode(
         std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const uint16_t localId);
-    Node wrapNode(
-        std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const Node &node,
+    WellMatchedNode wrapNode(
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const WellMatchedNode &node,
         const uint16_t callId, const uint16_t returnId);
-    Node composeNodes(const Node &firstNode, const Node &secondNode);
+    WellMatchedNode composeNodes(
+        const WellMatchedNode &firstNode, const WellMatchedNode &secondNode);
 
     common::Word checkEquivalence(
         const std::shared_ptr<ConvertedAutomata> convertedAutomata, const uint16_t specialSymbol);
     common::Word prepareCounterexample(
         const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
         const common::Word &word);
-
-    uint16_t calcDist(const std::vector<uint16_t> &first, const std::vector<uint16_t> &second);
-    void calcScore(Node &newNode);
-    Node makeIdentityNode();
-    bool tryInsertNode(Node &newNode);
 };
 } // namespace learner::srs

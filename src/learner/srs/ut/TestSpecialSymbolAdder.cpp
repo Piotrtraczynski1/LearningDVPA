@@ -2,14 +2,14 @@
 #include <memory>
 #include <vector>
 
-#include "learner/srs/AutomataConverter.hpp"
+#include "learner/srs/SpecialSymbolAdder.hpp"
 
 using namespace common::symbol;
 using common::transition::State;
 
 namespace learner::srs
 {
-class TestAutomataConverter : public ::testing::Test
+class TestSpecialSymbolAdder : public ::testing::Test
 {
 public:
     void SetUp() override
@@ -19,7 +19,7 @@ public:
 
         hypothesis = std::make_shared<common::VPA<AutomatonKind::Normal>>(
             std::move(transition), initialState, acceptingStates, numOfStates);
-        sut = std::make_shared<AutomataConverter>(hypothesis);
+        sut = std::make_shared<SpecialSymbolAdder>(hypothesis);
     }
 
     void initTransition()
@@ -94,10 +94,10 @@ public:
 
     std::vector<common::Word> prefixes{};
 
-    std::shared_ptr<AutomataConverter> sut;
+    std::shared_ptr<SpecialSymbolAdder> sut;
 };
 
-TEST_F(TestAutomataConverter, defaultTest1)
+TEST_F(TestSpecialSymbolAdder, defaultTest1)
 {
     SrsRule rule{
         .left = common::Word{LocalSymbol{0}, LocalSymbol{1}},
@@ -108,7 +108,7 @@ TEST_F(TestAutomataConverter, defaultTest1)
     testResult(*convertedAutomata, rule);
 }
 
-TEST_F(TestAutomataConverter, defaultTest2)
+TEST_F(TestSpecialSymbolAdder, defaultTest2)
 {
     SrsRule rule{
         .left = common::Word{CallSymbol{0}, LocalSymbol{0}, LocalSymbol{1}, ReturnSymbol{0}},

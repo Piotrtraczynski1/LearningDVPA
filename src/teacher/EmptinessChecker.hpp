@@ -5,45 +5,22 @@
 #include <tuple>
 
 #include "common/VPA.hpp"
+#include "teacher/NonTerminal.hpp"
+#include "teacher/ParentStateAndSymbol.hpp"
+#include "teacher/Witness.hpp"
 
 namespace teacher
 {
-
-using NonTerminal = uint64_t;
-
 class EmptinessChecker
 {
     std::queue<NonTerminal> generativeNonTerminals;
 
-    enum class WitnessKind
-    {
-        Call = 0,
-        Return = 1,
-        ReturnBottom = 2,
-        Local = 3,
-        Empty = 4
-    };
-
-    struct Witness
-    {
-        WitnessKind kind;
-        uint16_t symbol;
-        NonTerminal firstChild;
-        NonTerminal secondChild;
-    };
-
-    struct Parent
-    {
-        uint16_t state;
-        uint16_t symbol;
-    };
-
     std::vector<bool> generative;
     std::vector<Witness> witnesses;
 
-    std::vector<std::vector<Parent>> localParents;
-    std::vector<std::vector<Parent>> returnParents;
-    std::vector<std::vector<Parent>> callParents;
+    std::vector<std::vector<ParentStateAndSymbol>> localParents;
+    std::vector<std::vector<ParentStateAndSymbol>> returnParents;
+    std::vector<std::vector<ParentStateAndSymbol>> callParents;
     std::vector<std::vector<NonTerminal>> generativeByLeftState;
     std::vector<std::vector<NonTerminal>> generativeByRightState;
 
