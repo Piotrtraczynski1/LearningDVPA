@@ -6,7 +6,6 @@
     \item Implementacja została wykonana w języku C++ z wykorzystaniem standardu C++20 przy użyciu kompilatora GCC w wersji 13.3.0.
     \item Projekt budowany jest przy użyciu systemu budowania \texttt{CMake}.
     \item Testy jednostkowe zaimplementowano przy użyciu biblioteki \texttt{GoogleTest} w wersji 1.14.0.
-    \item Do pomiarów wydajności wykorzystano bibliotekę \texttt{Google Benchmark} w wersji 1.9.1.
     \item Program był rozwijany i testowany w systemie operacyjnym Ubuntu 24.04.
 \end{itemize}
 
@@ -18,15 +17,21 @@ znajdują się w katalogu \texttt{path/ut/} pod nazwą \texttt{TestFile.cpp}.
 \begin{verbatim}
 workspace/
 |-- src/
-|   |-- benchmark/              # punkt wejścia programu benchmarkującego
+|   |-- benchmark/              # framework benchmarkujący 
+|   |                             i zestawy scenariuszy testowych
 |   |-- common/                 # podstawowe struktury danych
-|   |-- failedTests/            # szczegóły testów zakończonych niepowodzeniem
+|   |-- failedTests/            # szczegóły testów zakończonych
+|   |                             niepowodzeniem
 |   |-- generator/              # generatory automatów testowych
+|   |-- helper/                 # pomocnicze klasy do obsługi 
+|   |                             danych wejściowych
 |   |-- learner/                # implementacja algorytmu ucznia
 |   |-- teacher/                # implementacja nauczyciela
 |   |-- utils/                  # dodatkowe narzędzia użyte w projekcie
-|   |-- Tester.hpp              # klasa odpowiedzialna za uruchamianie testów
-|   |-- TesterParameters.hpp    # parametry służące do konfigurowania testów
+|   |-- Tester.hpp              # klasa odpowiedzialna za uruchamianie
+|   |                             testów
+|   |-- TesterParameters.hpp    # parametry służące do konfigurowania
+|   |                             testów
 |   |-- main.cpp                # punkt wejścia programu
 |-- build.sh                    # skrypt służący do budowania
 |-- CMakeLists.txt              # konfiguracja systemu budowania
@@ -34,7 +39,7 @@ workspace/
 
 \section{Struktury danych}
 
-W tej sekcji przedstawiono kluczowe struktury danych wykorzystywane w implementacji algorytmu. Struktury te zostały zdefiniowane w module \texttt{common}.
+W tej sekcji przedstawiono kluczowe struktury danych wykorzystywane w implementacji algorytmu. Struktury te w większości zostały zdefiniowane w module \texttt{common}.
 
 \textbf{Alfabet wejściowy} jest reprezentowany za pomocą trzech typów wyliczeniowych: \texttt{CallSymbol}, \texttt{LocalSymbol}
 oraz \texttt{ReturnSymbol}. Dzięki temu możliwe jest reprezentowanie dowolnego alfabetu
@@ -45,7 +50,7 @@ oznaczającą liczność poszczególnych zbiorów symboli.
 
 \textbf{Zbiór symboli stosowych} jest reprezentowany za pomocą typu wyliczeniowego \texttt{StackSymbol}.
 Symbol $\bot$ jest oznaczany poprzez wartość 0. Zbiór symboli stosowych musi zawierać co najmniej jeden element
-reprezentujący symbol dna stosu. Jeśli $|\Sigma_{call}| > 0$ wymagane jest, żeby ten zbiór zawierał przynajmniej 2 elementy.
+reprezentujący symbol dna stosu. Jeśli $|\Sigma_{call}| > 0$ wymagane jest, żeby zbiór symboli stosowych zawierał przynajmniej 2 elementy.
 
 \textbf{Zbiór stanów automatu} również jest reprezentowany w postaci typu wyliczeniowego \texttt{State}.
 
@@ -71,7 +76,7 @@ State localT[MaxNumOfStates][MaxNumOfLetters];
 \end{verbatim}
 
 Tablice są inicjalizowane specjalnymi wartościami, które nie należą do alfabetu wejściowego,
-ani zbioru symboli stosowych i reprezentują przejście do stanu \texttt{sink}.
+ani zbioru symboli stosowych i reprezentują one przejście do stanu \texttt{sink}.
 
 
 \textbf{Deterministyczny automat visibly pushdown} reprezentowany jest jako klasa \texttt{VPA} która przechowuje zbiór stanów automatu $Q$,
@@ -79,17 +84,35 @@ stan początkowy $q_0$, zbiór stanów akceptujących $F$ i funkcję przejścia 
 przechowywane jawnie w strukturze automatu, ponieważ ich reprezentacja wynika z parametrów funkcji przejścia. Wczytanie liter z poza
 alfabetu nie generuje błędu, lecz prowadzi do stanu \texttt{sink}.
 
-\textbf{String rewriting system} jest reprezentowany jako wektor reguł typu \texttt{SrsRule}, z których każda składa się z pary słów.
+\textbf{String rewriting system} jest reprezentowany jako wektor reguł typu \texttt{SrsRule\-With\-Params}, z których każda składa się z pary
+następujących struktur:
+\begin{verbatim}
+struct Side
+{
+    common::Word left{};
+    common::Word right{};
+    bool takesParams{true};
+};
+\end{verbatim}
+    
 
 \section{Moduły projektu}
 
 \subsection{Learner}
 \begin{verbatim}
-teacher/
-|-- AutomataGenerator.hpp   # generator automatu na podstawie S i C
-|-- Learner.hpp             # algorytm ucznia
-|-- Selectors.hpp           # zbiór selektorów
-|-- TestWords.hpp           # zbiór słów testowych
+learner/
+|-- AutomataGenerator.hpp       # generator automatu na podstawie
+|                                 zbiorów S oraz C
+|-- Learner.hpp                 # algorytm ucznia
+|-- Selectors.hpp               # zbiór selektorów
+|-- TestWords.hpp               # zbiór słów testowych
+|-- srs/
+    |-- SpecialSymbolAdder.hpp  # dodaje nowe symbole lokalne
+    |                             na podstawie reguł SRS
+    |-- SrsChecker.hpp          # obsługuje sprawdzenie zgodności
+    |                             hipotezy z systemem SRS
+    |-- WellMatchedNode.hpp     # pomocniczna struktura do wyboru
+                                  słów dobrze zbalansowanych
 \end{verbatim}
 
 Jest to moduł w który zawiera implementacje algorytmu ucznia. Zaczyna działanie od zainicjalizowania zbiorów $S$ i $C$,
@@ -111,56 +134,98 @@ Jeśli niezgodność zostanie wykryta na podstawie różnicy w akceptacji słowa
 jako wymuszony następnik automatu w konfiguracji otrzymanej po przeczytaniu słowa $v$, dla litery $a$.
 Pozwala to wykluczyć to przejście, w przypadku gdyby pozostało nieokreślone na podstawie procedury generowania automatu.
 
-\textbf{Generowanie automatu} odbywa się poprzez interfejs klasy \texttt{AutomataGenerator}. Przeplata ona procedure generowania automatu
-razem z ustawianiem nieokreślonych przejść. Procedura iteruje po zbiorze selektorów konstruując funkcje przejścia, jednocześnie uzupełnia
-tablice \texttt{witnesses}, w której dla każdego selektora zapisywany jest jeden świadek, który świadczy o osiągalności pewnej konfiguracji.
+\textbf{Generowanie automatu} odbywa się poprzez interfejs klasy \texttt{Automata\-Genera\-tor}. Przeplata ona procedure generowania automatu
+razem z ustawianiem nieokreślonych przejść.
+Informacja o akceptacji poszczególnych stanów, jest zapisywana i utrzymywana w zbiorze selektorów,
+ponieważ nie wymaga ponownego przeliczania pomiędzy iteracjami algorytmu.
+Procedura iteruje po zbiorze selektorów konstruując funkcje przejścia w następujący sposób:
 
 \begin{enumerate}
     \item Dla każdego symbolu call oraz local sprawdzane jest czy istnieje poprawny następnik w zbiorze selektorów,
     wybierając pierwszego napotkanego. Jeśli taki nie istnieje to zbiór selektorów jest rozszerzany o nowy element.
 
     \item Dla każdego symbolu return oraz każdego symbolu stosowego sprawdzane jest czy istnieje poprawny następnik.
-    Jeśli nie istnieje to sprawdzamy, czy ta konfiguracja jest osiągalna na podstawie tablic \texttt{witnesses},
-    co umożliwiłoby rozszerzenie zbioru selektorów. Jeśli nie istnieje poprawny następnik oraz świadek świadczący o osiągalności,
-    to wybierany jest następnik na podstawie tablicy \texttt{forcedSelector}. Domyślnie wpisy w tej tablicy są zainicjalizowane zerami,
-    co skutkuje przejściem do stanu $\epsilon$. Jednak jeśli w trakcie obsługi kontrprzykładu przejście to było uznane za błędne,
+    Jeśli nie istnieje to sprawdzamy, czy ta konfiguracja jest osiągalna na podstawie zapytania $SC_T(s)$, gdzie $s$
+    jest aktualnie rozważanym selektorem. Jeżeli konfiguracja jest osiągalna to zbiór selektorów jest rozszerzany o
+    nowy element. W przeciwnym przypadku wybierany jest następnik na podstawie tablicy \texttt{forcedSelector}.
+    Domyślnie wpisy w tej tablicy są zainicjalizowane zerami, co skutkuje przejściem do stanu $\epsilon$.
+    Jednak jeśli w trakcie obsługi kontrprzykładu przejście to było uznane za błędne,
     to znajduje się w niej stan, który jest poprawnym następnikiem. 
 \end{enumerate}
+
+\subsection{SRS}
+
+Klasa \texttt{SrsChecker} utrzymuje system SRS podany jako podpowiedź do algorytmu uczenia. Metoda \texttt{check} przyjmuje hipoteze i 
+sprawdza jej zgodność z systemem. Na początku algorytm na podstawie hipotezy konstruuje dobrze zbalansowane słowa, których ilość jest ograniczona
+poprzez maksymalną ilość liter obsługiwaną przez automat \texttt{MaxNumOfLetters} oraz paramter konfiguracyjny \texttt{MaxNumOfWell\-Mat\-ched\-Words\-ForSrsCheck}.
+
+\paragraph{Wybór słów dobrze zbalansowanych}
+
+Każde dobrze zbalansowane słowo $w$ jest skojarzone z listą następników o rozmiarze równym ilości stanów hipotezy, $n$-ty element listy określa stan w jakim znajdzie się
+hipoteza po przeczytaniu słowa $w$ zaczynając w $n$-tym stanie. Dystans pomiędzy dwoma słowami oznacza ilość pozycji na którch ich listy następników są różne.
+Podczas dodawania nowego słowa do wynikowego zbioru słów dobrze zbalansowanych obliczana jest jego wartość, jako minimalny dystans od
+już zawartych w tym zbiorze słów. Na podstawie tej wartości, algorytm decyduje, które słowa należy usunąć gdy zbiór ma zbyt wiele elementów.
+
+Początkowo zaczyna od zainicjalizowania zbioru słowem pustym, oraz słowami składającymi się z pojedynczych liter typu local. Następnie algorytmem w stylu BFS
+dodaje nowe elementy do zbioru jeśli ich wartość jest nie zerowa. Nowe elementy są tworzone na podstawie dwóch typów operacji:
+
+\begin{enumerate}
+    \item Składanie słów podczas rozważania słowa $w$ polega na rozważaniu słowa $wv$, dla każdego $v$ ze zbioru dobrze zbalansowanych słów. obliczenie
+            listy następników również jest złożeniem list skojarzonych z obydwoma słowami.
+    \item Owijanie słowa $w$ polega na rozważaniu słowa $cwr$, gdzie $c \in \Sigma_{call}$ oraz $r \in \Sigma_{return}$.
+\end{enumerate}
+
+\paragraph{Budowanie automatów}
+
+Następnie tworzone są dwie kopie hipotezy $H_l$ oraz $H_r$. Po czy dla każdego słowa $w$ ze zbioru słów dobrze zbalansowanych oraz każdej reguły SRS postaci
+$l_1Xl_2 \rightarrow r_1Xr_2$ rozszerzamy zbiór $\Sigma_{local}$ dla obydwu automatów $H_l$ oraz $H_r$ o nową litere oraz określamy przejścia dla tej litery,
+które w automacie $H_l$ odpowiadają przejścią po słowie $l_1wl_2$ w hioptezie, a w automacie $H_r$ przejścią po słowie $r_1wr_2$. Dla nowo dodanej litery,
+użyta reguła SRS zostaje zapisana w celu konstrukcji kontrprzykładu nie zawierającego liter spoza orginalnego alfabetu wejściowego.
+
+\paragraph{Odzyskiwanie kontrprzykładu}
+
+Sprawdzamy równoważność automatów $H_l$ oraz $H_r$ przy pomocy procedur wykorzystywanych przez nauczyciela do sprawdzania równoważności,
+opisanych w następnej sekcji. Jeśli automaty są równoważne, oznacza to, że nie wykryliśmy niespójności z systemem SRS i zapytanie będzie
+przekierowane do nauczyciela. W przeciwnym przypadku jesteśmy w stanie odtworzyć dwa słowa $v_1$ oraz $v_2$ podmieniając dodatkowe litery typu local, na prawą w przypadku
+pierwszego słowa strone reguły, bądź lewą w przypadku drugiego słowa. Ponieważ system musi być zgodny z automatem docelowym, wiemy że jedno z tych słów
+musi być akceptowane przez dokładnie jeden z automatu docelowego oraz hipotezy. Dlatego wysyłając jedno zapytanie MQ($v_1$) do nauczyciela,
+jesteśmy w stanie stwierdzić, które z tych słów jest poprawnym kontrprzykładem.
 
 
 \subsection{Teacher}
 
 \begin{verbatim}
 teacher/
-|-- Teacher.hpp           # interfejs nauczyciela
-|-- Converter.hpp         # łączy automaty i konwertuje do gramatyki
-|-- cfg/
-    |-- Calculator.hpp    # koduje i dekoduje terminale i nieterminale
-    |-- Cfg.hpp           # struktura gramatyki i sprawdzanie pustości
-    |-- NonTerminal.hpp
-    |-- Terminal.hpp
+|-- Teacher.hpp             # interfejs nauczyciela
+|-- AutomataCombiner.hpp    # oblicza produkt automatów
+|-- EmptinessChecker.hpp    # sprawdza pustość automatu
+|-- Witness.hpp             # pomocnicza struktura 
+                              do odtworzenia świadka niepustości
 \end{verbatim}
 
 Nauczyciel jako parametry wejściowe przyjmuje alfabet wejściowy, alfabet stosowy i automat docelowy. Jego zadaniem jest udostępnić interfejs,
 który będzie odpowiadać na zapytania: \texttt{membershipQuery}, \texttt{stackContentQuery} i \texttt{equivalenceQuery}.
-Odpowiedzi na dwa pierwsze zapytania wymagają jedynie przekazania słowa do automatu docelowego. Zapytanie o równoważność jest dominującą
+Odpowiedzi na dwa pierwsze zapytania wymagają jedynie przekazania słowa do automatu docelowego.
+
+Zapytanie o równoważność jest dominującą
 częścią całego modułu. Należy podkreślić, że złożoność zapytań o równoważność w trakcie aktywnego uczenia jest znanym problemem.
 Zazwyczaj jest stosowane podejście heurystyczne jak sprawdzenie losowo generowanych słów \cite{json}[5.3 Learning Algorithm],
-lub bardziej złożone techniki jak np. W-method \cite{Wmethod}. Obecne podejście gwarantuje zwrócenie poprawnej odpowiedzi za każdym razem,
-ale dominuje przy tym złożoność czasową i pamięciową całego programu, które wynoszą $O(?)$.
+lub bardziej złożone techniki jak np. W-method \cite{Wmethod}. Zastosowanie podejścia ze sprawdzaniem losowo generowanych słów zostało
+również zaimplementowane i może być włączone poprzez ustawienie flagi \texttt{RANDOM\_EQUIVALENCE\_QUERY} w czasie kompilacji.
+
+Główne rozwiązanie gwarantuje zwrócenie poprawnej odpowiedzi za każdym razem, ale dominuje przy tym złożoność czasową i pamięciową całego programu.
 
 Cała procedura \texttt{equivalenceQuery} przebiega w następujących krokach:
 \begin{enumerate}
     \item Oblicz $A = T \triangle H$.
     \item Przekształć $A$ na $A'$ akceptujący poprzez pusty stos.
-    \item Przekształć $A'$ na gramatykę bezkontekstową $G$.
-    \item Sprawdź pustość $G$.
-    \item Zwróć słowo akceptowane przez $A$ na podstawie wyniku gramatyki, lub puste słowo jeśli $G$ jest pusta.
+    \item Sprawdź pustość $A'$.
+    \item Zwróć słowo akceptowane przez $A$ na podstawie wyniku pustości $A'$.
 \end{enumerate}
 
 \paragraph{Konstrukcja automatu $A = T \triangle H$}
 
-Konstrukcja produktu automatów została zaimplementowana w metodzie \texttt{combineVPA} klasy \texttt{Converter}. Klasa ta tworzy nowy automat
+Konstrukcja produktu automatów została zaimplementowana w metodzie \texttt{combineVPA} klasy \texttt{AutomataCombiner}. Klasa ta tworzy nowy automat
 symulujący jednoczesne działanie automatów $T$ oraz $H$. Zawiera on $(|Q_{T}| + 1) \cdot (|Q_{H}| + 1)$ stanów, ponieważ wszystkie przejścia
 w tym automacie są zdefiniowane jawnie w przeciwieństwie do $T$ i $H$, gdzie nieokreślone przejścia były niejawnie kierowane do stanu \texttt{sink}.
 
@@ -169,37 +234,92 @@ w tym automacie są zdefiniowane jawnie w przeciwieństwie do $T$ i $H$, gdzie n
 Przekształcenie automatu $A$ do automat akceptującego poprzez pusty stos odbywa się również w metodzie \texttt{combineVPA}.
 Po wyznaczeniu stanów akceptujących możemy zdefiniować dla nich dodatkowe przejścia umożliwiające opróżnienie stosu.
 
-\paragraph{Konstrukcja gramatyki bezkontekstowej}
+\paragraph{Sprawdzanie pustości automatu $A'$}
 
-Konstrukcja gramatyki bezkontekstowej $G$ została zaimplementowana w metodzie \texttt{convertVpaToCfg} klasy \texttt{Converter}.
-Rozpoczyna ona od heurystycznego oszacowania liczby produkcji i nieterminali w $G$, które są podawane jako argumenty klasy \texttt{Cfg},
-żeby zarezerwować pamięć na dynamicznie kontenery wymagające ciągłości pamięci.
+Ideea konwersji automatu DVPA $A' = (\Sigma', Q, q_0, F, \Gamma, \delta')$ do gramatyki bezkontekstowej $G = (T, N, P, S)$ polega na zdefiniowaniu
+gramatyki w następujący sposób:
+\begin{description}
+    \item[$T$] -- Jest to dokładnie zbiór $\Sigma'$
+    \item[$N$] -- Jest to zbiór elementów postaci $[s, B, s']$, gdzie $s, s' \in Q$ oraz $B \in \Gamma$. Rozumiane jako przejście automatem $A'$
+                z konfiguracji $(s, B)$ do stanu $s'$
+    \item[$P$] -- Dla poszczególnych przejść a automacie $A'$ definiujemy następujące produkcje:
+            \begin{itemize}
+                \item Dla $\delta(s, l) = q$ dodajemy produkcje $[s, B, s'] \rightarrow l[q, B, s']$,
+                        dla każdego $B \in \Gamma$ oraz każdego $s' \in Q$.
+                \item Dla $\delta(s, B, r) = q$, gdzie $B \in \Gamma$ oraz $B \neq \bot$ dodajemy produkcje $[s, B, q] \rightarrow r$
+                \item Dla $\delta(s, \bot, r) = q$ dodajemy produkcje $[s, \bot, s'] \rightarrow r[q, \bot, s']$.
+                \item Dla $\delta(s, c) = (q, B')$ dodajemy produkcje $[s, B, s'] \rightarrow c[q, B', m][m, B, s']$,
+                        dla każdego $B \in \Gamma$, każdego $s' \in Q$ oraz każdego $m \in Q$.
+                \item Dla każdego $s \in F$ dodajmey produkcje $[s, \bot, s] \rightarrow \epsilon$
+            \end{itemize}
+    \item[$S$] -- Wyróżniony element, którgo produkcje prowadzą do nietrminali $[q_0, \bot, s]$, gdzie $s \in F$.
+\end{description}
 
-Testy wykazały, że znacząca część dodawanych produkcji jest nieosiągalna, dlatego zastosowano heurystyczne podejście do zmniejszenia ich liczby.
-Na początku dodajemy nieterminale osiągalne z nieterminala startowego razem z potrzebnymi produkcjami i umieszczamy te nieterminale w kolejce.
-Następne produkcje i nieterminale się dodawne stosując algorytm BFS po osiągalnych z symbolu startowego nieterminalach.
-Podejście to na losowych testach zredukowało ilość generowanych produkcji o około jedną trzecią, co również skróciło czas potrzebny na zapytanie.
+Sprawdzenie pustości gramatyki polega na algorytmie w stylu BFS, zaczynającym działanie od oznaczenia nieterminali mających po prawej stronie
+dowolnej produkcji tylko symbole terminalne i oznaczeniu ich jako generujące. Następnie algorytm kontynuuje działanie oznaczając jako generujące
+te nieterminale, które mają po prawej stronie dowolnej produkcji tylko nieterminale generujące.
 
-\paragraph{Sprawdzanie pustości gramatyki bezkontekstowej}
+Klasa \texttt{EmptinessChecker} łączy te dwie idee w jedną procedurę bez jawnego konstruowania gramatyki. Nietrminale koduję jako liczby gęsto rozmieszczone
+w przedziale $[0, |Q| \cdot |\Gamma| \cdot |Q|]$, dla każdego z nich utrzymuje informacje czy jest on generujący oraz świadka służącego do odtworzenia
+słowa dowodzącego jego generatywności w postaci:
+\begin{verbatim}
+struct Witness                          enum class WitnessKind    
+{                                       {
+    WitnessKind kind;                       Call,
+    uint16_t symbol;                        Return,
+    NonTerminal firstChild;                 ReturnBottom,
+    NonTerminal secondChild;                Local,
+};                                          Empty,
+                                        };
+\end{verbatim}
 
-Klasa \texttt{Cfg} ma na celu sprawdzić pustość poprzez wyznaczenie zbioru generujących nieterminali.
-W tym celu udostępnia dwie publiczne metody: \texttt{addProduction} oraz \texttt{isEmpty}. 
+Algorytm zaczyna działanie od przygotowania następujących struktu danych, które będą wykorzystywane w trakcie działania algorytmu:
+\begin{verbatim}
+std::vector<std::vector<ParentStateAndSymbol>> localParents;
+std::vector<std::vector<ParentStateAndSymbol>> returnParents;
+std::vector<std::vector<ParentStateAndSymbol>> callParents;
+\end{verbatim}
 
-Metoda \texttt{addProduction} wykorzystywana podczas konstrukcji gramatyki indeksuje nieterminale pojawiające się w produkcjach.
-Dla każdej produkcji oblicza liczbę jej nieterminali po prawej stronie oraz dla każdego nieterminala zapisuję w ilu produkcjach występuje
-po prawej stronie oraz zapisuję nieterminale generujące. Informacja ta pozwala skonstruować dwie tablice określające zakres produkcji zależnych
-od danego nieterminala. Takie podejście umożliwia szybkie przechodzenie po wszystkich zależnych produkcjachi korzysta z ciągłości pamięci,
-co w praktyce okazało się wydajne.
+Reprezentują one listy stanów i symboli odpowiednich typów, zapewniając szybki dostęp do wszystkich stanów wraz z symbolami jakimi możemy dojść
+do rozważanego stanu $q$, lub w przypadku \texttt{callParents} do konfiguracji $(q, B)$.
 
-Sprawdzanie pustości realizowane jest w metodzie \texttt{isEmpty}. Wykonywana jest propagacja generatywności przy użyciu przeszukiwania BFS.
-Jeśli wszystkie nieterminale po prawej stronie danej produkcji zostały oznaczone jako generujące, generujący staje się również jej lewy nieterminal.
+Ponadto utrzymuje i aktualizuje w trakcie działania struktury:
+\begin{verbatim}
+    std::vector<std::vector<NonTerminal>> generativeByLeftState;
+    std::vector<std::vector<NonTerminal>> generativeByRightState;
+\end{verbatim}
 
-Podczas działania algorytmu dla każdego generującego nieterminala zapamiętywany jest świadek jego generatywności.
-Pozwala to w przypadku niepustości gramatyki odtworzyć przykładowe słowo należące do jej języka.
+Umożliwiające szybki dostęp do wszystkich generujących nieterminali postaci $[s, B, s']$, dla stanu $s$ poprzez \texttt{generativeByLeftState} oraz
+dla stanu $s'$ poprzez \texttt{generativeByRightState}.
+
+Następnie dodaje do kolejki symbole nieterminalne, które są generujące w oczywisty sposób. Ostatecznie rozważa każdy
+generujący nietrminal $n = [s, B, s']$ z kolejki w następujący sposób:
+
+\begin{itemize}
+    \item Dla każdego elementu listy \texttt{localParents[s]} postaci $(q, l)$ dodajemy generujący nieterminal $[q, B, s']$.
+    \item Jeśli $B = \bot$, dla każdego elementu listy \texttt{returnParents[s]} postaci $(q, r)$ dodajemy generujący nieterminal $[q, \bot, s']$.
+    \item Następnie wykonujemy dwa kroki zakładając, że $n$ jest odpowiednio lewym lub prawym 
+        nieterminalem po prawej stronie produkcji pewnego nieterminala, którego generatywność należy wykazać.
+
+        \begin{enumerate}
+            \item Zakładając, że $n$ jest nieterminalem po lewej stronie należy dla każdego nieterminala \texttt{generativeByLeftState[s']}
+                postaci $[s', B', q']$ oraz każdego elementu $(q, c)$ listy \texttt{returnParents[(s, B)]} oznaczyć nietrminal
+                $[q, B', q']$ jako generujący, odpowiada to produkcji:
+                $$[q, B', q'] \rightarrow c[s, B, s'][s', B', q']$$
+
+            \item Zakładając, że $n$ jest nieterminalem po prawej stronie należy dla każdego nieterminala \texttt{generativeByRightState[s]}
+                postaci $[q', B', s]$ oraz każdego elementu $(q, c)$ listy \texttt{returnParents[(q', B')]} oznaczyć nietrminal
+                $[q, B, s']$ jako generujący, odpowiada to produkcji:
+                $$[q, B, s'] \rightarrow c[q', B', s][s, B, s']$$
+        \end{enumerate}
+\end{itemize}
+
+Jeśli jakikolwiek z nieterminali postaci $[q_0, \bot, q]$, gdzie $q \in F$ został oznaczony jako generujący, oznacza to,
+że automat ten nie jest pusty i możemy na podstawie, tego nieterminala odtworzyć słowo świadczące o jego niepustości.
 
 \paragraph{Odzyskiwanie kontrprzykładu}
 
-Klasa \texttt{Cfg} zwraca słowo, którego prefiks rozróżnia $T$ i $H$. Ponieważ zwrócenie najkrótszego możliwego prefiksu jest
+Klasa \texttt{EmptinessChecker} zwraca słowo, którego prefiks rozróżnia $T$ i $H$. Ponieważ zwrócenie najkrótszego możliwego prefiksu jest
 korzystne dla algorytmu uczenia, a musimy odrzucić sufiks zawierający symbole spoza alfabetu wejściowego,
 przechodzi po całym słowie szukając najkrótszego prefiksu, który rozróżnia $T$ i $H$.
 
@@ -259,12 +379,12 @@ docelowym na losowo wygenerowanych słowach.
     \texttt{minParameter} oraz \texttt{maxParameter} dla parametrów \texttt{numOfStates}, \texttt{numOfCalls}, \texttt{numOfLocals},
     \texttt{numOfReturns} oraz \texttt{numOfStackSymbols}
     
-    \item pozostałe parametry generatora: \texttt{density}, \texttt{acceptingStatesDensity}, \texttt{numOfModules}
+    \item pozostałe parametry generatora: \texttt{density}, \texttt{acceptingStatesDensity}, \texttt{numOf\-Modules}
 
     \item parametr określający, czy zestaw testów powinien używać systemu SRS: \texttt{useSrs}
 
     \item parametry charakteryzujące maksymalną długość i liczbę słów testowych do przetestowania automatu będącego
-    wynikiem działania algorytmu: \texttt{maxTestingWordLength}, \texttt{numOfRandomTestingWords}
+    wynikiem działania algorytmu: \texttt{maxTest\-ingWordLength}, \texttt{numOfRandomTestingWords}
 
     \item parametry służące do debugowania: \texttt{savePassedTestData}, \texttt{supervisedMode}, \texttt{supervisedTestMaxDuration}
 \end{itemize}
@@ -272,8 +392,8 @@ docelowym na losowo wygenerowanych słowach.
 Parametry generatora są losowo wybierane na podstawie konfiguracji. Na koniec każdego testu aktualne statystyki dotyczące przeprowadzonych
 testów są drukowane na standardowe wyjście. Test kończy się niepowodzeniem, jeśli zostanie znalezione słowo, które rozróżnia wygenerowany
 automat od automatu otrzymanego przez algorytm, lub jeśli otrzymany automat ma więcej stanów niż automat wygenerowany.
-Jeśli test zakończy się niepowodzeniem lub parametr \texttt{savePassedTestData = true}, to szczegółowe informacje o teście
-zostają zapisane w pliku \texttt{failedTests/output\_\{testNumber\}.txt}.
+Jeśli test zakończy się niepowodzeniem lub parametr \texttt{savePassedTestData = true}, szczegółowe informacje o teście
+są zapisywane w pliku \path{failedTests/output_<testNumber>.txt}.
 
 Użycie trybu nadzorowanego (\texttt{supervisedMode = true}) powoduje uruchomienie algorytmu uczącego w osobnym procesie.
 Pozwala to kontynuować wykonywanie testów, gdy działanie programu zakończy się krytycznym błędem oraz przerwać test,
@@ -282,48 +402,16 @@ jeśli jego czas wykonania przekroczy wartość \texttt{supervisedTestMaxDuratio
 \subsection{Benchmark}
 \label{chap:bench}
 
-Moduł ten został stworzony do odpowiedniego przeprowadzenia testów na większych grupach testowych i odpowiednim zagregowaniu
-wyników przy pomocy narzędzia \texttt{Google Benchmark}. TODO
+Moduł ten został stworzony do przeprowadzenia testów na grupach testowych oraz odpowiednim zagregowaniu wyników.
+Ideea jego wykorzystania polega na wielokrotnym wykonaniu algorytmu dla automatów wygenerowanych zgodnie z parametrami ustawionymi w danym kroku scenariusza,
+zapisanie zaagregowanych wyników i przejściu do następnego kroku scenariusza. Scenariusz może być wielowymiarowy, maksymalnie cztery wymiary. Przykładem dwu--wymiarowego
+scenariusza może być zwiększająca się liczba symboli typu call w jednym wymiarze oraz zwięszająca się liczba stanów generowanych automatów w drugim wymiarze.
 
-\section{Podręcznik użytkownika}
+Dane zbierane są na podstawie makra \texttt{TIME\_MARKER} wykorzystywanego w kluczonych miejscach w kodzie, które służy do pomiaru czasu i zbieraniu liczby wywołań danych funkcji.
 
-W tej sekcji opisano sposób kompilacji programu oraz konfiguracji jego podstawowych parametrów.
+Kalsa \texttt{BenchmarkRunner} odpowiada za odpalanie kolejnych kroków scenariusza i zapisywanie wyników, korzystając z interfejsu do definiowania scenariuszy
+\texttt{Scenario}.
 
-\subsection{Uruchomienie programu}
-
-Projekt kompilowany jest przy użyciu skryptu \texttt{build.sh}, który umożliwia:
-
-\begin{itemize}
-    \item Standardowe zbudowanie pliku wykonywalnego \texttt{build/run} przy pomocy komendy \texttt{./build.sh}
-    \item Zbudowanie pliku wykonywalnego \texttt{build-debug/run} z dodatkowymi flagami debugowymi przy pomocy komendy \texttt{./build.sh -d}
-    \item Zbudowanie pliku wykonywalnego służącego do benchmarkowania wyników~\ref{chap:bench} \texttt{build-bench/run} przy pomocy komendy \texttt{./build.sh -bench}
-    \item Zbudowanie i uruchomienie wszystkich testów jednostkowych używając komendy \texttt{./build.sh test} (lub \texttt{./build.sh -d test})
-    \item Zbudowanie i uruchomienie pojedynczego testu jednostkowego \texttt{test} używając komendy \texttt{./build.sh test -t test} (lub \texttt{./build.sh -d test -t test})
-\end{itemize}
-
-Plik wykonywalny \texttt{build/run} przyjmuje następujące argumenty:
-\begin{verbatim}
-./build/run numOfTest generator
-\end{verbatim}
-Gdzie \texttt{numOfTest} oznacza liczbę testów przekazywaną do klasy \texttt{Tester}, a \texttt{generator} określa,
-który generator powinien zostać użyty i może przyjąć jedną z następujących wartości:
-\textbf{random}, \textbf{cda}, \textbf{sevpa}, \textbf{mevpa}, \textbf{ecda} lub \textbf{custom}.
-
-Podanie jako generatora \textbf{custom} ignoruje argument liczby testów i uruchamia algorytm dla jednego automatu zdefiniowanego
-bezpośrednio w pliku \texttt{main.cpp} w metodzie \texttt{getCustomVpa()}. Umożliwia to zdefiniowanie własnego automatu i przetestowanie
-algorytmu na jego przykładzie.
-
-\subsection{Konfiguracja programu}
-
-Program zawiera dwa istotne pliki konfiguracyjne:
-\begin{enumerate}
-    \item \texttt{utils/Constants.hpp} zawiera m.in. definicje parametrów: \texttt{MaxNumOfAutomatonStates}, \texttt{MaxNumOfLetters}
-    oraz \texttt{MaxNumOfStackSymbols}, które określają maksymalny rozmiar automatów przyjmowanych przez algorytm.
-    Podczas dostosowywania tych wartości należy zwrócić uwagę, że złożoność pamięciowa nauczyciela wynosi $O(?)$, a czasowa $O(?)$.
-
-    \item \texttt{TesterParameters.hpp} zawiera definicję struktury \texttt{TesterParameters} oraz obiekty:
-    \texttt{RandomTestParameters}, \texttt{CdaTestParameters}, \texttt{SeVpaTestParameters}, \texttt{MeVpaTestParameters}
-    oraz \texttt{ECdaTestParameters}, które są wykorzystywane podczas odpalenia programu dla odpowiedniego generatora.
-\end{enumerate}
-
-Zmiana parametrów konfiguracyjnych wymaga ponownego skompilowania programu.
+Każdy scenariusz testowy odpowiada za udostępnienie odpowiednich informacji do klasy \texttt{BenchmarkRunner} takich jaki ziarno generatora liczb losowych,
+liczba testów w danym kroku oraz informacji o wielowymiarowaości testu ozgodnie z interfejsem \texttt{Scenario}. Odpowiada on także całkowicie, za wykonanie testów
+w danym kroku oraz przekonfigurowanie parametrów testowych dla następnego kroku.

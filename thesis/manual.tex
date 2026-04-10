@@ -1,0 +1,68 @@
+\chapter{Podręcznik użytkownika}
+
+W tym rozdziale opisano sposób kompilacji programu, obsługiwane argumenty programu oraz konfigurację parametrów dotyczących automatów oraz generatorów.
+
+\section{Uruchomienie programu}
+
+Projekt kompilowany jest przy użyciu skryptu \texttt{build.sh}, który umożliwia:
+
+\begin{itemize}
+    \item Standardowe zbudowanie pliku wykonywalnego \path{build/run} przy pomocy komendy: \texttt{./build.sh}
+    \item Zbudowanie pliku wykonywalnego \path{build-debug/run} z dodatkowymi flagami debugowymi przy pomocy komendy: \texttt{./build.sh -d}
+    \item Zbudowanie pliku wykonywalnego, w którym zapytania o równoważność są sprawdzane heurystycznie \path{build-random/run} przy pomocy komendy: \\ \texttt{./build.sh -randomEQ}
+    \item Zbudowanie i uruchomienie wszystkich testów jednostkowych używając komendy: \texttt{./build.sh test} (lub \texttt{./build.sh -d test})
+    \item Zbudowanie i uruchomienie pojedynczego testu jednostkowego \texttt{testName} używając komendy: \texttt{./build.sh test -t testName} (lub \texttt{./build.sh -d test -t testName})
+\end{itemize}
+
+Program można uruchomić przy użyciu następujących poleceń:
+\begin{verbatim}
+    ./run <generator> <seed> <numOfTests>
+    ./run bench <scenario>
+    ./run custom
+    ./run --help
+    
+Generatory:
+    random        uruchomienie testów z losowym generatorem
+    cda           uruchomienie testów z generatorem CDA
+    sevpa         uruchomienie testów z generatorem SeVpa
+    mevpa         uruchomienie testów z generatorem MeVpa
+    ecda          uruchomienie testów z generatorem eCDA
+    commutative   uruchomienie testów z generatorem commutative
+    cancel        uruchomienie testów z generatorem cancellation
+    idempotency   uruchomienie testów z generatorem idempotency
+    
+Pozostałe komendy:
+    bench      uruchomienie wybranego scenariusza benchmarkowego
+    custom     wykonanie algorytmu dla przykładowego automatu
+               z pliku `helper/ExampleRun.cpp`
+
+Scenariusze:
+    Nazwy scenariuszy zdefiniowane są w pliku:
+    `benchmark/scenario/scenarios.hpp`
+
+Argumenty:
+    seed         ziarno generatora liczb losowych
+    numOfTests   liczba testów do wykonania
+    scenario     nazwa scenariusza benchmarkowego
+
+Przykłady uruchomień:
+    ./run random 42 100
+    ./run cda 123 50
+    ./run bench base-scenario
+    ./run custom
+\end{verbatim}
+
+\section{Konfiguracja programu}
+
+Program zawiera dwa istotne pliki konfiguracyjne:
+\begin{enumerate}
+    \item \texttt{utils/Constants.hpp} zawiera m.in. definicje parametrów: \texttt{MaxNumOf\-Automa\-ton\-States}, \texttt{MaxNumOfLetters}
+    oraz \texttt{MaxNumOfStackSymbols}, które określają maksymalny rozmiar automatów przyjmowanych przez algorytm. 
+    Zawiera również parametry \texttt{MaxNumOfWellMatchedWordsForSrsCheck} oraz \texttt{MaxNumOf\-Rev\-ealed\-Well\-MatchedWordsForSrsCheck} określające maksymalną ilość dobrze zbalansowancyh słów do sprawdzania
+    zgodności z SRS oraz maksymalną ilość rozważanych słów, które potencjalnie mogą zostać wybrane do sprawdzenia zgodności.
+
+    \item \texttt{TesterParameters.hpp} zawiera definicję struktury \texttt{TesterParameters} służącej do parametryzowania testu oraz obiekty:
+    \texttt{<nazwa\_generatora>Test\-Param\-eters}, które są wykorzystywane podczas wykonywania programu dla odpowiedniego generatora.
+\end{enumerate}
+
+Zmiana powyższych parametrów konfiguracyjnych wymaga ponownej kompilacji programu.

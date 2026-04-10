@@ -1,0 +1,39 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        baseMetricsHeatmap,
+        colorbar = false,
+        point meta min=0,
+        point meta max=200000,
+        xlabel={liczba symboli return},
+        xmin=3, xmax=9,
+        ymin=2, ymax=8,
+        xtick={3,5,...,9},
+        ytick={2,4,...,8},
+    ]
+    \addplot [
+        matrix plot*,
+        point meta=explicit,
+        mesh/rows=4,
+    ] coordinates {
+        (3, 2) [681.86]
+        (3, 4) [4816.39]
+        (3, 6) [13215.7]
+        (3, 8) [25774.5]
+
+        (5, 2) [1136.47]
+        (5, 4) [7623.64]
+        (5, 6) [20919.2]
+        (5, 8) [41133.3]
+
+        (7, 2) [1505.67]
+        (7, 4) [10480.8]
+        (7, 6) [28607.2]
+        (7, 8) [56263.8]
+
+        (9, 2) [1912.82]
+        (9, 4) [12437.2]
+        (9, 6) [37472.6]
+        (9, 8) [71837.2]
+    };
+    \end{axis}
+    \end{tikzpicture}

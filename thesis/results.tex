@@ -1,1 +1,45 @@
 \chapter{Wyniki eksperymentów}
+
+Rozdział ten przedstawia wybrane wyniki eksperymentów, skupia się na podstawowych metrykach opisujących wydajność algorytmu aktywnego uczenia,
+czyli liczbię poszczególnych zapytań kierowanych do nauczyciela. Przedstawia w jaki sposób struktura automatu może wpływać na ilość potrzebnych zapytań
+oraz jak wykorzystanie systemu SRS wpływa na liczbę koniecznych zapytań.
+
+\section{Podstawowe metryki}
+
+Przedstawione poniżej wykresy zostały wygenerowane na podstawie danych ze scenariuszy benchmarkowych, z użyciem losowego generatora.
+Mając na celu wizualizację liczby potrzebnych zapytań dla losowych automatów różniących się ilością stanów, rozmiarem alfaberu, jak i alfabetu stosowego.
+
+Poniżej jest przedstawiona początkowa konfiguracja losowego generatora dla wszystkich scenariuszy w tej sekcji:
+\begin{verbatim}
+minNumOfStates = 2,
+maxNumOfStates = 2,
+minNumOfCalls = 3,
+maxNumOfCalls = 3,
+minNumOfLocals = 3,
+maxNumOfLocals = 3,
+minNumOfReturns = 3,
+maxNumOfReturns = 3,
+minNumOfStackSymbols = 5,
+maxNumOfStackSymbols = 5,
+density = 0.8,
+acceptingStatesDensity = 0.3,
+\end{verbatim}
+
+Dla każdej kofiguracji generator generuje 200 automatów, które będą obiektem testowym algorytmu. Scenariusze zakładają zwiększająca się liczbe
+poszczególnych typów symboli w alfabecie o 2 w każdym kroku oraz stanów automatu również o 2 w każdym kroku.
+Poniżej przedstawiam średnie wyniki dla poszczególnych zapytań oraz konfiguracji automatu:
+
+\input{plots/baseMetrics}
+
+
+\section{Wpływ SRS}
+
+\subsection{Cancellation generator}
+
+Redukuję liczbę zapytań o około połowę, przy czym nie używa parametru, zawsze podstawia słowo puste.
+
+\input{plots/cancellationSrs}
+
+\subsection{Idempotency}
+
+\input{plots/idempotencySrs}

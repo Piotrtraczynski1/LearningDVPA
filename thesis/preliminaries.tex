@@ -26,7 +26,7 @@ Analogicznie do DFA definiujemy domknięcie funkcji $\delta$, jako $\widehat{\de
 $$\widehat{\delta}(q, \epsilon, s) = (q, s) \text{,\ gdzie\ } s \in \Gamma^*$$
 $$\widehat{\delta}(q, aw, sB) = \widehat{\delta}(q', w, ss') \text{,\ gdzie\ } \delta(q, a, B) = (q', s') \text{,\ gdzie\ } B\in \Gamma \text{\ i\ } s, s' \in \Gamma^*$$
 Język $L(A)$ generowany przez automat DPDA, to zbiór wszystkich słów $w \in \Sigma^*$, dla których $\widehat{\delta}(q_0, w, \bot) \in F$.
-Zwracamy uwagę, że stos po przeczytaniu słowa $w$ nie musi być pusty, żeby słowo zostało zaakceptowane.
+Należy zwrócić uwagę, że stos po przeczytaniu słowa $w$ nie musi być pusty, żeby słowo zostało zaakceptowane.
 
 
 \textbf{Deterministycznym automatem visibly pushdown \cite{vpl}} $A$ dalej DVPA $A$ nazywamy automat DPDA, dla którego alfabet wejściowy
@@ -49,7 +49,9 @@ Oznacza to, że klasa automatów DVPA stanowi podklasę DPDA, w której operacja
 Model ten zachowuje istotne własności automatów skończonych, takie jak domknięcie ze względu na sumę, przekrój oraz dopełnienie,
 przy jednoczesnym umożliwieniu modelowania struktur o zagnieżdżonej naturze.
 
-\textbf{Słowa dobrze zbalansowane.}
+\textbf{Słowa dobrze zbalansowane.} Słowo $w$ nad alfabetem $\Sigma = \Sigma_{call} \cup \Sigma_{return} \cup \Sigma_{local}$, nazywamy dobrze
+zbalansowanym, jeśli w słowie $w$ liczba liter z $\Sigma_{call}$ jest równa liczbie liter z $\Sigma_{return}$ oraz w każdym prefiksie słowa $w$
+liczba liter z $\Sigma_{call}$ jest nie mniejsza niż liczba liter z $\Sigma_{return}$.
 
 \textbf{Relacja prawostronnej kongruencji $\sim$.} To relacja, która spełnia warunek $\forall_{v_1, v_2 \in \Sigma^*} \forall_{a \in \Sigma}(v_1 \sim v_2 \Leftrightarrow v_1a \sim v_2a)$
 
@@ -58,6 +60,15 @@ Definiuje ono relację równoważności $\sim_L \subseteq\Sigma^*\times\Sigma^*$
 Język $L$ jest regularny wtedy i tylko wtedy, kiedy relacja $\sim_L$ ma skończenie wiele klas abstrakcji, a minimalny automat DFA
 rozpoznający ten język ma dokładnie tyle stanów ile klas abstrakcji ma ta relacja.
 
-\textbf{Gramatyka bezkontekstowa.}
+\textbf{Gramatyka bezkontekstowa} $G$ dalej CFG $G$ nazywamy krotkę $(T, N, P, S)$ w której:
+\begin{description}
+    \item[$T$] -- zbiór symboli terminalnych
+    \item[$N$] -- zbiór symboli nieterminalnych
+    \item[$P$] -- zbiór reguł typu $L \rightarrow R$, gdzie $L \in N$ oraz $R \in (T \cup N)^*$
+    \item[$S$] -- $S \in N$ jest elementem początkowym
+\end{description}
+Słowo $w \in T^*$ jest generowane przez gramatykę, jeśli można je otrzymać z symbolu początkowego $S$ przez skończony
+ciąg produkcji z $P$. Zbiór wszystkich słów generowanych przez gramatykę $G$ oznaczamy jako $L(G)$.
 
-\textbf{String Rewriting System}
+\textbf{String Rewriting System} $R$ dalej SRS $R$ nazywamy zbiór reguł typu $l \rightarrow r$, gdzie $l$ oraz $r$ są słowami nad pewnym alfabetem $\Sigma$.
+System ten jest zdefiniowany na podstawie własności pewnego języka $L$, gdzie każda z reguł oznacza tożsamość $wlv \in L \Leftrightarrow wrv \in L$, gdzie $w,v \in \Sigma^*$.

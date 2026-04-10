@@ -1,12 +1,12 @@
 \chapter{String rewriting systems}
 
 \textbf{Active Automata Learning with Advice \cite{srs}} przedstawia podejście, w którym algorytm aktywnego uczenia się, 
-może dostać dodatkową wskazówkę, dzięki której jest możliwe zredukowanie liczby zapytań kierowanych do nauczyciela.
+może dostać dodatkową wskazówkę, dzięki której możliwe jest zredukowanie liczby zapytań kierowanych do nauczyciela.
 Autorzy sugerują także w jaki sposób wykorzystać to podejście w innych algorytmach aktywnego uczenia się automatów,
 z wykorzystaniem odpowiednika Twierdzenia Myhilla-Nerode'a.
 
 Podejście to nie wymaga zmian w algorytmie ucznia. Zapytania, które zadaje uczeń nie są wprost przekazywane do nauczyciela,
-tylko kierowane do systemu, który wnioskuje o nich na podstawie zadanego systemu $SRS$.
+tylko kierowane do systemu, który wnioskuje o nich na podstawie zadanego systemu SRS.
 Jeśli system nie jest w stanie odpowiedzieć na zapytanie, wtedy przekierowuje je do nauczyciela i zwraca jego odpowiedź.
 
 Szczególnie wartościową częścią, z punktu zaprezentowanej w tej pracy implementacji algorytmu
@@ -14,15 +14,15 @@ Szczególnie wartościową częścią, z punktu zaprezentowanej w tej pracy impl
 które stanowią znaczący narzut czasowy. Zapytania o przynależność nie są kosztowne z punktu widzenia tego algorytmu,
 więc ta cześć nie została wykorzystana.
 
-Jan Otop i Michał Fica wprowadzają następujące definicje: system $SRS$ jest spójny z językiem, wtedy i tylko wtedy,
+Jan Otop i Michał Fica wprowadzają następujące definicje: system SRS $R$ jest spójny z językiem, wtedy i tylko wtedy,
 gdy dla wszystkich słów $s, t$, jeśli $s \to^*_R t$, to $s \in L \Leftrightarrow t \in L$.
-Podpowiedzią dla algorytmu jest system $SRS$ spójny z językiem docelowym.
+Podpowiedzią dla algorytmu jest system SRS $R$ spójny z językiem docelowym.
 
-Następnie dowodzą, że, jeśli $R$ jest $SRS$ nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
-to $SRS$ $R$ jest spójny z $L(A)$ wtedy i tylko wtedy, gdy dla każdego stanu $q \in Q_A$ i każdej reguły
+Następnie dowodzą, że, jeśli $R$ jest SRS nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
+to SRS $R$ jest spójny z $L(A)$ wtedy i tylko wtedy, gdy dla każdego stanu $q \in Q_A$ i każdej reguły
 $l \to r \in R$ mamy $\delta_A(q, l) = \delta_A(q, r)$.
 
-Ta obserwacja umożliwia przeiterowanie się po konfiguracjach automatu DFA i regułach systemu $SRS$ $R$ w celu wykrycia niespójności hipotezy z systemem.
+Ta obserwacja umożliwia przeiterowanie się po konfiguracjach automatu DFA i regułach systemu SRS $R$ w celu wykrycia niespójności hipotezy z systemem.
 Następnie pokazują jak znając stan $q \in Q_A$ i $l \to r \in R$, takie że tylko jeden ze stanów $H(q, l)$ i $H(q, r)$ należy do $F_H$
 skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
 
@@ -32,12 +32,32 @@ skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
     \item Zastosowany odpowiednik Twierdzenia Myhilla-Nerode'a dla automatów visibly pushdown nie jest prawo-kongruencją. 
     Oznacza to, że dwie różne konfiguracje hipotezy $H$ mogą generować dokładnie te same prawostronne języki.
     Dlatego znalezienie reguły $r \to l \in R$ i konfiguracji $(q, s)$, takich że konfiguracje $H(q, l, s)$ i $H(q, r, s)$
-    się różnią nie gwarantuje nam, że automat nie jest zgodny z systemem $SRS$.
+    się różnią nie gwarantuje nam, że automat nie jest zgodny z systemem SRS $R$.
     
     \item Nie jesteśmy w stanie sprawdzić wszystkich osiągalnych konfiguracji dla hipotezy, bo w ogólności jest ich nieskończenie wiele.
     Musimy ograniczyć się tylko do części osiągalnych konfiguracji.
 \end{enumerate}
 
-Konsekwencje, które niosą za sobą te problemy: TODO
+Z powodu trudności w zastosowaniu tego podejścia, zaostały nałożone dodatkowe obostrzenia na system SRS, który może być wskazówką dla algorytmu.
+Każda reguła postaci $l \rightarrow r$ powinna składać się z słów $l$ oraz $r$, które są dobrze zbalansowane. Ponieważ nie zależą one od stosu,
+ani nie zmieniają jego zawartości, odpowiadają one pewnemu przekształceniu stanów analogicznie jak dla automatów DFA.
 
-\textbf{Finalne zastosowanie} TODO
+Umożliwia to sprawdzenie czy automat jest zgodny z daną regułą $l \rightarrow r$, poprzez sprawdzenie równoważności dwóch automatów $H_l$ oraz $H_r$, utworznych
+na podstawie hipotezy $H$ nad alfabetem $\Sigma = \Sigma_{call} \cup \Sigma_{return} \cup \Sigma_{local}$, każdy nad alfabetem $\Sigma' = \Sigma_{call} \cup \Sigma_{return} \cup (\Sigma_{local} \cup \{l'\})$.
+gdzie automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którm znalazłby się automat $H$ po przeczytaniu słowa $l$, a $H_r$ po przeczytaniu $l'$
+trafia do stanu w którym znalazłaby się hipoteza po przeczytaniu słowa $r$.
+
+Problemem tego podejścia wydawało się sprawdzanie równoważności, gdyż w aktualnej implementacji jest wykorzystywany ten sam algorytm, który sprawdza
+równoważność hipotezy z automatem docelowym. Jednak hipoteza przez znaczący czas trwania algorytmu jest znacznie mniejsza niż automat docelowy, przez co produkt
+$H_l \times H_r$ jest znacząco mniejszy niż $H \times T$, gdzie $T$ jest automatem docelowym. Gwarantuje to, że wykorzystanie tego systemu może przyśpieszyć
+proces uczenia się automatu.
+
+\textbf{Finalne zastosowanie} rozszerza idee systemu o parametryzowane reguły postaci $l_1Xl_2 \rightarrow r_1Xr_2$, reguła ta reprezentuję tożsamość
+$wl_1Xl_2v \in L \Leftrightarrow wr_1Xr_2v \in L$, gdzie $w,v \in \Sigma^*$, $X \in \Sigma^*$ jest słowem dobrze zbalansowanym oraz słowa $l_1l_2, r_1r_2$
+są dobrze zbalansowane.
+
+Algorytm w celu sprawdzenia zgodności z hiptezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia słów dobrze zbalansowanych, które mogą zostać podstawione
+jako parametr $X$. Wybiera słowa dla których funkcja reprezentująca przekształcenie stanów jest możliwie różna od pozostałych już wybranych słów.
+Następnie dla każdej reguły oraz słowa dodaje nową literę lokalną do automatów $H_l$ oraz $H_r$. Jeśli zostanie wykryta niespójność
+na podstawie niezgodności tych automatów, to gwarantuję to, że $H$ nie jest zgodne z systemem SRS. Jednakże nie daje to gwarancji, że każda
+niezgodność $H$ z systemem SRS zostanie wykryta.

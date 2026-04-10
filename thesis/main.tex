@@ -10,8 +10,8 @@
 % Pamietaj o madrym (zgodnym z logicznym rozbiorem zdania oraz estetyka) recznym
 % zlamaniu wierszy w temacie pracy, zwlaszcza tego w jezyku pracy. Uzyj do tego
 % polecenia \fmlinebreak.
-\polishtitle    {Implementacja i badanie efektywności algorytmu \fmlinebreak "Learning Deterministic Visibly Pushdown Automata under Accessible Stack"}
-\englishtitle   {English title}
+\polishtitle    {Uczenie się DVPA z więzami}
+\englishtitle   {Learning DVPA with constraints}
 \polishabstract {
 Tematem pracy licencjackiej jest implementacja oraz analiza wydajności algorytmu aktywnego uczenia się automatów visibly pushdown \cite{main}.
 Przedstawiono motywację do aktywnego uczenia się automatów. Opisano algorytm wraz ze szczegółami implementacyjnymi oraz wykorzystanie dodatkowej
@@ -41,6 +41,13 @@ the algorithm are presented. Finally, the results of the experiments are present
 %
 %\usepackage{graphicx,listings,amsmath,amssymb,amsthm,amsfonts,tikz}
 \usepackage{amsmath}
+\usepackage{pgfplots}
+\usepackage{subcaption}
+\usepackage{placeins}
+\usepackage{float}
+
+\input{plots/baseMetrics/baseMetricsHeatmap.tex}
+
 %
 %%%%% WŁASNE DEFINICJE I POLECENIA
 %
@@ -65,6 +72,7 @@ the algorithm are presented. Finally, the results of the experiments are present
 \input{algorithm}
 \input{srs}
 \input{project}
+\input{manual}
 \input{generators}
 \input{results}
 \input{summary}

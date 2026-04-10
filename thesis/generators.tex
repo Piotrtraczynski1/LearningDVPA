@@ -6,9 +6,8 @@ organizacją przejść, w celu zbadania wpływu tych własności na wydajność 
 
 TODO: jak było to robione w innych pracach.
 
-\section{Generator losowy}
-
-TODO
+Głównie wykorzystywanym generatorem jest generator losowy. Generuje automaty, które należą do klasy DVPA, ale nie nakłada,
+żadnych dodatkowych ograniczeń, dlatego jego struktura nie wymaga dalszego opisu.
 
 \section{Generatory sterowane call}
 \label{chap:CDA}
@@ -46,8 +45,26 @@ Jednakże zbiór $\Gamma = M$, czyli stos przenosi informację tylko o module z 
 Pozostałe wymagania są zdefiniowane analogicznie do automatów Call Driven.
 
 Automat $A$ w tej formie ma własność, że $lcw \in L(A) \Leftrightarrow cw \in L(A)$, umożliwia to zdefiniowanie prostych reguł SRS,
-które mogą zostać wykorzystane do usprawnienia aktywnego uczenia.
+które mogą zostać wykorzystane do usprawnienia aktywnego uczenia. Ponieważ wykorzystanie systemu SRS w tej pracy wymaga żeby słowa były
+dobrze zbalansowane ta własność nie została wykorzystana, lecz możliwym jest, że przy alternatywnym wykorzystaniu podpowiedzi, takie reguły
+mogłyby zostać wykorzystane.
 
 \textbf{Extended Call Driven Automaton} jest to kalasa automatów, która zawiera się zawrówno w klasie Multiple Entry, jak i Single Entry.
 Jest zdefiniowana poprzez dostosowanie funkcji $Target$. Automat $A$ należy do klasy Extended Call Driven,
 wtedy i tylko wtedy, gdy $Target(c_1) \sameModuleRel Target(c_2) \Rightarrow c_1 = c_2$.
+
+\section{Generatory wraz z systemem SRS}
+
+Sekcja ta zawiera opisy czterech rodzai automatów, które były generowane w celu utworzenia automatów wraz z systemem SRS wynikającym z ich struktury, która
+może odpowiadać automatom rozwiązującym rzeczywiste problemy z naturalnie występującymi własnościami dającymi się zapisać w postaci systemu SRS.
+Z każdym generatorem jest powiązany dokładnie jeden typ reguł SRS.
+
+\textbf{Combined} jest to automat będący połączeniem dwóch automatów o niezależnym alfabecie wejściowym. Odpowiada on dwóm niezależnym automatom reprezentowanym
+poprzez jeden. Został on zaimplementowany poprzez produkt dwóch automatów nad tym samym alfabetem $\Sigma = \Sigma_{call} \cup \Sigma_{return} \cup \Sigma{local}$,
+gdzie każdy ze zbiorów $\Sigma_{call}, \Sigma{return}$ oraz $\Sigma{local}$ został podzielony na dwa rozłączne zbiory i dla dokładnie jednego z tych zbiorów
+dokładnie jedna z dwóch automatów produktowych nie zmienia stanu po wczytaniu symbolu z tego zbioru. Umożliwia to zdefiniowanie reguł SRS następującej postaci:
+$c_1c_2Xr_2c_1 \rightarrow c_2c_1Xc_1c_2$, gdzie $c_1 \in \Sigma_{call}^1$, $c_2 \in \Sigma_{call}^2$, $r_1 \in \Sigma{return}^1$ oraz $r_2 \in \Sigma_{return}^2$.
+
+TODO popraw ten opis
+
+\textbf{Comments} jest to automat, który odpowiada lock + unlock zasobu ??

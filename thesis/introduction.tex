@@ -19,7 +19,7 @@ Jednakże ogólność tych automatów wiąże się z istotnymi ograniczeniami, j
 
 \textbf{Automaty Visibly Pushdown} stanowią klasę automatów zdefiniowaną w roku 2004 przez Rajeeva Alura i P.Madhusudana \cite{vpl}.
 Jej obiekty podobnie jak automaty ze stosem, posiadają nieskończoną pamięć. Ich struktura jednakże jest bardziej przewidywalna,
-co umożliwia wykonywanie m.in. takich operacji jak suma, różnica, czy przekrój dwóch automatów \cite{vpl}[2.3 Decision problems].
+co umożliwia wykonywanie m.in. takich operacji jak suma, różnica, czy przekrój dwóch automatów w czasie wielomianowym \cite{vpl}[2.3 Decision problems].
 
 Automaty visibly pushdown znajdują zastosowanie w wielu systemach komputerowych. Przykładowo mogą służyć do przetwarzania dokumentów XML \cite{xml},
 walidacji plików JSON \cite{json}, czy monitorowania programów w języku C \cite{Cmonitor}. Czyni je to wartościowymi obiektami badań.
@@ -28,5 +28,12 @@ walidacji plików JSON \cite{json}, czy monitorowania programów w języku C \ci
 Algorytm umożliwia poznanie dokładnej struktury automatu DVPA na podstawie obserwacji w wielomianowym czasie. Algorytm wymaga w porównaniu
 do algorytmu $L^*$ dodatkowego zapytania o aktualny stan stosu, jak i możliwości modyfikacji stosu podczas wczytywania słowa przez automat.
 
-Praca przedstawia implementację tego algorytmu, jak i sprawdzenie jego wydajność pod kątem ilości wymaganych zapytań dla różnych klas automatów DVPA.
-Dodatkowo analizowany jest wpływ zastosowania idei z pracy \textit{Active Automata Learning with Advice} \cite{srs} dla omawianego algorytmu.
+Praca przedstawia implementację tego algorytmu oraz analizę jego wydajność pod kątem ilości wymaganych zapytań dla różnych klas automatów DVPA.
+Badany jest również wpływ zastosowania wskazówki w postaci reguł przepisywania termów na podstawie pracy \textit{Active Automata Learning with Advice} \cite{srs},
+której idea została dostosowana do automatów DVPA.
+
+Pomimo szczegółowego opisu algorytmów w pracy \cite{main}, ich implementacja wymagała dogłębnego zrozumienia idei
+aktywnego uczenia automatów, semantyki automatów visibly pushdown oraz opracowania rozbudowanych mechanizmów
+weryfikacji poprawności. Wynikało to z konieczności zaprojektowania efektywnych struktur danych,
+uzupełnienia brakujących szczegółów implementacyjnych oraz trudności w znajdywaniu powstałych błędów, wynikających z faktu,
+że przewidywanie dokładnego zachowania algorytmu staje się skomplikowane nawet dla niewielkich automatów.
