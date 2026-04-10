@@ -25,7 +25,7 @@ void IncreasingNumOfStatesAndCalls::prepareNextIterationDim2()
 
 void IncreasingNumOfStatesAndCalls::resetDim2()
 {
-    parameters.minNumOfCalls = 2;
-    parameters.maxNumOfCalls = 2;
+    parameters.minNumOfCalls = 3;
+    parameters.maxNumOfCalls = 3;
 }
 } // namespace benchmark::scenario

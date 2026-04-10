@@ -4,3 +4,9 @@
 /build-debug
 out.log
 out.txt
+/thesis/main.aux
+/thesis/main.log
+/thesis/main.out
+/thesis/main.pdf
+/thesis/main.toc
+src/benchmark/results

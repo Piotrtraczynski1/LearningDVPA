@@ -85,6 +85,12 @@ std::string BenchmarkRunner::getOutputFileName()
     return (std::filesystem::path(getDirectoryName()) / "output.csv").string();
 }
 
+std::string BenchmarkRunner::getPlotFileName(const std::string &marker)
+{
+    std::string filename = "plot" + marker + ".txt";
+    return (std::filesystem::path(getDirectoryName()) / filename).string();
+}
+
 void BenchmarkRunner::saveResults(const uint16_t numOfTestsInSingleIteration)
 {
     std::ofstream out(getOutputFileName(), std::ios::app);
@@ -92,6 +98,10 @@ void BenchmarkRunner::saveResults(const uint16_t numOfTestsInSingleIteration)
     {
         saveMarker(out, marker, numOfTestsInSingleIteration);
     }
+
+    savePlot("[Teacher]: membershipQuery", numOfTestsInSingleIteration);
+    savePlot("[Teacher]: stackContentQuery", numOfTestsInSingleIteration);
+    savePlot("[Teacher]: equivalenceQuery", numOfTestsInSingleIteration);
 }
 
 void BenchmarkRunner::saveMarker(
@@ -107,6 +117,19 @@ void BenchmarkRunner::saveMarker(
             << (markerInfo.time / numOfTestsInSingleIteration) << ";"
             << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration) << ";"
             << (markerInfo.time / markerInfo.executions) << "\n";
+    }
+}
+
+void BenchmarkRunner::savePlot(
+    const std::string &marker, const uint16_t numOfTestsInSingleIteration)
+{
+    std::ofstream out(getPlotFileName(marker), std::ios::app);
+    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
+    if (markerInfo.executions > 0)
+    {
+        out << marker << " (" << scenario->getDim2Details() << ", " << scenario->getDim1Details()
+            << ") [" << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration)
+            << "]\n";
     }
 }
 } // namespace benchmark

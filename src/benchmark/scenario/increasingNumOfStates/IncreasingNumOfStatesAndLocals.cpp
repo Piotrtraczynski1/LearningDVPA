@@ -25,7 +25,7 @@ void IncreasingNumOfStatesAndLocals::prepareNextIterationDim2()
 
 void IncreasingNumOfStatesAndLocals::resetDim2()
 {
-    parameters.minNumOfLocals = 2;
-    parameters.maxNumOfLocals = 2;
+    parameters.minNumOfLocals = 3;
+    parameters.maxNumOfLocals = 3;
 }
 } // namespace benchmark::scenario

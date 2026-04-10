@@ -21,8 +21,10 @@ private:
     void createDirectory();
     std::string getDirectoryName();
     std::string getOutputFileName();
+    std::string getPlotFileName(const std::string &marker);
     void saveMarker(
         std::ofstream &out, const std::string &marker, const uint16_t numOfTestsInSingleIteration);
+    void savePlot(const std::string &marker, const uint16_t numOfTestsInSingleIteration);
 
     static const std::vector<std::string> markersToBeIncluded;
     std::string scenarioName;

@@ -39,8 +39,8 @@ void IncreasingNumOfStatesBase::runSingleIteration()
 
 void IncreasingNumOfStatesBase::prepareNextIterationDim1()
 {
-    parameters.minNumOfStates++;
-    parameters.maxNumOfStates++;
+    parameters.minNumOfStates += 2;
+    parameters.maxNumOfStates += 2;
 }
 
 void IncreasingNumOfStatesBase::resetDim1()

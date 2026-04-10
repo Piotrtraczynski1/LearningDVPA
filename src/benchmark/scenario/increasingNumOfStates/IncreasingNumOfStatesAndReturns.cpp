@@ -25,7 +25,7 @@ void IncreasingNumOfStatesAndReturns::prepareNextIterationDim2()
 
 void IncreasingNumOfStatesAndReturns::resetDim2()
 {
-    parameters.minNumOfReturns = 2;
-    parameters.maxNumOfReturns = 2;
+    parameters.minNumOfReturns = 3;
+    parameters.maxNumOfReturns = 3;
 }
 } // namespace benchmark::scenario
