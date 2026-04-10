@@ -27,8 +27,6 @@ class AutomataGenerator
 
     std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
 
-    common::Word witnesses[AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates] = {};
-
     uint16_t forcedSelector[AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates]
                            [AutomatonSize<AutomatonKind::Normal>::MaxNumOfLetters]
                            [AutomatonSize<AutomatonKind::Normal>::MaxNumOfLetters] = {};
@@ -61,8 +59,6 @@ private:
     void considerReturn(
         const uint16_t selectorIndex, const uint16_t symbolIndex, const uint16_t stackIndex);
 
-    void setWitness(
-        const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix);
     template <typename T, typename K>
     void fillTransitionRegardlessOfStackSymbol(
         const T symbol, const common::transition::State state, const K coArg);

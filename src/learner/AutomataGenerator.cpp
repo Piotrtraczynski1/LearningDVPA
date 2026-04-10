@@ -21,9 +21,6 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> AutomataGenerator::generate(
 void AutomataGenerator::clearGenerator()
 {
     transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
-    std::fill(
-        &witnesses[0], &witnesses[0] + AutomatonSize<AutomatonKind::Normal>::MaxNumOfStates,
-        common::Word{});
 }
 
 void AutomataGenerator::buildTransition()
@@ -62,8 +59,6 @@ void AutomataGenerator::considerCall(const uint16_t selectorIndex, const uint16_
     transition->add(
         selectors->getState(selectorIndex), common::symbol::CallSymbol{symbolIndex},
         selectors->getState(successor), pushedStackSymbol);
-
-    setWitness(successor, selectorIndex, common::Word{common::symbol::CallSymbol{symbolIndex}});
 }
 
 void AutomataGenerator::considerLocal(const uint16_t selectorIndex, const uint16_t symbolIndex)
@@ -76,8 +71,6 @@ void AutomataGenerator::considerLocal(const uint16_t selectorIndex, const uint16
     transition->add(
         selectors->getState(selectorIndex), common::symbol::LocalSymbol{symbolIndex},
         selectors->getState(successor));
-
-    setWitness(successor, selectorIndex, common::Word{common::symbol::LocalSymbol{symbolIndex}});
 }
 
 void AutomataGenerator::considerReturn(
@@ -103,8 +96,6 @@ void AutomataGenerator::considerReturn(
     transition->add(
         selectors->getState(selectorIndex), common::symbol::StackSymbol{stackIndex},
         common::symbol::ReturnSymbol{symbolIndex}, selectors->getState(successor));
-
-    setWitness(successor, selectorIndex, common::Word{common::symbol::ReturnSymbol{symbolIndex}});
 }
 
 uint16_t AutomataGenerator::findOrAddSuccessor(const common::Word &candidate)
@@ -124,18 +115,6 @@ void AutomataGenerator::addForcedSelector(
     const uint16_t successor)
 {
     forcedSelector[selectorIdx][stackIdx][returnSymbolIdx] = successor;
-}
-
-void AutomataGenerator::setWitness(
-    const uint16_t successor, const uint16_t selectorIndex, const common::Word suffix)
-{
-    if (successor != 0 and witnesses[successor] == common::Word{})
-    {
-        // TODO: Using witness sometimes generates redundant states, while the selector does not.
-
-        // witnesses[successor] = witnesses[selectorIndex] + suffix;
-        witnesses[successor] = (*selectors)[successor];
-    }
 }
 
 uint16_t AutomataGenerator::addSelector(const common::Word &selector)
@@ -264,7 +243,7 @@ bool AutomataGenerator::isConfigurationAchievable(
     const uint16_t selectorIndex, const common::symbol::StackSymbol stackSymbol) const
 {
     common::symbol::StackSymbol expectedStackTop{
-        oracle.stackContentQuery(witnesses[selectorIndex]).top()};
+        oracle.stackContentQuery((*selectors)[selectorIndex]).top()};
     return expectedStackTop == stackSymbol;
 }
 } // namespace learner
