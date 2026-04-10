@@ -1259,4 +1259,99 @@ TEST_F(TestLearnerTooManyStates2, testLearner)
         << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
         << vpa->getNumOfStates() + 1;
 }
+
+class TestLearnerWitnessesGenerateRedundantStates : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 3;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 3;
+        numOfCalls = 1;
+        numOfReturns = 1;
+        numOfLocals = 1;
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{2}, StackSymbol{2});
+        transition->add(State{1}, CS{0}, State{1}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{2}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{1});
+
+        // LocalTransitions:
+        transition->add(State{0}, LS{0}, State{2});
+        transition->add(State{1}, LS{0}, State{2});
+        transition->add(State{2}, LS{0}, State{2});
+        init();
+    }
+};
+
+TEST_F(TestLearnerWitnessesGenerateRedundantStates, testLearner)
+{
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates() + 1)
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
+
+class TestLearnerWitnessesGenerateRedundantStatesNoSink : public TestLearner
+{
+public:
+    void SetUp() override
+    {
+        numOfStates = 4;
+        acceptingStates = std::vector<uint16_t>{0, 1, 2};
+        numOfStackSymbols = 3;
+        numOfCalls = 1;
+        numOfReturns = 1;
+        numOfLocals = 1;
+        transition = std::make_unique<Transition<AutomatonKind::Normal>>();
+
+        // CallTransitions:
+        transition->add(State{0}, CS{0}, State{2}, StackSymbol{2});
+        transition->add(State{1}, CS{0}, State{1}, StackSymbol{1});
+        transition->add(State{2}, CS{0}, State{3}, StackSymbol{1});
+        transition->add(State{3}, CS{0}, State{3}, StackSymbol{1});
+
+        // ReturnTransitions:
+        transition->add(State{0}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{0}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{0}, StackSymbol{2}, RS{0}, State{1});
+        transition->add(State{1}, StackSymbol{0}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{1}, RS{0}, State{0});
+        transition->add(State{1}, StackSymbol{2}, RS{0}, State{1});
+        transition->add(State{2}, StackSymbol{0}, RS{0}, State{3});
+        transition->add(State{2}, StackSymbol{1}, RS{0}, State{2});
+        transition->add(State{2}, StackSymbol{2}, RS{0}, State{1});
+
+        // LocalTransitions:
+        transition->add(State{0}, LS{0}, State{2});
+        transition->add(State{1}, LS{0}, State{2});
+        transition->add(State{2}, LS{0}, State{2});
+        transition->add(State{3}, LS{0}, State{3});
+        init();
+    }
+};
+
+TEST_F(TestLearnerWitnessesGenerateRedundantStatesNoSink, testLearner)
+{
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hyp{sut->run()};
+    common::Word ce{};
+
+    EXPECT_TRUE(equalUpTo(hyp, 7, &ce)) << "counter example: " << ce;
+    EXPECT_TRUE(hyp->getNumOfStates() <= vpa->getNumOfStates())
+        << "hypothesis numOfStates: " << hyp->getNumOfStates() << " shouldn't be greater than "
+        << vpa->getNumOfStates() + 1;
+}
 } // namespace learner
