@@ -1,11 +1,11 @@
-#include "generator/srs/CommentsGenerator.hpp"
+#include "generator/srs/CancellationGenerator.hpp"
 #include "utils/Constants.hpp"
 #include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 
 namespace generator::srs
 {
-void CommentsGenerator::validateGeneratorConfig(
+void CancellationGenerator::validateGeneratorConfig(
     uint16_t &numOfStates_, uint16_t &numOfCalls_, [[maybe_unused]] uint16_t &numOfLocals_,
     uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_)
 {
@@ -61,13 +61,13 @@ void CommentsGenerator::validateGeneratorConfig(
     numOfReturns_ = adjustedNumOfReturns;
 }
 
-bool CommentsGenerator::generatorSpecificCheck(
+bool CancellationGenerator::generatorSpecificCheck(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     return numOfStates * 2 + 1 >= hypothesis->getNumOfStates();
 }
 
-learner::srs::Srs CommentsGenerator::getSrs()
+learner::srs::Srs CancellationGenerator::getSrs()
 {
     return learner::srs::Srs{learner::srs::SrsRuleWithParams{
         .left =
@@ -76,7 +76,7 @@ learner::srs::Srs CommentsGenerator::getSrs()
         .right = {.takesParams = false}}};
 }
 
-std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommentsGenerator::run()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> CancellationGenerator::run()
 {
     generateTransition();
     addComments();
@@ -86,7 +86,7 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommentsGenerator::run()
         std::move(transition), initialState, acceptingStates, numOfStates * 2);
 }
 
-void CommentsGenerator::addComments()
+void CancellationGenerator::addComments()
 {
     const common::symbol::CallSymbol startComment{numOfCalls};
     const common::symbol::StackSymbol stackSymbolComment{numOfStackSymbols};

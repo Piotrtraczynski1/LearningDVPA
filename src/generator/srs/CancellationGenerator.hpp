@@ -9,7 +9,7 @@
 
 namespace generator::srs
 {
-class CommentsGenerator : public RandomGenerator
+class CancellationGenerator : public RandomGenerator
 {
 public:
     using RandomGenerator::RandomGenerator;

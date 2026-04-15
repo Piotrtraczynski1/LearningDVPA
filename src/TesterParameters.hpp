@@ -55,7 +55,7 @@ constexpr TesterParameters RandomTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
-constexpr TesterParameters CombinedTestParameters{
+constexpr TesterParameters CommutativeTestParameters{
     .minNumOfStates = 2,
     .maxNumOfStates = 3,
     .minNumOfCalls = 2,
@@ -74,7 +74,7 @@ constexpr TesterParameters CombinedTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
-constexpr TesterParameters CommentsTestParameters{
+constexpr TesterParameters CancellationTestParameters{
     .minNumOfStates = 10,
     .maxNumOfStates = 10,
     .minNumOfCalls = 3,
@@ -193,7 +193,7 @@ constexpr TesterParameters RandomTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
-constexpr TesterParameters CombinedTestParameters{
+constexpr TesterParameters CommutativeTestParameters{
     .minNumOfStates = 2,
     .maxNumOfStates = 3,
     .minNumOfCalls = 2,
@@ -212,7 +212,7 @@ constexpr TesterParameters CombinedTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
-constexpr TesterParameters CommentsTestParameters{
+constexpr TesterParameters CancellationTestParameters{
     .minNumOfStates = 2,
     .maxNumOfStates = 3,
     .minNumOfCalls = 2,

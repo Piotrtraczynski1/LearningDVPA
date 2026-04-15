@@ -7,5 +7,5 @@
 #include "generator/callDriven/MeVpaGenerator.hpp"
 #include "generator/callDriven/SeVpaGenerator.hpp"
 
-#include "generator/srs/CombinedGenerator.hpp"
-#include "generator/srs/CommentsGenerator.hpp"
+#include "generator/srs/CancellationGenerator.hpp"
+#include "generator/srs/CommutativeGenerator.hpp"

@@ -1,6 +1,6 @@
 add_library(srsGenerator STATIC
-    CombinedGenerator.cpp
-    CommentsGenerator.cpp
+    CommutativeGenerator.cpp
+    CancellationGenerator.cpp
 )
 
 target_link_libraries(srsGenerator PRIVATE common utils learner teacher)

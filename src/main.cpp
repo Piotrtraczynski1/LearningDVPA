@@ -53,19 +53,19 @@ void runECdaGenerator(const uint16_t numOfTests)
         .run();
 }
 
-void runCombinedGenerator(const uint16_t numOfTests)
+void runCommutativeGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CombinedGenerator()),
-        CombinedTestParameters}
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
+        CommutativeTestParameters}
         .run();
 }
 
-void runCommentsGenerator(const uint16_t numOfTests)
+void runCancellationGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CommentsGenerator()),
-        CommentsTestParameters}
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
+        CancellationTestParameters}
         .run();
 }
 
@@ -85,13 +85,13 @@ int main(int argc, char *argv[])
         std::srand(seed);
         runRandomGenerator(numOfTests);
         break;
-    case (helper::Command::Combined):
+    case (helper::Command::Commutative):
         std::srand(seed);
-        runCombinedGenerator(numOfTests);
+        runCommutativeGenerator(numOfTests);
         break;
-    case (helper::Command::Comments):
+    case (helper::Command::Cancellation):
         std::srand(seed);
-        runCommentsGenerator(numOfTests);
+        runCancellationGenerator(numOfTests);
         break;
     case (helper::Command::Cda):
         std::srand(seed);

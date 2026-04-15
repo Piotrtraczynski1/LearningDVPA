@@ -12,10 +12,10 @@ Command parseCommand(const std::string &cmd)
 {
     if (cmd == "random")
         return Command::Random;
-    if (cmd == "combined")
-        return Command::Combined;
-    if (cmd == "comments")
-        return Command::Comments;
+    if (cmd == "commutative")
+        return Command::Commutative;
+    if (cmd == "cancel")
+        return Command::Cancellation;
     if (cmd == "cda")
         return Command::Cda;
     if (cmd == "sevpa")
@@ -60,8 +60,8 @@ std::tuple<Command, int, uint16_t, std::string> parseInput(int argc, char *argv[
         scenarioName = argv[2];
     }
 
-    if (command == Command::Random or command == Command::Combined or
-        command == Command::Comments or command == Command::Cda or command == Command::SeVpa or
+    if (command == Command::Random or command == Command::Commutative or
+        command == Command::Cancellation or command == Command::Cda or command == Command::SeVpa or
         command == Command::MeVpa or command == Command::eCda)
     {
         if (argc < 4)

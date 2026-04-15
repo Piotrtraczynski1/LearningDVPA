@@ -15,13 +15,13 @@ R"(Usage:
     ./run --help
     
 Generators:
-    random     run tests with random generator
-    cda        run tests with CDA generator
-    sevpa      run tests with SeVPA generator
-    mevpa      run tests with MeVPA generator
-    ecda       run tests with eCDA generator
-    combined   run test with combined generator
-    comments   run test with comments generator
+    random         run tests with random generator
+    cda            run tests with CDA generator
+    sevpa          run tests with SeVPA generator
+    mevpa          run tests with MeVPA generator
+    ecda           run tests with eCDA generator
+    commutative    run test with commutative generator
+    cancel         run test with cancellation generator
     
 Other commands:
     bench      run benchmark for selected scenario

@@ -299,6 +299,9 @@ common::Word SrsChecker::prepareCounterexample(
                 const auto srsRule = specialSymbolToRule[specialSymbol];
                 firstCandidate += srsRule.left;
                 secondCandidate += srsRule.right;
+
+                std::cout << "applied Srs Rule: {" << srsRule.left << ", " << srsRule.right
+                          << "}\n";
             }
             else
             {

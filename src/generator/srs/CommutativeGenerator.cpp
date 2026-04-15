@@ -1,4 +1,4 @@
-#include "generator/srs/CombinedGenerator.hpp"
+#include "generator/srs/CommutativeGenerator.hpp"
 #include "teacher/AutomataCombiner.hpp"
 #include "utils/Constants.hpp"
 #include "utils/ExitCode.hpp"
@@ -6,7 +6,7 @@
 
 namespace generator::srs
 {
-void CombinedGenerator::validateGeneratorConfig(
+void CommutativeGenerator::validateGeneratorConfig(
     uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
     [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
     uint16_t &numOfStackSymbols_)
@@ -14,37 +14,37 @@ void CombinedGenerator::validateGeneratorConfig(
     uint16_t adjustedNumOfStates{static_cast<uint16_t>((numOfStates + 1) * (numOfStates + 1))};
     if (adjustedNumOfStates > utils::MaxNumOfAutomatonStates)
     {
-        ERR("[CombinedGenerator]: (numOfStates + 1) * (numOfStates + 1) (%u) is greater than "
+        ERR("[CommutativeGenerator]: (numOfStates + 1) * (numOfStates + 1) (%u) is greater than "
             "MaxNumOfAutomatonStates!",
             adjustedNumOfStates);
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CombinedGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
+    LOG("[CommutativeGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
     numOfStates_ = adjustedNumOfStates;
 
     uint16_t adjustedNumOfStackSymbols{
         static_cast<uint16_t>((numOfStackSymbols + 1) * (numOfStackSymbols + 1))};
     if (adjustedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
     {
-        ERR("[CombinedGenerator]: (numOfStackSymbols + 1) * (numOfStackSymbols + 1) (%u) is "
+        ERR("[CommutativeGenerator]: (numOfStackSymbols + 1) * (numOfStackSymbols + 1) (%u) is "
             "greater than "
             "MaxNumOfStackSymbols!",
             adjustedNumOfStates);
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CombinedGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
+    LOG("[CommutativeGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
     numOfStackSymbols_ = adjustedNumOfStackSymbols;
 }
 
-bool CombinedGenerator::generatorSpecificCheck(
+bool CommutativeGenerator::generatorSpecificCheck(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     return (numOfStates + 1) * (numOfStates + 1) >= hypothesis->getNumOfStates();
 }
 
-std::shared_ptr<common::VPA<AutomatonKind::Normal>> CombinedGenerator::run()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommutativeGenerator::run()
 {
     splitAplhabet();
 
@@ -58,7 +58,7 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> CombinedGenerator::run()
     return combiner.combineVPA(*secondVpa);
 }
 
-void CombinedGenerator::splitAplhabet()
+void CommutativeGenerator::splitAplhabet()
 {
     callSplitPoint = (rand() % (numOfCalls - 1)) + 1;
     returnSplitPoint = (rand() % (numOfReturns - 1)) + 1;
@@ -66,7 +66,7 @@ void CombinedGenerator::splitAplhabet()
 }
 
 template <typename Predicate>
-std::shared_ptr<common::VPA<AutomatonKind::Normal>> CombinedGenerator::generateVpa(
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommutativeGenerator::generateVpa(
     const Predicate &isVoidSymbol)
 {
     generateTransition(isVoidSymbol);
@@ -78,7 +78,7 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> CombinedGenerator::generateV
 }
 
 template <typename Predicate>
-void CombinedGenerator::generateTransition(const Predicate &isVoidSymbol)
+void CommutativeGenerator::generateTransition(const Predicate &isVoidSymbol)
 {
     transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
 
@@ -92,7 +92,7 @@ void CombinedGenerator::generateTransition(const Predicate &isVoidSymbol)
 }
 
 template <typename Predicate>
-void CombinedGenerator::addCalls(common::transition::State state, const Predicate &isVoidSymbol)
+void CommutativeGenerator::addCalls(common::transition::State state, const Predicate &isVoidSymbol)
 {
     for (uint16_t call = 0; call < numOfCalls; call++)
     {
@@ -115,7 +115,7 @@ void CombinedGenerator::addCalls(common::transition::State state, const Predicat
 }
 
 template <typename Predicate>
-void CombinedGenerator::addLocals(common::transition::State state, const Predicate &isVoidSymbol)
+void CommutativeGenerator::addLocals(common::transition::State state, const Predicate &isVoidSymbol)
 {
     for (uint16_t local = 0; local < numOfLocals; local++)
     {
@@ -136,7 +136,7 @@ void CombinedGenerator::addLocals(common::transition::State state, const Predica
 }
 
 template <typename Predicate>
-void CombinedGenerator::addReturns(common::transition::State state, const Predicate &isVoidSymbol)
+void CommutativeGenerator::addReturns(common::transition::State state, const Predicate &isVoidSymbol)
 {
     for (uint16_t ret = 0; ret < numOfReturns; ret++)
     {
@@ -160,13 +160,13 @@ void CombinedGenerator::addReturns(common::transition::State state, const Predic
     }
 }
 
-void CombinedGenerator::addVoidCall(const common::transition::State state, const uint16_t callId)
+void CommutativeGenerator::addVoidCall(const common::transition::State state, const uint16_t callId)
 {
     transition->add(
         state, common::symbol::CallSymbol{callId}, state, common::symbol::StackSymbol{1});
 }
 
-void CombinedGenerator::addVoidReturn(
+void CommutativeGenerator::addVoidReturn(
     const common::transition::State state, const uint16_t stackSymbolId, const uint16_t returnId)
 {
     transition->add(
@@ -174,12 +174,12 @@ void CombinedGenerator::addVoidReturn(
         state);
 }
 
-void CombinedGenerator::addVoidLocal(const common::transition::State state, const uint16_t localId)
+void CommutativeGenerator::addVoidLocal(const common::transition::State state, const uint16_t localId)
 {
     transition->add(state, common::symbol::LocalSymbol{localId}, state);
 }
 
-bool CombinedGenerator::firstVpaPredicate(const common::Symbol &symbol)
+bool CommutativeGenerator::firstVpaPredicate(const common::Symbol &symbol)
 {
     switch (symbol.index())
     {
@@ -199,11 +199,11 @@ bool CombinedGenerator::firstVpaPredicate(const common::Symbol &symbol)
         return localId < localSplitPoint;
     }
     }
-    ERR("[CombinedGenerator] invalid symbol!");
+    ERR("[CommutativeGenerator] invalid symbol!");
     return false;
 }
 
-bool CombinedGenerator::secondVpaPredicate(const common::Symbol &symbol)
+bool CommutativeGenerator::secondVpaPredicate(const common::Symbol &symbol)
 {
     switch (symbol.index())
     {
@@ -223,11 +223,11 @@ bool CombinedGenerator::secondVpaPredicate(const common::Symbol &symbol)
         return localId >= localSplitPoint;
     }
     }
-    ERR("[CombinedGenerator] invalid symbol!");
+    ERR("[CommutativeGenerator] invalid symbol!");
     return false;
 }
 
-learner::srs::Srs CombinedGenerator::getSrs()
+learner::srs::Srs CommutativeGenerator::getSrs()
 {
     learner::srs::Srs srs{};
 

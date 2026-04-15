@@ -5,8 +5,8 @@ namespace helper
 enum class Command
 {
     Random,
-    Combined,
-    Comments,
+    Commutative,
+    Cancellation,
     Cda,
     SeVpa,
     MeVpa,

@@ -7,7 +7,7 @@
 
 namespace generator::srs
 {
-class CombinedGenerator : public Generator
+class CommutativeGenerator : public Generator
 {
 public:
     using Generator::Generator;
