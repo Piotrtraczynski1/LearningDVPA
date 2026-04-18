@@ -25,19 +25,20 @@ private:
     void splitAplhabet();
 
     template <typename Predicate>
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> generateVpa(const Predicate &isVoidSymbol);
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> generateVpa(
+        const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates);
 
     template <typename Predicate>
-    void generateTransition(const Predicate &isVoidSymbol);
+    void generateTransition(const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates);
 
     template <typename Predicate>
-    void addCalls(common::transition::State state, const Predicate &isVoidSymbol);
+    void addCalls(common::transition::State state, const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates);
 
     template <typename Predicate>
-    void addLocals(common::transition::State state, const Predicate &isVoidSymbol);
+    void addLocals(common::transition::State state, const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates);
 
     template <typename Predicate>
-    void addReturns(common::transition::State state, const Predicate &isVoidSymbol);
+    void addReturns(common::transition::State state, const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates);
 
     void addVoidCall(const common::transition::State state, const uint16_t callId);
     void addVoidReturn(
@@ -48,8 +49,10 @@ private:
     bool firstVpaPredicate(const common::Symbol &symbol);
     bool secondVpaPredicate(const common::Symbol &symbol);
 
+    void selectAcceptingStates(const uint16_t specificVpaNumOfStates);
+
     uint16_t callSplitPoint{1};
     uint16_t returnSplitPoint{1};
     uint16_t localSplitPoint{1};
 };
-} // namespace generator
+} // namespace generator::srs

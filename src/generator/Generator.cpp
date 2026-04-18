@@ -5,7 +5,7 @@ namespace generator
 void Generator::setConfig(
     uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_, uint16_t &numOfReturns_,
     uint16_t &numOfStackSymbols_, const double density_, const double acceptingStatesDensity_,
-    const uint16_t numOfModules_)
+    const uint16_t numOfModules_, const uint16_t secondDvpaNumOfStates_)
 {
     numOfStates = numOfStates_;
     numOfCalls = numOfCalls_;
@@ -15,6 +15,7 @@ void Generator::setConfig(
     density = density_;
     acceptingStatesDensity = acceptingStatesDensity_;
     numOfModules = numOfModules_;
+    secondDvpaNumOfStates = secondDvpaNumOfStates_;
 
     validateGeneratorConfig(
         numOfStates_, numOfCalls_, numOfLocals_, numOfReturns_, numOfStackSymbols_);

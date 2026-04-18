@@ -29,6 +29,7 @@ struct TesterParameters
     uint16_t numOfModules{0};
 
     bool useSrs{false};
+    uint16_t secondDvpaNumOfStates{3};
 
     bool savePassedTestData;
     bool supervisedMode;
@@ -57,7 +58,7 @@ constexpr TesterParameters RandomTestParameters{
 
 constexpr TesterParameters CommutativeTestParameters{
     .minNumOfStates = 2,
-    .maxNumOfStates = 3,
+    .maxNumOfStates = 4,
     .minNumOfCalls = 2,
     .maxNumOfCalls = 3,
     .minNumOfLocals = 2,
@@ -88,6 +89,26 @@ constexpr TesterParameters CancellationTestParameters{
     .numOfRandomTestingWords = 65000,
     .maxTestingWordLength = 10,
     .density = 0.9,
+    .useSrs = true,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
+constexpr TesterParameters IdempotencyTestParameters{
+    .minNumOfStates = 5,
+    .maxNumOfStates = 10,
+    .minNumOfCalls = 4,
+    .maxNumOfCalls = 4,
+    .minNumOfLocals = 5,
+    .maxNumOfLocals = 15,
+    .minNumOfReturns = 4,
+    .maxNumOfReturns = 4,
+    .minNumOfStackSymbols = 16,
+    .maxNumOfStackSymbols = 16,
+    .numOfRandomTestingWords = 10000,
+    .maxTestingWordLength = 30,
+    .density = 1,
+    .numOfModules = 5,
     .useSrs = true,
     .savePassedTestData = false,
     .supervisedMode = false,
@@ -227,6 +248,26 @@ constexpr TesterParameters CancellationTestParameters{
     .maxTestingWordLength = 10,
     .density = 0.9,
     .useSrs = true,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
+constexpr TesterParameters IdempotencyTestParameters{
+    .minNumOfStates = 10,
+    .maxNumOfStates = 10,
+    .minNumOfCalls = 5,
+    .maxNumOfCalls = 5,
+    .minNumOfLocals = 5,
+    .maxNumOfLocals = 15,
+    .minNumOfReturns = 5,
+    .maxNumOfReturns = 5,
+    .minNumOfStackSymbols = 16,
+    .maxNumOfStackSymbols = 16,
+    .numOfRandomTestingWords = 10000,
+    .maxTestingWordLength = 30,
+    .density = 1,
+    .numOfModules = 3,
+    .useSrs = false,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};

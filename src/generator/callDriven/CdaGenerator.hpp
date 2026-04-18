@@ -34,6 +34,11 @@ protected:
         const uint16_t module, const uint16_t callId) const;
     virtual common::transition::State findSuccessorForReturn(const uint16_t stackSymbol) const;
 
+    virtual void addReturns();
+    virtual void addCalls();
+    virtual void addLocals();
+    std::pair<uint16_t, uint16_t> decodeStackSymbol(uint16_t stackSymbol) const;
+
     common::transition::State target[utils::MaxNumOfLetters];
     uint16_t stateToModule[utils::MaxNumOfAutomatonStates];
     std::vector<std::vector<uint16_t>> modules{};
@@ -44,12 +49,7 @@ private:
 
     common::symbol::StackSymbol encodeStackSymbol(const uint16_t module, const uint16_t callId)
         const; // TODO: maybe it's worth to have CallerModule, callId
-    std::pair<uint16_t, uint16_t> decodeStackSymbol(uint16_t stackSymbol) const;
 
     void generateTransition();
-
-    void addCalls();
-    void addLocals();
-    void addReturns();
 };
-} // namespace generator
+} // namespace generator::callDriven

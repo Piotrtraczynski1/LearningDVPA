@@ -18,6 +18,21 @@ const std::vector<std::string> BenchmarkRunner::markersToBeIncluded = {
     "[SrsChecker]: counterexample found",
     "[AutomataGenerator]: generateAutomaton"
 };
+
+const std::vector<std::string> BenchmarkRunner::heatmapMarkers = {
+    "[Teacher]: membershipQuery",
+    "[Teacher]: stackContentQuery",
+    "[Teacher]: equivalenceQuery"
+};
+
+const std::vector<std::string> BenchmarkRunner::plotExecutionMarkers = {
+    "[Teacher]: equivalenceQuery",
+    "[SrsChecker]: counterexample found"
+};
+
+const std::vector<std::string> BenchmarkRunner::plotTimeMarkers = {
+    "[Learner]: Learner::run"
+};
 // clang-format on
 
 BenchmarkRunner::BenchmarkRunner(const std::string &scenarioNameArg) : scenarioName{scenarioNameArg}
@@ -73,6 +88,21 @@ void BenchmarkRunner::createDirectory()
     std::ofstream out(getOutputFileName(), std::ios::trunc);
     out << "dim4Name;dim4Details;dim3Name;dim3Details;dim2Name;dim2Details;dim1Name;dim1Details;"
            "marker;time;executions;avg_time_per_execution\n";
+
+    for (const auto &marker : heatmapMarkers)
+    {
+        std::ofstream out(getHeatmapFileName(marker), std::ios::trunc);
+    }
+
+    for (const auto &marker : plotExecutionMarkers)
+    {
+        std::ofstream out(getPlotFileName(marker), std::ios::trunc);
+    }
+
+    for (const auto &marker : plotTimeMarkers)
+    {
+        std::ofstream out(getPlotFileName(marker), std::ios::trunc);
+    }
 }
 
 std::string BenchmarkRunner::getDirectoryName()
@@ -83,6 +113,12 @@ std::string BenchmarkRunner::getDirectoryName()
 std::string BenchmarkRunner::getOutputFileName()
 {
     return (std::filesystem::path(getDirectoryName()) / "output.csv").string();
+}
+
+std::string BenchmarkRunner::getHeatmapFileName(const std::string &marker)
+{
+    std::string filename = "heatmap" + marker + ".txt";
+    return (std::filesystem::path(getDirectoryName()) / filename).string();
 }
 
 std::string BenchmarkRunner::getPlotFileName(const std::string &marker)
@@ -99,9 +135,20 @@ void BenchmarkRunner::saveResults(const uint16_t numOfTestsInSingleIteration)
         saveMarker(out, marker, numOfTestsInSingleIteration);
     }
 
-    savePlot("[Teacher]: membershipQuery", numOfTestsInSingleIteration);
-    savePlot("[Teacher]: stackContentQuery", numOfTestsInSingleIteration);
-    savePlot("[Teacher]: equivalenceQuery", numOfTestsInSingleIteration);
+    for (const auto &marker : heatmapMarkers)
+    {
+        saveHeatmap(marker, numOfTestsInSingleIteration);
+    }
+
+    for (const auto &marker : plotExecutionMarkers)
+    {
+        savePlotExecutions(marker, numOfTestsInSingleIteration);
+    }
+
+    for (const auto &marker : plotTimeMarkers)
+    {
+        savePlotTime(marker, numOfTestsInSingleIteration);
+    }
 }
 
 void BenchmarkRunner::saveMarker(
@@ -120,16 +167,46 @@ void BenchmarkRunner::saveMarker(
     }
 }
 
-void BenchmarkRunner::savePlot(
+void BenchmarkRunner::saveHeatmap(
     const std::string &marker, const uint16_t numOfTestsInSingleIteration)
 {
-    std::ofstream out(getPlotFileName(marker), std::ios::app);
+    std::ofstream out(getHeatmapFileName(marker), std::ios::app);
     const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
     if (markerInfo.executions > 0)
     {
         out << marker << " (" << scenario->getDim2Details() << ", " << scenario->getDim1Details()
             << ") [" << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration)
             << "]\n";
+    }
+}
+
+void BenchmarkRunner::savePlotExecutions(
+    const std::string &marker, const uint16_t numOfTestsInSingleIteration)
+{
+    std::ofstream out(getPlotFileName(marker), std::ios::app);
+    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
+    if (markerInfo.executions > 0)
+    {
+        out << marker << ", dim2Details: " << scenario->getDim2Details() << ", ("
+            << scenario->getDim1Details() << ", "
+            << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration) << ")\n";
+    }
+}
+
+void BenchmarkRunner::savePlotTime(
+    const std::string &marker, const uint16_t numOfTestsInSingleIteration)
+{
+    constexpr double microsecondsToSeconds{1e-6};
+
+    std::ofstream out(getPlotFileName(marker), std::ios::app);
+    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
+    if (markerInfo.executions > 0)
+    {
+        out << marker << ", dim2Details: " << scenario->getDim2Details() << ", ("
+            << scenario->getDim1Details() << ", "
+            << (static_cast<float>(markerInfo.time) / numOfTestsInSingleIteration) *
+                   microsecondsToSeconds
+            << ")\n";
     }
 }
 } // namespace benchmark

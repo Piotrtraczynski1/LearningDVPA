@@ -56,7 +56,8 @@ void runECdaGenerator(const uint16_t numOfTests)
 void runCommutativeGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
         CommutativeTestParameters}
         .run();
 }
@@ -64,8 +65,18 @@ void runCommutativeGenerator(const uint16_t numOfTests)
 void runCancellationGenerator(const uint16_t numOfTests)
 {
     Tester{
-        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
         CancellationTestParameters}
+        .run();
+}
+
+void runIdempotencyGenerator(const uint16_t numOfTests)
+{
+    Tester{
+        numOfTests,
+        std::unique_ptr<generator::Generator>(new generator::srs::IdempotencyGenerator()),
+        IdempotencyTestParameters}
         .run();
 }
 
@@ -92,6 +103,10 @@ int main(int argc, char *argv[])
     case (helper::Command::Cancellation):
         std::srand(seed);
         runCancellationGenerator(numOfTests);
+        break;
+    case (helper::Command::Idempotency):
+        std::srand(seed);
+        runIdempotencyGenerator(numOfTests);
         break;
     case (helper::Command::Cda):
         std::srand(seed);

@@ -49,7 +49,8 @@ void Tester::run()
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
 {
-    teacher = std::make_shared<teacher::Teacher>(vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
+    teacher = std::make_shared<teacher::Teacher>(
+        vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
     learner::srs::Srs srs = params.useSrs ? generator->getSrs() : learner::srs::Srs{};
     learner = std::make_shared<learner::Learner>(
         *teacher, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols, srs);
@@ -99,7 +100,7 @@ void Tester::prepareTest()
 
     generator->setConfig(
         numOfStates, numOfCalls, numOfLocals, numOfReturns, numOfStackSymbols, params.density,
-        params.acceptingStatesDensity, params.numOfModules);
+        params.acceptingStatesDensity, params.numOfModules, params.secondDvpaNumOfStates);
     vpa = generator->run();
 }
 

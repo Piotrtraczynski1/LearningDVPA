@@ -16,6 +16,8 @@ Command parseCommand(const std::string &cmd)
         return Command::Commutative;
     if (cmd == "cancel")
         return Command::Cancellation;
+    if (cmd == "idempotency")
+        return Command::Idempotency;
     if (cmd == "cda")
         return Command::Cda;
     if (cmd == "sevpa")
@@ -61,8 +63,9 @@ std::tuple<Command, int, uint16_t, std::string> parseInput(int argc, char *argv[
     }
 
     if (command == Command::Random or command == Command::Commutative or
-        command == Command::Cancellation or command == Command::Cda or command == Command::SeVpa or
-        command == Command::MeVpa or command == Command::eCda)
+        command == Command::Cancellation or command == Command::Idempotency or
+        command == Command::Cda or command == Command::SeVpa or command == Command::MeVpa or
+        command == Command::eCda)
     {
         if (argc < 4)
         {

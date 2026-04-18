@@ -9,3 +9,4 @@
 
 #include "generator/srs/CancellationGenerator.hpp"
 #include "generator/srs/CommutativeGenerator.hpp"
+#include "generator/srs/IdempotencyGenerator.hpp"

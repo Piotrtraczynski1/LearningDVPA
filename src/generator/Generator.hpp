@@ -19,7 +19,8 @@ public:
     void setConfig(
         uint16_t &numOfStates_, uint16_t &numOfCalls_, uint16_t &numOfLocals_,
         uint16_t &numOfReturns_, uint16_t &numOfStackSymbols_, const double density_,
-        const double acceptingStatesDensity_, const uint16_t numOfModules_);
+        const double acceptingStatesDensity_, const uint16_t numOfModules_,
+        const uint16_t secondDvpaNumOfStates_);
 
     virtual std::shared_ptr<common::VPA<AutomatonKind::Normal>> run() = 0;
     virtual bool generatorSpecificCheck(
@@ -44,6 +45,7 @@ protected:
     double acceptingStatesDensity;
 
     uint16_t numOfModules;
+    uint16_t secondDvpaNumOfStates;
 
     std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
 

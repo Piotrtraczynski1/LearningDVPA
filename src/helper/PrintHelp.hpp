@@ -22,6 +22,7 @@ Generators:
     ecda           run tests with eCDA generator
     commutative    run test with commutative generator
     cancel         run test with cancellation generator
+    idempotency    run test with idempotency generator
     
 Other commands:
     bench      run benchmark for selected scenario

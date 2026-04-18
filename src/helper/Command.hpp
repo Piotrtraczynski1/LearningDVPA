@@ -7,6 +7,7 @@ enum class Command
     Random,
     Commutative,
     Cancellation,
+    Idempotency,
     Cda,
     SeVpa,
     MeVpa,

@@ -2,14 +2,6 @@
 
 namespace generator::callDriven
 {
-void SeVpaGenerator::validateGeneratorConfig(
-    [[maybe_unused]] uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
-    [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
-    [[maybe_unused]] uint16_t &numOfStackSymbols_)
-{
-    return;
-}
-
 void SeVpaGenerator::selectTargetsForCalls()
 {
     selectEntryPoints();
