@@ -163,7 +163,7 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
 
     for (uint16_t i = 0; i < length; i++)
     {
-        uint8_t symbol{static_cast<uint8_t>(rand() % 3)};
+        uint8_t symbol{static_cast<uint8_t>(rng() % 3)};
 
         switch (symbol)
         {
@@ -171,21 +171,21 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
             if (numOfCalls != 0)
             {
                 word += common::Word{
-                    common::symbol::CallSymbol{static_cast<uint16_t>(rand() % numOfCalls)}};
+                    common::symbol::CallSymbol{static_cast<uint16_t>(rng() % numOfCalls)}};
             }
             break;
         case 1:
             if (numOfLocals != 0)
             {
                 word += common::Word{
-                    common::symbol::LocalSymbol{static_cast<uint16_t>(rand() % numOfLocals)}};
+                    common::symbol::LocalSymbol{static_cast<uint16_t>(rng() % numOfLocals)}};
             }
             break;
         case 2:
             if (numOfReturns != 0)
             {
                 word += common::Word{
-                    common::symbol::ReturnSymbol{static_cast<uint16_t>(rand() % numOfReturns)}};
+                    common::symbol::ReturnSymbol{static_cast<uint16_t>(rng() % numOfReturns)}};
             }
             break;
         default:
@@ -209,7 +209,7 @@ void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>
 
     for (uint16_t i = 0; i < params.numOfRandomTestingWords; i++)
     {
-        const uint16_t length{static_cast<uint16_t>(rand() % (params.maxTestingWordLength + 1))};
+        const uint16_t length{static_cast<uint16_t>(rng() % (params.maxTestingWordLength + 1))};
         std::shared_ptr<common::Word> testWord{generateRandomWord(length)};
 
         if (hypothesis->checkWord(*testWord) != vpa->checkWord(*testWord))

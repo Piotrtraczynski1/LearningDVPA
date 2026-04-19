@@ -1,45 +1,110 @@
 \chapter{Wyniki eksperymentów}
 
 Rozdział ten przedstawia wybrane wyniki eksperymentów, skupia się na podstawowych metrykach opisujących wydajność algorytmu aktywnego uczenia,
-czyli liczbię poszczególnych zapytań kierowanych do nauczyciela. Przedstawia w jaki sposób struktura automatu może wpływać na ilość potrzebnych zapytań
-oraz jak wykorzystanie systemu SRS wpływa na liczbę koniecznych zapytań.
+czyli liczbię poszczególnych zapytań kierowanych do nauczyciela. Przedstawia w jaki sposób struktura automatu może wpływać na liczbę potrzebnych zapytań
+oraz jak wykorzystanie systemu SRS wpływa na proces uczenia.
 
 \section{Podstawowe metryki}
 
 Przedstawione poniżej wykresy zostały wygenerowane na podstawie danych ze scenariuszy benchmarkowych, z użyciem losowego generatora.
-Mając na celu wizualizację liczby potrzebnych zapytań dla losowych automatów różniących się ilością stanów, rozmiarem alfaberu, jak i alfabetu stosowego.
+Mają na celu wizualizację liczby potrzebnych zapytań dla losowych automatów różniących się ilością stanów, rozmiarem alfaberu, jak i alfabetu stosowego.
 
-Poniżej jest przedstawiona początkowa konfiguracja losowego generatora dla wszystkich scenariuszy w tej sekcji:
+Poniżej przedstawiona jest początkowa konfiguracja losowego generatora dla wszystkich scenariuszy w tej sekcji:
 \begin{verbatim}
-minNumOfStates = 2,
-maxNumOfStates = 2,
-minNumOfCalls = 3,
-maxNumOfCalls = 3,
-minNumOfLocals = 3,
-maxNumOfLocals = 3,
-minNumOfReturns = 3,
-maxNumOfReturns = 3,
-minNumOfStackSymbols = 5,
-maxNumOfStackSymbols = 5,
-density = 0.8,
-acceptingStatesDensity = 0.3,
+NumOfStates = 2
+NumOfCalls = 3
+NumOfLocals = 3
+NumOfReturns = 3
+NumOfStackSymbols = 5
+density = 0.8
+acceptingStatesDensity = 0.3
 \end{verbatim}
 
-Dla każdej kofiguracji generator generuje 200 automatów, które będą obiektem testowym algorytmu. Scenariusze zakładają zwiększająca się liczbe
-poszczególnych typów symboli w alfabecie o 2 w każdym kroku oraz stanów automatu również o 2 w każdym kroku.
-Poniżej przedstawiam średnie wyniki dla poszczególnych zapytań oraz konfiguracji automatu:
+Każdy ze scenariuszy modyfikował początkową konfigurację generatora poprzez zwiększanie liczby stanów oraz
+liczby symboli wybranego typu. Dla każdej kofiguracji zostało wygenerowane 200 automatów,
+dla których poszczególne wyniki zostały zebrane i uśrednione w celu pokazania trendów.
 
 \input{plots/baseMetrics}
 
+Podobieństwo wyników przy rosnącej liczbie symboli typu call oraz local jest zaskakujące.
+Oczekiwano, że wzrost liczby symboli typu call znacząco zwiększy liczbę zapytań w porównaniu
+z symbolami typu local.
 
 \section{Wpływ SRS}
 
-\subsection{Cancellation generator}
+Wartością, którą wnosi wykorzystanie systemu SRS jest potencjalne zredukowanie liczby zapytań,
+skrócenie czasu procesu uczenia oraz poprawienie dokładności uczenia w przypadku wykorzystania
+heurystycznych podejść do przetwarzania zapytania equivalence query. Dlatego sekcja ta została
+podzielona na dwie podsekcje. Pierwsza przedstawia wpływ systemu SRS na wydajność uczenia,
+z wykorzystaniem dokładnego algorytmu nauczyciela. Druga wykorzystuje heurystyczne podejście
+oraz przedstawia jak system SRS wpływa na dokładność uczenia.
 
-Redukuję liczbę zapytań o około połowę, przy czym nie używa parametru, zawsze podstawia słowo puste.
+Każdy ze scenariuszy składa się z dwóch iteracji. W pierwszej iteracji system SRS nie jest wykorzystywany.
+Przed drugą iteracją ziarno generatora liczb losowych jest ponownie ustawiane w celu wygenerowania
+identycznych automatów.
+
+\subsection{Podstawowe metryki}
+
+Sekcje ta przedstawia jak poszczególne typy systemów SRS wpłyneły na proces uczenia pod względem ilość zapytań
+equivalence query skierowanych do nauczyciela, oraz czasu działania algorytmu.
+
+Poniżej przedstawiona jest cześć wspólna początkowej konfiguracji wszystkich
+generatorów, które zostały wykorzystane w tej sekcji:
+\begin{verbatim}
+NumOfCalls = 3
+NumOfLocals = 3
+NumOfReturns = 3
+NumOfStackSymbols = 5
+density = 0.8
+acceptingStatesDensity = 0.3
+\end{verbatim}
+
+Każdy ze scenariuszy modyfikował początkową konfigurację generatora poprzez zwiększanie liczby stanów automatu.
+Dla każdej kofiguracji zostało wygenerowane 10 (TODO) automatów,
+dla których poszczególne wyniki zostały zebrane i uśrednione.
+
+\paragraph{Cancellation}
+
+Z każdym wygenerowanym automatem była związania następująca reguła SRS $cXr \rightarrow \epsilon$.
+Jednak na podstawie obserwacji i przeprowadzonych testów okazuje się, że dla wygenerowanych automatów
+równie skuteczna jest reguła $cr \rightarrow \epsilon$. Może oznaczać to, że w przypadku reguł w tej postaci
+wykorzystanie parametru nie wnosi żadnej dodatkowej wartości.
 
 \input{plots/cancellationSrs}
 
-\subsection{Idempotency}
+\paragraph{Idempotency}
+
+Odpowiadające tej regule reguła dla automatów DFA w postaci $uu \rightarrow u$ w pracy~\cite{srs}
+została przedstawiona, jako przynosząca najmniejsze korzyści. Jednak nie było oczywiste, że obserwacja
+ta powtórzy się dla automatów DVPA z powodu zastosowania reguł z parametrem z powodu braku lokalności
+reguł z parametrami. Jednakże, otrzymane wyniki potwierdzają tą obserwację również dla automatów DVPA.
 
 \input{plots/idempotencySrs}
+
+\paragraph{Commutation}
+
+
+
+\paragraph{}
+
+\subsection{Wpływ SRS na dokładność uczenia}
+
+W celu heurystycznego sprawdzenia równoważności dwóch automatów dla każdego sprawdzenia zostało wygenerowane
+(?) losowych słów o losowej długości ograniczonej do (?). Sprawdzanie równoważności dwóch automatów,
+które odbywa się podczas sprawdzania reguł SRS również wykorzystywało tę samą heurystykę.
+
+Ostateczne sprawdzanie poprawności wygenerowanych automatów zostało zaimplementowane w analogiczny sposób
+sprwadzając (?) losowcyh słów o długośći ograniczonej przez (?).
+
+Podejście to umożliwoło przeprowadzenie eksperymentów na znacząco większych automatach w porównaniu
+z wcześniejszymi eksperymentami.
+
+Do generowania losowych słów wykorzystywanych przy sprawdzaniu równoważności użyto
+oddzielnego generatora liczb losowych, aby zapewnić identyczność generowanych automatów
+dla algorytmu wykorzystującego system SRS, jak i bez niego.
+
+\paragraph{Cancellation}
+
+\paragraph{Idempotency}
+
+\paragraph{Commutation}

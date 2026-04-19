@@ -6,7 +6,10 @@
     ylabel={Liczba zwróconych kontrprzykładów},
     grid=major,
     legend style={at={(0.02,0.98)}, anchor=north west, font=\small},
-    legend cell align=left
+    legend cell align=left,
+    xmin=0,
+    ymin=0,
+    enlargelimits=false
 ]
     \addplot[mark=*] coordinates { \DataCexSrs };
     \addlegendentry{Kontrprzykłady znalezione przez SRS}

@@ -54,17 +54,42 @@ Jest zdefiniowana poprzez dostosowanie funkcji $Target$. Automat $A$ należy do 
 wtedy i tylko wtedy, gdy $Target(c_1) \sameModuleRel Target(c_2) \Rightarrow c_1 = c_2$.
 
 \section{Generatory wraz z systemem SRS}
+\label{chap:generatorsSrs}
 
-Sekcja ta zawiera opisy czterech rodzai automatów, które były generowane w celu utworzenia automatów wraz z systemem SRS wynikającym z ich struktury, która
+Sekcja ta zawiera opisy czterech rodzajów automatów, które były generowane w celu utworzenia automatów wraz z systemem SRS wynikającym z jego struktury, która
 może odpowiadać automatom rozwiązującym rzeczywiste problemy z naturalnie występującymi własnościami dającymi się zapisać w postaci systemu SRS.
 Z każdym generatorem jest powiązany dokładnie jeden typ reguł SRS.
 
-\textbf{Combined} jest to automat będący połączeniem dwóch automatów o niezależnym alfabecie wejściowym. Odpowiada on dwóm niezależnym automatom reprezentowanym
-poprzez jeden. Został on zaimplementowany poprzez produkt dwóch automatów nad tym samym alfabetem $\Sigma = \Sigma_{call} \cup \Sigma_{return} \cup \Sigma{local}$,
-gdzie każdy ze zbiorów $\Sigma_{call}, \Sigma{return}$ oraz $\Sigma{local}$ został podzielony na dwa rozłączne zbiory i dla dokładnie jednego z tych zbiorów
-dokładnie jedna z dwóch automatów produktowych nie zmienia stanu po wczytaniu symbolu z tego zbioru. Umożliwia to zdefiniowanie reguł SRS następującej postaci:
-$c_1c_2Xr_2c_1 \rightarrow c_2c_1Xc_1c_2$, gdzie $c_1 \in \Sigma_{call}^1$, $c_2 \in \Sigma_{call}^2$, $r_1 \in \Sigma{return}^1$ oraz $r_2 \in \Sigma_{return}^2$.
+\textbf{Commutative} jest to klasa automatów będących produktem dwóch automatów DVPA $A_1 \times A_2$ nad tym samym alfabetem,
+z czego każdy ze zbiorów $\Sigma_{call}$, $\Sigma_{return}$ i $\Sigma_{local}$ jest podzielony na dwa rozłączne podzbiory:
+\begin{itemize}
+    \item $\Sigma_{call} = \Sigma_{call}^1 \cup \Sigma_{call}^2$
+    \item $\Sigma_{return} = \Sigma_{return}^1 \cup \Sigma_{return}^2$
+    \item $\Sigma_{local} = \Sigma_{local}^1 \cup \Sigma_{local}^2$.
+\end{itemize}
+Obydwa automaty są generowane losowo na podstawie losowego generatora z dodatkowym obostrzeniem.
+Jeśli automat $A_i$ wczyta literę spoza zbioru $\Sigma^i$ to nie zmienia on stanu. Umożliwia to
+zdefiniowanie następujących reguł SRS dla $c_1 \in \Sigma_{call}^1$, $c_2 \in \Sigma_{call}^2$,
+$r_1 \in \Sigma_{return}^1$ oraz $r_2 \in \Sigma_{return}^2$:
+$$c_1c_2Xr_2c_2 \rightarrow c_2c_1Xr_1r_2$$
+Stany akceptujące tego automatu są zdefiniowane poprzez alternatywę wykluczającą stanów akceptujących automatów $A_1$ oraz $A_2$.
+Naturalną interpretacją tej klasy są automaty składające się z dwóch niezależnych komponentów.
 
-TODO popraw ten opis
 
-\textbf{Cancellation}
+\textbf{Cancellation} jest to klasa automatów dla których dla pewnych symboli $c \in \Sigma_{call}$ oraz $r \in \Sigma_{return}$ możliwym jest zdefiniowanie
+reguł SRS w następującej postaci:
+$$cXr \rightarrow \epsilon$$
+Zachowanie to można interpretować jako rozpoczęcie oraz zakończenie komentarza w kodzie. Automaty te są generowane na podstawie generatora losowego, gdzie
+alfabet losowo wygenerowanego automatu rozszerza się o dodatkowe litery $c$ i $r$ oraz zbiór symboli stosowych o dodatkowy symbol $B$. Zbiór stanów automatu również zostaje rozszerzony poprzez
+dodanie dla każdego stanu $q \in Q$ jego odpowiednika $q'$, do którego można przejść jedynie za stanu $q$ za pomocą litery $c$, która wkłada na stos symbol $B$.
+Wszystkie przejścia w stanie $q'$ prowadzą również do stanu $q'$, dodając na stos symbol stosowy różny od $B$. Wyjątkiem jest jedynie przejście:
+$(q', r, B) = q$.
+
+\textbf{Idempotency} jest to klasa automatów umożliwiająca zdefiniowanie reguł postaci:
+$$ccXrr \rightarrow cXr$$
+Automaty te są wygenerowane poprzez nałożenie dodatkowych obostrzeń na automaty z klasy \textbf{Single Entry Visibly Pushdown automaton}:
+\begin{enumerate}
+    \item Wymagane jest żeby wszystkiej przejścia dla liter typu call były określone
+    \item Wymagamy, żeby po przeczytaniu litery typu return w konfiguracji $(q_i, (i, c))$ automat przechodzi do stanu $q_i$.
+          Czyli wracając do modułu w którym aktualnie się znajduje, nie powinien on zmieniać stanu.
+\end{enumerate}

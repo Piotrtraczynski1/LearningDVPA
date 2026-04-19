@@ -43,9 +43,10 @@ Każda reguła postaci $l \rightarrow r$ powinna składać się z słów $l$ ora
 ani nie zmieniają jego zawartości, odpowiadają one pewnemu przekształceniu stanów analogicznie jak dla automatów DFA.
 
 Umożliwia to sprawdzenie czy automat jest zgodny z daną regułą $l \rightarrow r$, poprzez sprawdzenie równoważności dwóch automatów $H_l$ oraz $H_r$, utworznych
-na podstawie hipotezy $H$ nad alfabetem $\Sigma = \Sigma_{call} \cup \Sigma_{return} \cup \Sigma_{local}$, każdy nad alfabetem $\Sigma' = \Sigma_{call} \cup \Sigma_{return} \cup (\Sigma_{local} \cup \{l'\})$.
-gdzie automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którm znalazłby się automat $H$ po przeczytaniu słowa $l$, a $H_r$ po przeczytaniu $l'$
-trafia do stanu w którym znalazłaby się hipoteza po przeczytaniu słowa $r$.
+na podstawie hipotezy $H$, z alfabetem rozszerzonym o dodatkową literę $l'$ typu local.
+Automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którm znalazłby się automat $H$ po przeczytaniu słowa $l$, a $H_r$ po przeczytaniu $l'$
+trafia do stanu w którym znalazłaby się hipoteza po przeczytaniu słowa $r$. Jest to możliwe, gdyż słowa dobrze
+zbalansowane nie zależą od stosu ani go nie modyfikują.
 
 Problemem tego podejścia wydawało się sprawdzanie równoważności, gdyż w aktualnej implementacji jest wykorzystywany ten sam algorytm, który sprawdza
 równoważność hipotezy z automatem docelowym. Jednak hipoteza przez znaczący czas trwania algorytmu jest znacznie mniejsza niż automat docelowy, przez co produkt
@@ -56,8 +57,24 @@ proces uczenia się automatu.
 $wl_1Xl_2v \in L \Leftrightarrow wr_1Xr_2v \in L$, gdzie $w,v \in \Sigma^*$, $X \in \Sigma^*$ jest słowem dobrze zbalansowanym oraz słowa $l_1l_2, r_1r_2$
 są dobrze zbalansowane.
 
-Algorytm w celu sprawdzenia zgodności z hiptezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia słów dobrze zbalansowanych, które mogą zostać podstawione
-jako parametr $X$. Wybiera słowa dla których funkcja reprezentująca przekształcenie stanów jest możliwie różna od pozostałych już wybranych słów.
-Następnie dla każdej reguły oraz słowa dodaje nową literę lokalną do automatów $H_l$ oraz $H_r$. Jeśli zostanie wykryta niespójność
-na podstawie niezgodności tych automatów, to gwarantuję to, że $H$ nie jest zgodne z systemem SRS. Jednakże nie daje to gwarancji, że każda
-niezgodność $H$ z systemem SRS zostanie wykryta.
+Algorytm w celu sprawdzenia zgodności hiptezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia zbioru 
+słów dobrze zbalansowanych, które mogą zostać podstawione jako parametr $X$.
+Ponieważ liczba tych słów powinna być ogarniczona, obliczana jest wartość każdego słowa
+na podstawie której podejmowana jest dezycja czy słowo to powinno zostać wykorzystane.
+Dystansem $dist(w_1, w_2)$ pomiędzy słowami $w_1$ i $w_2$ określamy liczbę takich stanów
+$q \in Q$, że $H(q, \bot, w_1) \neq H(q, \bot, w_2)$.
+Następnie w momencie dodawania słowa do zbioru słów dobrze zbalansowanych określana jest jego wartość,
+jako minimalny dystans od już zawartych w tym zbiorze słów. Jeśli zbiór ten zawiera zbyt wiele elementów
+usuwane są słowa o najmniejszej wartości. Podejście to ma na celu zmaksymalizować szanse algorytmu na
+wykrycie niespójności.
+
+Następnie dla każdej reguły oraz słowa dodaje nową literę lokalną do automatów $H_l$ oraz $H_r$,
+po czym sprawdzana jest ich równoważność. Jeżeli istnieje słowo $w$, które należy do dokładniej jednego
+z języków generowanych przez automaty $H_l$ oraz $H_r$ to oznacza, że została wykryta niespójność
+z systemem SRS. Należy wtedy skonstruować słowa $w_l$ oraz $w_r$ poprzez podstawienie za wszystkie dodatkowe
+litery lokalne odpowiednio lewej oraz prawej strony reguły SRS odpowiadającej danej literze.
+Ostatecznie jedno tych słów jest poprawnym kontrprzykładem, więc przy pomocy jednego zapytania \textbf{MQ}
+algortm podejmuje decyzje, które słowo należy zwrócić.
+
+Podejście to gwarantuję to, że w przypadku wykrycia niespójności $H$ nie jest zgodne z systemem SRS.
+Jednakże nie daje to gwarancji, że każda niezgodność $H$ z systemem SRS zostanie wykryta.

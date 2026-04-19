@@ -163,8 +163,6 @@ poprzez maksymalną ilość liter obsługiwaną przez automat \texttt{MaxNumOfLe
 
 Każde dobrze zbalansowane słowo $w$ jest skojarzone z listą następników o rozmiarze równym ilości stanów hipotezy, $n$-ty element listy określa stan w jakim znajdzie się
 hipoteza po przeczytaniu słowa $w$ zaczynając w $n$-tym stanie. Dystans pomiędzy dwoma słowami oznacza ilość pozycji na którch ich listy następników są różne.
-Podczas dodawania nowego słowa do wynikowego zbioru słów dobrze zbalansowanych obliczana jest jego wartość, jako minimalny dystans od
-już zawartych w tym zbiorze słów. Na podstawie tej wartości, algorytm decyduje, które słowa należy usunąć gdy zbiór ma zbyt wiele elementów.
 
 Początkowo zaczyna od zainicjalizowania zbioru słowem pustym, oraz słowami składającymi się z pojedynczych liter typu local. Następnie algorytmem w stylu BFS
 dodaje nowe elementy do zbioru jeśli ich wartość jest nie zerowa. Nowe elementy są tworzone na podstawie dwóch typów operacji:
@@ -177,7 +175,7 @@ dodaje nowe elementy do zbioru jeśli ich wartość jest nie zerowa. Nowe elemen
 
 \paragraph{Budowanie automatów}
 
-Następnie tworzone są dwie kopie hipotezy $H_l$ oraz $H_r$. Po czy dla każdego słowa $w$ ze zbioru słów dobrze zbalansowanych oraz każdej reguły SRS postaci
+Następnie tworzone są dwie kopie hipotezy $H_l$ oraz $H_r$. Po czym dla każdego słowa $w$ ze zbioru słów dobrze zbalansowanych oraz każdej reguły SRS postaci
 $l_1Xl_2 \rightarrow r_1Xr_2$ rozszerzamy zbiór $\Sigma_{local}$ dla obydwu automatów $H_l$ oraz $H_r$ o nową litere oraz określamy przejścia dla tej litery,
 które w automacie $H_l$ odpowiadają przejścią po słowie $l_1wl_2$ w hioptezie, a w automacie $H_r$ przejścią po słowie $r_1wr_2$. Dla nowo dodanej litery,
 użyta reguła SRS zostaje zapisana w celu konstrukcji kontrprzykładu nie zawierającego liter spoza orginalnego alfabetu wejściowego.
@@ -186,9 +184,9 @@ użyta reguła SRS zostaje zapisana w celu konstrukcji kontrprzykładu nie zawie
 
 Sprawdzamy równoważność automatów $H_l$ oraz $H_r$ przy pomocy procedur wykorzystywanych przez nauczyciela do sprawdzania równoważności,
 opisanych w następnej sekcji. Jeśli automaty są równoważne, oznacza to, że nie wykryliśmy niespójności z systemem SRS i zapytanie będzie
-przekierowane do nauczyciela. W przeciwnym przypadku jesteśmy w stanie odtworzyć dwa słowa $v_1$ oraz $v_2$ podmieniając dodatkowe litery typu local, na prawą w przypadku
-pierwszego słowa strone reguły, bądź lewą w przypadku drugiego słowa. Ponieważ system musi być zgodny z automatem docelowym, wiemy że jedno z tych słów
-musi być akceptowane przez dokładnie jeden z automatu docelowego oraz hipotezy. Dlatego wysyłając jedno zapytanie MQ($v_1$) do nauczyciela,
+przekierowane do nauczyciela. W przeciwnym przypadku jesteśmy w stanie odtworzyć dwa słowa $v_1$ oraz $v_2$ podmieniając dodatkowe litery typu local, na lewą w przypadku
+pierwszego słowa strone reguły, bądź prawą w przypadku drugiego słowa. Ponieważ system jest zgodny z automatem docelowym, wiemy że jedno z tych słów
+musi być akceptowane przez dokładnie jeden spośród automatu docelowego oraz hipotezy. Dlatego wysyłając jedno zapytanie MQ($v_1$) do nauczyciela,
 jesteśmy w stanie stwierdzić, które z tych słów jest poprawnym kontrprzykładem.
 
 
@@ -338,6 +336,8 @@ rozdziale~\ref{chap:generators}.
     \item gęstość przejść w automacie: \texttt{density}
     \item gęstość stanów akceptujących: \texttt{acceptingStatesDensity}
     \item liczba modułów: \texttt{numOfModules}, stosowana tylko dla automatów sterowanych symbolami call (rozdz.~\ref{chap:CDA})
+    \item liczba stanów drugiego automatu: \texttt{secondDvpaNumOfStates}, stosowana tylko dla \texttt{CommutativeGenerator} 
+          opisanego w sekcji o generatorach wraz z systemem SRS~\ref{chap:generatorsSrs}
 \end{itemize}
 
 \textbf{Interfejs} udostępniany przez klasę \texttt{Generator} obejmuje następujące metody:

@@ -5,12 +5,14 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <random>
 #include <string>
 
 #include "TesterParameters.hpp"
 #include "generator/Generator.hpp"
 #include "learner/Learner.hpp"
 #include "teacher/Teacher.hpp"
+#include "utils/EquivalenceCheckConfig.hpp"
 #include "utils/ExitCode.hpp"
 
 struct RunResult;
@@ -74,6 +76,9 @@ private:
 
     std::shared_ptr<teacher::Teacher> teacher;
     std::shared_ptr<learner::Learner> learner;
+
+    static constexpr int testerSeed{1};
+    std::mt19937 rng{testerSeed};
 };
 
 struct RunResult
