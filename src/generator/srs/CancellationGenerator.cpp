@@ -18,7 +18,7 @@ void CancellationGenerator::validateGeneratorConfig(
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CombinedGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
+    IMP("[CombinedGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
     numOfStates_ = adjustedNumOfStates;
 
     uint16_t adjustedNumOfStackSymbols{static_cast<uint16_t>(numOfStackSymbols + 1)};
@@ -31,7 +31,7 @@ void CancellationGenerator::validateGeneratorConfig(
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CombinedGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
+    IMP("[CombinedGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
     numOfStackSymbols_ = adjustedNumOfStackSymbols;
 
     uint16_t adjustedNumOfCalls{static_cast<uint16_t>(numOfCalls + 1)};
@@ -44,7 +44,7 @@ void CancellationGenerator::validateGeneratorConfig(
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CombinedGenerator] adjusting numOfCalls to %u", adjustedNumOfCalls);
+    IMP("[CombinedGenerator] adjusting numOfCalls to %u", adjustedNumOfCalls);
     numOfCalls_ = adjustedNumOfCalls;
 
     uint16_t adjustedNumOfReturns{static_cast<uint16_t>(numOfReturns + 1)};
@@ -57,7 +57,7 @@ void CancellationGenerator::validateGeneratorConfig(
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CombinedGenerator] adjusting numOfReturns to %u", adjustedNumOfReturns);
+    IMP("[CombinedGenerator] adjusting numOfReturns to %u", adjustedNumOfReturns);
     numOfReturns_ = adjustedNumOfReturns;
 }
 

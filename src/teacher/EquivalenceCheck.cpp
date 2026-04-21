@@ -27,7 +27,7 @@ std::shared_ptr<common::Word> equivalenceCheck(
     [[maybe_unused]] std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa)
 {
-    std::mt19937 rng(utils::equivalenceCheckSeed);
+    static std::mt19937 rng(utils::equivalenceCheckSeed);
 
     auto generateRandomWord = [&](const uint16_t length)
     {

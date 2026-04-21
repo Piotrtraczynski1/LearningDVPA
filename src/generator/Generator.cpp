@@ -23,6 +23,11 @@ void Generator::setConfig(
     transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
 }
 
+void Generator::setSeed(uint32_t seed)
+{
+    rng = std::mt19937{seed};
+}
+
 bool Generator::generatorSpecificCheck(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
@@ -55,11 +60,11 @@ void Generator::validateGeneratorConfig(
 
 bool Generator::skipTransition()
 {
-    return ((static_cast<double>(rand()) / RAND_MAX) >= density);
+    return ((static_cast<double>(rng()) / RAND_MAX) >= density);
 }
 
 bool Generator::shouldAccept()
 {
-    return ((static_cast<double>(rand()) / RAND_MAX) < acceptingStatesDensity);
+    return ((static_cast<double>(rng()) / RAND_MAX) < acceptingStatesDensity);
 }
 } // namespace generator

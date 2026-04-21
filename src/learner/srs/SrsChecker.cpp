@@ -79,6 +79,7 @@ uint16_t SrsChecker::buildConvertedAutomata()
 void SrsChecker::prepareWellMatchedWords(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
+    TIME_MARKER("[SrsChecker]: prepareWellMatchedWords");
     wellMatchedWords.clear();
     nodes.clear();
     numOfStates = hypothesis->getNumOfStates();
@@ -129,6 +130,10 @@ void SrsChecker::prepareWellMatchedWords(
 
         numOfRevealedNodes++;
     }
+
+    std::sort(
+        nodes.begin(), nodes.end(), [](const WellMatchedNode &l, const WellMatchedNode &r) -> bool
+        { return l.score > r.score; });
 
     wellMatchedWords.reserve(nodes.size());
     for (const auto &node : nodes)

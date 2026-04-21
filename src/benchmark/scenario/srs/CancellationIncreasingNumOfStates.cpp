@@ -19,7 +19,7 @@ void CancellationIncreasingNumOfStates::runSingleIteration()
     Tester{
         numOfTestsInSingleIteration,
         std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
-        parameters}
+        parameters, rand()}
         .run();
 }
 } // namespace benchmark::scenario

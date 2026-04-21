@@ -22,28 +22,28 @@ void CommutativeGenerator::validateGeneratorConfig(
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CommutativeGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
+    IMP("[CommutativeGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
     numOfStates_ = adjustedNumOfStates;
 
     uint16_t adjustedNumOfStackSymbols{
-        static_cast<uint16_t>((numOfStackSymbols + 1) * (numOfStackSymbols + 1))};
+        static_cast<uint16_t>((numOfStackSymbols + 1) * (numOfStackSymbols + 1))}; // TODO
     if (adjustedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
     {
         ERR("[CommutativeGenerator]: (numOfStackSymbols + 1) * (numOfStackSymbols + 1) (%u) is "
             "greater than "
-            "MaxNumOfStackSymbols!",
-            adjustedNumOfStates);
+            "MaxNumOfStackSymbols! (%u)",
+            adjustedNumOfStackSymbols, utils::MaxNumOfStackSymbols);
         exit(toExit(ExitCode::GENERATOR));
     }
 
-    LOG("[CommutativeGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
+    IMP("[CommutativeGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
     numOfStackSymbols_ = adjustedNumOfStackSymbols;
 }
 
 bool CommutativeGenerator::generatorSpecificCheck(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
-    return (numOfStates + 1) * (secondDvpaNumOfStates + 1) >= hypothesis->getNumOfStates();
+    return (numOfStates + 1) * (secondDvpaNumOfStates + 1) + 1 >= hypothesis->getNumOfStates();
 }
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommutativeGenerator::run()
@@ -63,9 +63,9 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommutativeGenerator::run()
 
 void CommutativeGenerator::splitAplhabet()
 {
-    callSplitPoint = (rand() % (numOfCalls - 1)) + 1;
-    returnSplitPoint = (rand() % (numOfReturns - 1)) + 1;
-    localSplitPoint = (rand() % (numOfLocals - 1)) + 1;
+    callSplitPoint = (rng() % (numOfCalls - 1)) + 1;
+    returnSplitPoint = (rng() % (numOfReturns - 1)) + 1;
+    localSplitPoint = (rng() % (numOfLocals - 1)) + 1;
 }
 
 template <typename Predicate>
@@ -112,9 +112,9 @@ void CommutativeGenerator::addCalls(
         {
             continue;
         }
-        common::transition::State dest{static_cast<uint16_t>(rand() % specificVpaNumOfStates)};
+        common::transition::State dest{static_cast<uint16_t>(rng() % specificVpaNumOfStates)};
         common::symbol::StackSymbol stackSymbol{
-            static_cast<uint16_t>((rand() % (numOfStackSymbols - 1)) + 1)};
+            static_cast<uint16_t>((rng() % (numOfStackSymbols - 1)) + 1)};
 
         transition->add(state, common::symbol::CallSymbol{call}, dest, stackSymbol);
     }
@@ -137,7 +137,7 @@ void CommutativeGenerator::addLocals(
         {
             continue;
         }
-        common::transition::State dest{static_cast<uint16_t>(rand() % specificVpaNumOfStates)};
+        common::transition::State dest{static_cast<uint16_t>(rng() % specificVpaNumOfStates)};
 
         transition->add(state, common::symbol::LocalSymbol{local}, dest);
     }
@@ -162,7 +162,7 @@ void CommutativeGenerator::addReturns(
             {
                 continue;
             }
-            common::transition::State dest{static_cast<uint16_t>(rand() % specificVpaNumOfStates)};
+            common::transition::State dest{static_cast<uint16_t>(rng() % specificVpaNumOfStates)};
             common::symbol::StackSymbol stackSymbol{stackSymbolId};
 
             transition->add(state, stackSymbol, common::symbol::ReturnSymbol{ret}, dest);
@@ -246,6 +246,16 @@ void CommutativeGenerator::selectAcceptingStates(const uint16_t specificVpaNumOf
         {
             acceptingStates.push_back(i);
         }
+    }
+
+    if (acceptingStates.size() == specificVpaNumOfStates)
+    {
+        acceptingStates.pop_back();
+    }
+
+    if (acceptingStates.size() == 0)
+    {
+        acceptingStates.push_back(0);
     }
 }
 

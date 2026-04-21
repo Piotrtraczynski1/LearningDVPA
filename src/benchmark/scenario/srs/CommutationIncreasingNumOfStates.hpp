@@ -14,6 +14,11 @@ class CommutationIncreasingNumOfStates : public BaseSrsScenario
     uint16_t dim1Step{0};
 
 public:
+    CommutationIncreasingNumOfStates()
+    {
+        parameters.minNumOfStackSymbols = 2;
+        parameters.maxNumOfStackSymbols = 2;
+    }
     uint16_t getNumOfIterationsIn1Dim() override;
     uint16_t getDim1Details() override;
     void runSingleIteration() override;

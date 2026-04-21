@@ -60,7 +60,7 @@ void ECdaGenerator::selectTargetsForCalls()
 {
     std::vector<uint16_t> randomModules(numOfModules - 1);
     std::iota(randomModules.begin(), randomModules.end(), 1);
-    std::mt19937 g(rand());
+    std::mt19937 g(rng());
     std::shuffle(randomModules.begin(), randomModules.end(), g);
 
     for (uint16_t call = 0; call < numOfCalls; call++)

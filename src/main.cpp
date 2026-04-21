@@ -9,74 +9,74 @@
 
 namespace
 {
-void runRandomGenerator(const uint16_t numOfTests)
+void runRandomGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests, std::unique_ptr<generator::Generator>(new generator::RandomGenerator()),
-        RandomTestParameters}
+        RandomTestParameters, seed}
         .run();
 }
 
-void runCdaGenerator(const uint16_t numOfTests)
+void runCdaGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::callDriven::CdaGenerator()),
-        CdaTestParameters}
+        CdaTestParameters, seed}
         .run();
 }
 
-void runSeVpaGenerator(const uint16_t numOfTests)
+void runSeVpaGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::callDriven::SeVpaGenerator()),
-        SeVpaTestParameters}
+        SeVpaTestParameters, seed}
         .run();
 }
 
-void runMeVpaGenerator(const uint16_t numOfTests)
+void runMeVpaGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::callDriven::MeVpaGenerator()),
-        MeVpaTestParameters}
+        MeVpaTestParameters, seed}
         .run();
 }
 
-void runECdaGenerator(const uint16_t numOfTests)
+void runECdaGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::callDriven::ECdaGenerator()),
-        ECdaTestParameters}
+        ECdaTestParameters, seed}
         .run();
 }
 
-void runCommutativeGenerator(const uint16_t numOfTests)
+void runCommutativeGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
-        CommutativeTestParameters}
+        CommutativeTestParameters, seed}
         .run();
 }
 
-void runCancellationGenerator(const uint16_t numOfTests)
+void runCancellationGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
-        CancellationTestParameters}
+        CancellationTestParameters, seed}
         .run();
 }
 
-void runIdempotencyGenerator(const uint16_t numOfTests)
+void runIdempotencyGenerator(const uint16_t numOfTests, const uint32_t seed)
 {
     Tester{
         numOfTests,
         std::unique_ptr<generator::Generator>(new generator::srs::IdempotencyGenerator()),
-        IdempotencyTestParameters}
+        IdempotencyTestParameters, seed}
         .run();
 }
 
@@ -93,36 +93,28 @@ int main(int argc, char *argv[])
     switch (command)
     {
     case (helper::Command::Random):
-        std::srand(seed);
-        runRandomGenerator(numOfTests);
+        runRandomGenerator(numOfTests, seed);
         break;
     case (helper::Command::Commutative):
-        std::srand(seed);
-        runCommutativeGenerator(numOfTests);
+        runCommutativeGenerator(numOfTests, seed);
         break;
     case (helper::Command::Cancellation):
-        std::srand(seed);
-        runCancellationGenerator(numOfTests);
+        runCancellationGenerator(numOfTests, seed);
         break;
     case (helper::Command::Idempotency):
-        std::srand(seed);
-        runIdempotencyGenerator(numOfTests);
+        runIdempotencyGenerator(numOfTests, seed);
         break;
     case (helper::Command::Cda):
-        std::srand(seed);
-        runCdaGenerator(numOfTests);
+        runCdaGenerator(numOfTests, seed);
         break;
     case (helper::Command::SeVpa):
-        std::srand(seed);
-        runSeVpaGenerator(numOfTests);
+        runSeVpaGenerator(numOfTests, seed);
         break;
     case (helper::Command::MeVpa):
-        std::srand(seed);
-        runMeVpaGenerator(numOfTests);
+        runMeVpaGenerator(numOfTests, seed);
         break;
     case (helper::Command::eCda):
-        std::srand(seed);
-        runECdaGenerator(numOfTests);
+        runECdaGenerator(numOfTests, seed);
         break;
     case (helper::Command::Custom):
         helper::runExample();

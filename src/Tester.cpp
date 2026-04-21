@@ -1,20 +1,24 @@
 #include <cstdlib>
-#include <thread>
-
+#include <memory>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 
 #include "Tester.hpp"
 #include "learner/srs/Srs.hpp"
+#include "teacher/AutomataCombiner.hpp"
+#include "teacher/EmptinessChecker.hpp"
 #include "utils/TimeMarker.hpp"
 
 Tester::Tester(
     const uint64_t numOfTests, std::unique_ptr<generator::Generator> gen,
-    const TesterParameters &testerParameters)
+    const TesterParameters &testerParameters, uint32_t seed)
     : numOfTests{numOfTests}, generator{std::move(gen)}, params{testerParameters}
 {
+    generator->setSeed(seed + 1);
+    rng = std::mt19937{seed};
     setOutputDirectoryPath();
 }
 
@@ -25,7 +29,7 @@ void Tester::setOutputDirectoryPath()
     directoryPath = path + "failedTests/";
 }
 
-void Tester::run()
+uint16_t Tester::run()
 {
     while (numOfExecutedTests < numOfTests)
     {
@@ -45,6 +49,8 @@ void Tester::run()
         numOfExecutedTests++;
         printTestStats();
     }
+
+    return numOfFailedTests;
 }
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
@@ -88,14 +94,13 @@ void Tester::runSupervisedTest()
 void Tester::prepareTest()
 {
     numOfStates =
-        (rand() % (params.maxNumOfStates - params.minNumOfStates + 1)) + params.minNumOfStates;
-    numOfCalls =
-        (rand() % (params.maxNumOfCalls - params.minNumOfCalls + 1)) + params.minNumOfCalls;
+        (rng() % (params.maxNumOfStates - params.minNumOfStates + 1)) + params.minNumOfStates;
+    numOfCalls = (rng() % (params.maxNumOfCalls - params.minNumOfCalls + 1)) + params.minNumOfCalls;
     numOfLocals =
-        (rand() % (params.maxNumOfLocals - params.minNumOfLocals + 1)) + params.minNumOfLocals;
+        (rng() % (params.maxNumOfLocals - params.minNumOfLocals + 1)) + params.minNumOfLocals;
     numOfReturns =
-        (rand() % (params.maxNumOfReturns - params.minNumOfReturns + 1)) + params.minNumOfReturns;
-    numOfStackSymbols = (rand() % (params.maxNumOfStackSymbols - params.minNumOfStackSymbols + 1)) +
+        (rng() % (params.maxNumOfReturns - params.minNumOfReturns + 1)) + params.minNumOfReturns;
+    numOfStackSymbols = (rng() % (params.maxNumOfStackSymbols - params.minNumOfStackSymbols + 1)) +
                         params.minNumOfStackSymbols;
 
     generator->setConfig(
@@ -199,6 +204,12 @@ std::shared_ptr<common::Word> Tester::generateRandomWord(uint16_t length)
 void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
     TIME_MARKER("[Tester]: testOutput");
+    if (params.useEquivalenceCheckToValidateOutput)
+    {
+        testOutputWithEquivalenceCheck(hypothesis);
+        return;
+    }
+
     if (not generator->generatorSpecificCheck(hypothesis))
     {
         ERR("[Tester]: Generator specific check failed!");
@@ -207,7 +218,7 @@ void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>
         return;
     }
 
-    for (uint16_t i = 0; i < params.numOfRandomTestingWords; i++)
+    for (uint32_t i = 0; i < params.numOfRandomTestingWords; i++)
     {
         const uint16_t length{static_cast<uint16_t>(rng() % (params.maxTestingWordLength + 1))};
         std::shared_ptr<common::Word> testWord{generateRandomWord(length)};
@@ -223,6 +234,23 @@ void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>
     if (params.savePassedTestData)
     {
         saveTestData(hypothesis, "PASSED");
+    }
+}
+
+void Tester::testOutputWithEquivalenceCheck(
+    const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
+{
+    LOG("testOutputWithEquivalenceCheck");
+    auto combiner = std::make_shared<teacher::AutomataCombiner<AutomatonKind::Combined>>(
+        vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
+    auto emptinessChecker = std::make_shared<teacher::EmptinessChecker>(
+        numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
+
+    auto combinedVpa{combiner->combineVPA(*hypothesis)};
+
+    if (*emptinessChecker->check(combinedVpa) != common::Word{})
+    {
+        numOfFailedTests++;
     }
 }
 

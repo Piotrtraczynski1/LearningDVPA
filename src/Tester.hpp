@@ -27,9 +27,9 @@ class Tester
 public:
     Tester(
         const uint64_t numOfTests, std::unique_ptr<generator::Generator> generator,
-        const TesterParameters &testerParameters);
+        const TesterParameters &testerParameters, uint32_t seed);
 
-    void run();
+    uint16_t run();
 
 private:
     std::string directoryPath;
@@ -51,6 +51,8 @@ private:
 
     std::shared_ptr<common::Word> generateRandomWord(uint16_t length);
     void testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
+    void testOutputWithEquivalenceCheck(
+        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
     void printTestStats();
     void saveFailedTestData(
         const std::shared_ptr<common::Word> testWord,
@@ -77,8 +79,7 @@ private:
     std::shared_ptr<teacher::Teacher> teacher;
     std::shared_ptr<learner::Learner> learner;
 
-    static constexpr int testerSeed{1};
-    std::mt19937 rng{testerSeed};
+    std::mt19937 rng;
 };
 
 struct RunResult

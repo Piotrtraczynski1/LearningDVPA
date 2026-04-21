@@ -19,7 +19,7 @@ void IdempotencyIncreasingNumOfStates::runSingleIteration()
     Tester{
         numOfTestsInSingleIteration,
         std::unique_ptr<generator::Generator>(new generator::srs::IdempotencyGenerator()),
-        parameters}
+        parameters, rand()}
         .run();
 }
 } // namespace benchmark::scenario

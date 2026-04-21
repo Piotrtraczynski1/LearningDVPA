@@ -50,7 +50,7 @@ void CdaGenerator::validateGeneratorConfig(
 
 uint16_t CdaGenerator::randRange(const uint16_t a, const uint16_t b) const
 {
-    return a + (rand() % (b - a));
+    return a + (rng() % (b - a));
 }
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> CdaGenerator::run()
@@ -107,7 +107,7 @@ void CdaGenerator::addLocals()
 
                 transition->add(
                     common::transition::State{state}, common::symbol::LocalSymbol{local},
-                    common::transition::State{module[(rand() % module.size())]});
+                    common::transition::State{module[(rng() % module.size())]});
             }
         }
     }
@@ -222,7 +222,7 @@ std::vector<uint16_t> CdaGenerator::selectSplitPoints()
 {
     std::vector<uint16_t> states(numOfStates - 1);
     std::iota(states.begin(), states.end(), 0);
-    std::mt19937 g(rand());
+    std::mt19937 g(rng());
     std::shuffle(states.begin(), states.end(), g);
     states.resize(numOfModules - 1);
     std::sort(states.begin(), states.end());

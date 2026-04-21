@@ -32,9 +32,9 @@ void RandomGenerator::addCalls(common::transition::State state)
         {
             continue;
         }
-        common::transition::State dest{static_cast<uint16_t>(rand() % numOfStates)};
+        common::transition::State dest{static_cast<uint16_t>(rng() % numOfStates)};
         common::symbol::StackSymbol stackSymbol{
-            static_cast<uint16_t>((rand() % (numOfStackSymbols - 1)) + 1)};
+            static_cast<uint16_t>((rng() % (numOfStackSymbols - 1)) + 1)};
 
         transition->add(state, common::symbol::CallSymbol{call}, dest, stackSymbol);
     }
@@ -48,7 +48,7 @@ void RandomGenerator::addLocals(common::transition::State state)
         {
             continue;
         }
-        common::transition::State dest{static_cast<uint16_t>(rand() % numOfStates)};
+        common::transition::State dest{static_cast<uint16_t>(rng() % numOfStates)};
 
         transition->add(state, common::symbol::LocalSymbol{local}, dest);
     }
@@ -64,7 +64,7 @@ void RandomGenerator::addReturns(common::transition::State state)
             {
                 continue;
             }
-            common::transition::State dest{static_cast<uint16_t>(rand() % numOfStates)};
+            common::transition::State dest{static_cast<uint16_t>(rng() % numOfStates)};
             common::symbol::StackSymbol stackSymbol{stackSymbolId};
 
             transition->add(state, stackSymbol, common::symbol::ReturnSymbol{ret}, dest);

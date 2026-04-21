@@ -13,7 +13,7 @@ class BaseSrsScenario : public Scenario
     const std::string dim2Name{"useSrs"};
 
 protected:
-    static constexpr uint16_t numOfTestsInSingleIteration{10};
+    static constexpr uint16_t numOfTestsInSingleIteration{1};
     TesterParameters parameters{
         .minNumOfStates = 2,
         .maxNumOfStates = 2,
@@ -47,6 +47,6 @@ public:
 
     virtual void prepareNextIterationDim1();
     virtual void resetDim1();
-    std::string getDim1Name();
+    virtual std::string getDim1Name();
 };
 } // namespace benchmark::scenario

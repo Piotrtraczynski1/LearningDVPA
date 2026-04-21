@@ -16,6 +16,11 @@
 #include "benchmark/scenario/srs/CommutationIncreasingNumOfStates.hpp"
 #include "benchmark/scenario/srs/IdempotencyIncreasingNumOfStates.hpp"
 
+// srs accuracy
+#include "benchmark/scenario/srs/CancellationAccuracy.hpp"
+#include "benchmark/scenario/srs/CommutationAccuracy.hpp"
+#include "benchmark/scenario/srs/IdempotencyAccuracy.hpp"
+
 namespace benchmark
 {
 using ScenarioFactory = std::function<std::unique_ptr<scenario::Scenario>()>;
@@ -27,7 +32,10 @@ static const std::map<std::string, ScenarioFactory> scenariosRegistry{
     {"increasing-number-of-states-and-locals", [] { return std::make_unique<scenario::IncreasingNumOfStatesAndLocals>(); }},
     {"cancellation-increasing-number-of-states", [] { return std::make_unique<scenario::CancellationIncreasingNumOfStates>(); }},
     {"commutation-increasing-number-of-states", [] { return std::make_unique<scenario::CommutationIncreasingNumOfStates>(); }},
-    {"idempotency-increasing-number-of-states", [] { return std::make_unique<scenario::IdempotencyIncreasingNumOfStates>(); }}
+    {"idempotency-increasing-number-of-states", [] { return std::make_unique<scenario::IdempotencyIncreasingNumOfStates>(); }},
+    {"cancellation-accuracy", [] { return std::make_unique<scenario::CancellationAccuracy>(); }},
+    {"commutation-accuracy", [] { return std::make_unique<scenario::CommutationAccuracy>(); }},
+    {"idempotency-accuracy", [] { return std::make_unique<scenario::IdempotencyAccuracy>(); }}
 };
 // clang-format on
 

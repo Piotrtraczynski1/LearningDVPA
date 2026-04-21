@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <random>
 
 #include "common/VPA.hpp"
 #include "common/transition/State.hpp"
@@ -27,6 +28,8 @@ public:
         std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
     virtual learner::srs::Srs getSrs();
 
+    void setSeed(uint32_t seed);
+
 protected:
     virtual void selectAcceptingStates();
     virtual void validateGeneratorConfig(
@@ -51,5 +54,7 @@ protected:
 
     common::transition::State initialState{0};
     std::vector<uint16_t> acceptingStates{0};
+
+    mutable std::mt19937 rng{1};
 };
 } // namespace generator

@@ -2,6 +2,7 @@
 /build
 /build-random
 /build-debug
+/build-debug-random
 out.log
 out.txt
 /thesis/main.aux

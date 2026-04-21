@@ -26,20 +26,25 @@ void CommutationIncreasingNumOfStates::runSingleIteration()
     Tester{
         numOfTestsInSingleIteration,
         std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
-        parameters}
+        parameters, rand()}
         .run();
 }
 
 void CommutationIncreasingNumOfStates::prepareNextIterationDim1()
 {
+    dim1Step++;
+    if (dim1Step == numOfIterationsIn1Dim)
+        return;
     parameters.minNumOfStates = dim1Steps[dim1Step].first;
     parameters.maxNumOfStates = dim1Steps[dim1Step].first;
     parameters.secondDvpaNumOfStates = dim1Steps[dim1Step].second;
-    dim1Step++;
 }
 
 void CommutationIncreasingNumOfStates::resetDim1()
 {
     dim1Step = 0;
+    parameters.minNumOfStates = dim1Steps[dim1Step].first;
+    parameters.maxNumOfStates = dim1Steps[dim1Step].first;
+    parameters.secondDvpaNumOfStates = dim1Steps[dim1Step].second;
 }
 } // namespace benchmark::scenario

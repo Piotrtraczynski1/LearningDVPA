@@ -8,7 +8,7 @@ namespace utils
 {
 constexpr int equivalenceCheckSeed{1};
 constexpr uint32_t numOfRandomWords{100000};
-constexpr uint16_t maxLengthRandomWord{50};
+constexpr uint16_t maxLengthRandomWord{100};
 } // namespace utils
 
 #endif
