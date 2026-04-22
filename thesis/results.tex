@@ -72,6 +72,13 @@ wykorzystanie parametru nie wnosi żadnej dodatkowej wartości.
 
 \input{plots/cancellationSrs}
 
+
+\paragraph{Commutation}
+
+TODO:
+
+\input{plots/commutationSrs}
+
 \paragraph{Idempotency}
 
 Odpowiadające tej regule reguła dla automatów DFA w postaci $uu \rightarrow u$ w pracy~\cite{srs}
@@ -81,23 +88,17 @@ reguł z parametrami. Jednakże, otrzymane wyniki potwierdzają tą obserwację 
 
 \input{plots/idempotencySrs}
 
-\paragraph{Commutation}
-
-
 
 \paragraph{}
 
 \subsection{Wpływ SRS na dokładność uczenia}
 
 W celu heurystycznego sprawdzenia równoważności dwóch automatów dla każdego sprawdzenia zostało wygenerowane
-(?) losowych słów o losowej długości ograniczonej do (?). Sprawdzanie równoważności dwóch automatów,
+$N$ losowych słów o losowej długości ograniczonej do 100 liter. Sprawdzanie równoważności dwóch automatów,
 które odbywa się podczas sprawdzania reguł SRS również wykorzystywało tę samą heurystykę.
 
-Ostateczne sprawdzanie poprawności wygenerowanych automatów zostało zaimplementowane w analogiczny sposób
-sprwadzając (?) losowcyh słów o długośći ograniczonej przez (?).
-
-Podejście to umożliwoło przeprowadzenie eksperymentów na znacząco większych automatach w porównaniu
-z wcześniejszymi eksperymentami.
+Ostateczne sprawdzanie zgodności hipotezy z automatem docelowym polegało na orginalnym algorytmie sprawdzającym równoważność.
+Testy przeprowadzono z $N = 10^5$ oraz $N = 10^6$.
 
 Do generowania losowych słów wykorzystywanych przy sprawdzaniu równoważności użyto
 oddzielnego generatora liczb losowych, aby zapewnić identyczność generowanych automatów
@@ -105,6 +106,68 @@ dla algorytmu wykorzystującego system SRS, jak i bez niego.
 
 \paragraph{Cancellation}
 
-\paragraph{Idempotency}
+Konfiguracja generatora automatów:
+\begin{verbatim}
+minNumOfStates = 10
+maxNumOfStates = 24
+minNumOfCalls = 3
+maxNumOfCalls = 6
+minNumOfLocals = 2
+maxNumOfLocals = 5
+minNumOfReturns = 3
+maxNumOfReturns = 6
+minNumOfStackSymbols = 3
+maxNumOfStackSymbols = 6
+density = 0.8,
+acceptingStatesDensity = 0.3
+\end{verbatim}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|cc|cc}
+\hline
+ & \multicolumn{2}{c|}{Bez SRS} & \multicolumn{2}{c}{Z SRS} \\
+N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
+\hline
+$10^5$ & 6971 & 69.71\% & 4281 & 42.81\% \\
+$10^6$ & 0 & 0\% & 0 & 0\% \\
+\hline
+\end{tabular}
+\caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
+\end{table}
 
 \paragraph{Commutation}
+
+Konfiguracja generatora automatów:
+\begin{verbatim}
+minNumOfStates = 12
+maxNumOfStates = 24
+minNumOfCalls = 3
+maxNumOfCalls = 6
+minNumOfLocals = 2
+maxNumOfLocals = 5
+minNumOfReturns = 3
+maxNumOfReturns = 6
+minNumOfStackSymbols = 9
+maxNumOfStackSymbols = 9
+density = 0.8,
+acceptingStatesDensity = 0.3
+\end{verbatim}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|cc|cc}
+\hline
+ & \multicolumn{2}{c|}{Bez SRS} & \multicolumn{2}{c}{Z SRS} \\
+N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
+\hline
+$10^5$ & 2607 & 26.07\% & 2589 & 25.89\% \\
+$10^6$ & 0 & 0\% & 0 & 0\% \\
+\hline
+\end{tabular}
+\caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
+\end{table}
+
+\paragraph{Idempotency}
+
+
