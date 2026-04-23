@@ -1,0 +1,97 @@
+\NPHardness*
+\begin{proof}
+
+\end{proof}
+
+
+\NPHardnessOfClash*
+\begin{proof}
+Let us fix a parameter $n$. Before the reduction, we construct a gadget that distinguishes all words of length at most $n$ unless they consist one of the designated letters. 
+Let $Y \subseteq \Sigma$ and $x \in \Sigma \setminus Y$. Consider the automaton $\autB_{Y,x}$ depicted below:
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+    shorten >=1pt, 
+    node distance=2.5cm, 
+    on grid, 
+    auto,
+    >={Stealth[bend]}
+]
+
+  % State Definitions
+  \node[state] (qn) {$q_n$};
+   \node[draw=none] (dots) [right=of qn] {$\dots$};
+  \node[state] (q2) [right=of dots] {$q_2$};
+  \node[state] (q1) [right=of q2] {$q_1$};
+\node[state] (qF) [right=of q1] {$q_F$};
+
+\node[state] (sink) [below=of q2] {$s$};
+
+  % Transition Edges
+  \path[->]
+    (qn) edge node [above] {$\Sigma\setminus Y$} (dots)
+    (dots) edge node [above] {$\Sigma\setminus Y$} (q2)
+    (q2)  edge node [above] {$\Sigma\setminus Y$} (q1)
+    % The top arc from qn back to q1
+    (q1)  edge [bend right=45] node [above] {$\Sigma\setminus (Y \cup \set{x})$} (qn)
+    % The outgoing edge xi from q1
+%    (q1)  edge [nodes={at={(1, -0.5)}}] node {$x$} ++(1.5, 0);
+    (q1)  edge node [above] {$x$} (qF)
+    (q1) edge node [left] {$Y$} (sink)
+    (q2) edge node [left] {$Y$} (sink)
+    (qn) edge node [above] {$Y$} (sink)
+    (qF) edge node [left] {$Y$} (sink)
+    ;
+
+ \draw[loop,->] (qF)  to node[above] {$\Sigma \setminus Y$} (qF);
+ \draw[loop right,->] (sink) to node[right] {$\Sigma$} (sink);
+
+\end{tikzpicture}
+%\label{The gadget \DFA $\autB_{Y,x}$, which parially distingushes words of length at most $n$, which do not contain any letter from $Y$ }
+\end{figure}
+
+Observe that for all words $w_1, w_2$ of length bounded by $n$, if $f^{\autB_{Y,x}}_{w_1} = f^{\autB_{Y,x}}_{w_2}$, then one of the following holds:
+\begin{itemize}
+    \item each of the words $w_1, w_2$ contains at least one letter from $Y$; in that case $f_{w_1}, f_{w_2}$ are constant functions equal 
+    $s$ for every argument,
+    \item the sets positions at which $x$ occurs in $w_1$ and resp. $w_2$ are equal; 
+    indeed, for any $w \in (\Sigma \setminus Y)^{\leq n}$ we have
+    $f_{w}(q_i) = q_F$ if and only if $w[i] = x$.
+\end{itemize}
+Now, consider $\autB_Y$ being the disjoint union of automata $\autB_{Y,x}$ over all $x \in \Sigma\setminus Y$.
+
+Observe that for all words $w_1, w_2$ of length bounded by $n$, if $f^{\autB_{Y}}_{w_1} = f^{\autB_{Y}}_{w_2}$, then one of the following holds:
+\begin{itemize}
+    \item each of the words $w_1, w_2$ contains at least one letter from $Y$; in that case $f_{w_1}, f_{w_2}$ are constant functions equal 
+    $s$ for every argument,
+    \item words $w_1$ and $w_2$ are equal.
+\end{itemize}
+
+Having the automaton $\autB_Y$ we reduce the 3-SAT problem to the minimal collision problem.
+Let $\varphi$ be a 3-CNF formula over variables $x_1, \ldots, x_n$.
+Consider $\Sigma = \{x_1, \bar{x_1}, \ldots, x_n, \bar{x_n}, a, b \}$.
+With each clause $c_j$ we associate the subset $C_j$ of $\Sigma$ consisting of the literals from $c_j$.
+Furthermore, for every variable $x_i$ we define the set $X_i = \set{x_i, \bar{x_i}}$.
+Now, consider a \DFA $\aut_0$ being the disjoint union of automata $\autB_{C_1}, \ldots, \autB_{C_m}$ over all clauses of $\varphi$ and
+automata $\autB_{X_1}, \ldots, \autB_{X_n}$ over all variables of $\varphi$. 
+We extend $\aut_0$ to $\aut$ with additional states such that over these states letters from $\Sigma \setminus \set{a,b}$ are self loops, and
+letters $a,b$ ensure that every component of the disjoint union is reachable. 
+Let $k$ in the instance of the minimal collision problem be equal $n$, the number of variables.
+
+Now, consider a pair of different words $w_1, w_2$ such that $f^{\aut}_{w_1} = f^{\aut}_{w_2}$ and $|w_1|,|w_2| \leq n$.
+Then, for every automaton $\autB_{X_1}, \ldots, \autB_{X_n}$, since $w_1 \neq w_2$, each word contains at least one letter from each set $X_i$.
+There are $n$ such sets, which are disjoint, and hence $w_1$ and $w_2$ contain exactly one letter from each of the sets $X_i$, i.e., 
+$w_1$ and $w_2$ represent consistent variable assignments (they either contain $x_i$ or $\bar{x_i}$).
+Furthermore, for every clause $c_j$ each word $w_1, w_2$ contains at least one letter corresponding to some literal from $c_j$.
+Therefore, $w_1$ and $w_2$ represent (possibly different) satisfying assignments for $\varphi$.
+
+Conversely, assume that $\varphi$ has a satisfying assignment. 
+Consider two words $w_1, w_2$ representing this variable assignment with a different order or literals.
+Then, for every component $\autB_{Y,x}$ of $\aut_0$, the functions $f_{w_1}^{\autB_{Y,x}}, f_{w_2}^{\autB_{Y,x}}$ are constant functions equal $s$.
+Furthermore, on states in $\aut$, which are not in $\aut_0$, both functions $f_{w_1}^{\aut}, f_{w_2}^{\aut}$ coincide with the identity.
+Consequently, we have
+(a)~$w_1 \neq w_2$, (b)~$|w_1| = |w_2| = n$, and
+(c)~$f_{w_1}^{\aut_0}, f_{w_2}^{\aut_0}$, i.e., 
+the constructed instance of the minimal collision problem is positive.
+\end{proof}

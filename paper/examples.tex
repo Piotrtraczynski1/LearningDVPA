@@ -1,0 +1,58 @@
+We evaluate our framework by expressing natural VPL properties as rewrite rules with variables. 
+Our experiments confirm that this learning with advice approach yields a substantial reduction in equivalence queries,
+confirming the practical advantages of the proposed method.
+
+\subsection{Examples of rewrite rules}
+We consider the following types rules:
+\begin{itemize}
+\item \emph{Well-matched commutativity}: $c_1 c_2 X r_2 r_1 \to c_2 c_1 X r_1 r_2$.
+% two components 
+% independent markings
+
+\item \emph{Well-matched join}: $c X r c Y r \to c X Y r$.
+
+\item \emph{Well-matched cancellation}: $c X r \to \epsilon$.
+\todo{c, r are comment tags}
+
+\item \emph{Well-matched idempotency}: $c c X r r \to c X r$.
+\end{itemize}
+
+% reserch questions
+
+\subsection{Implementation}
+
+\Paragraph{Baseline}
+As a baseline for our experiments, we have implemented a polynomial-time active learning algorithm for \DVPA~\cite{mfcs22}.
+The algorithm from~\cite{mfcs22} assumes a stronger teacher model than the typical MAT; it allows queries extended membership queries
+that read as well modify the stack content and hence it depends on a concrete \DVPA rather than \VPL.
+On the positive side, the learning algorithm works in polynomial time. 
+
+\Paragraph{The advice mechanism}
+We have extended the baseline algorithm with the advice mechanism, where the advice is given via rewrite rules with a \textbf{single}
+ variable. 
+\todo{how the advice is computed}
+
+\Paragraph{Equivalence tests}
+\todo{two types of equivalence checks -- exact and probabilistic}
+
+\subsection{Experiments}
+
+\todo{Reserch questions:}
+
+\Paragraph{Benchmarks}
+\todo{Note that the number of equivalence queries depends on the number  of states, not the size of the alphabet}
+
+\Paragraph{Scenarios}
+\todo{Perefect eqivalence and probabilistic}
+
+ We preset the results per rule.
+
+\Paragraph{Results on well-matched cancellation}
+$c r \to \epsilon$ usually does the trick
+
+\Paragraph{Results on well-matched commutativity}
+Idempotency
+
+\Paragraph{Results on well-matched idempotency}
+
+\Paragraph{Summary}
