@@ -1,0 +1,63 @@
+\documentclass[a4paper]{lipics-v2021}
+
+
+\title{Learning Visibly Pushdown Languages under Rewriting Rules}
+
+%\titlerunning{Approximate Learning of Limit-Average Automata}%optional, please use if title is longer than one line
+
+\author{Jan Otop}{University of Wroc\l{}aw}{jan.otop@uwr.edu.pl}{https://orcid.org/0000-0002-8804-8011}{}
+\author{Piotr Traczyński}{University of Wroc\l{}aw}{}{}{} %mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty.
+
+\authorrunning{Jan Otop and Piotr Traczyński}%mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et. al.'
+
+\Copyright{Jan Otop and Piotr Traczyński}%mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+
+
+\ccsdesc[500]{Theory of computation~Grammars and context-free languages}
+\ccsdesc[500]{Theory of computation~Rewrite systems}
+%\ccsdesc[100]{Mathematics of computing~Markov networks}
+%}% mandatory: Please choose ACM 2012 classifications from https://www.acm.org/publications/class-2012 or https://dl.acm.org/ccs/ccs_flat.cfm . E.g., cite as "General and reference $\rightarrow$ General literature" or \ccsdesc[100]{General and reference~General literature}. 
+
+\keywords{visibly pushdown automata, string rewriting, active learning} 
+
+\input{macros}
+\usepackage{thmtools} 
+\usepackage{thm-restate}
+%\usepackage{minted}
+\usetikzlibrary{automata, positioning, arrows.meta,bending}
+
+%\usepackage{dutchcal} % \mathcal: also small letters. \mathbcal = bold ones. 
+
+%\hideLIPIcs
+\begin{document}
+
+\maketitle
+
+\input{abstract}
+\section{Introduction}
+\input{intro}
+
+\section{Preliminaries}
+\input{preliminaries}
+
+
+\section{Rewriting strings in visibly pushdown languages}
+\input{rules}
+
+\section{Rule synthesis}
+\input{synthesis}
+
+\section{Empirical evaluation}
+\input{examples}
+
+%\section{Experiments}
+%\input{experiments}
+
+
+
+\bibliographystyle{plain}
+\bibliography{papers}
+
+\input{appendix}
+
+\end{document}
