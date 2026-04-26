@@ -9,8 +9,8 @@ There are two types of queries:
 where the oracle either confirms equivalence or returns a \emph{counterexample} word witnessing the difference between $\lang$ and $\lang(\aut)$.
 This framework was proposed in the seminal paper~\cite{angluin1987learning} together with the \lStar-algorithm, 
 which enables learning in polynomial time. 
-Active automata learning has been intensively researched 
-for both efficiency~\cite{TTTalgorithm,Lsharp} as well as extensions to other automata-based models such as
+Active automata learning has been extensively researched 
+for both efficiency~\cite{TTTalgorithm,Lsharp} and extensions to other automata-based models such as
 nondeterministic finite automata~\cite{BolligHKL09}, tree automata~\cite{DBLP:conf/dlt/DrewesH03}, nominal automata over infinite alphabets~\cite{MoermanS0KS17} 
 and weighted automata~\cite{activeWeightedAutomata}.
 
@@ -18,20 +18,21 @@ and weighted automata~\cite{activeWeightedAutomata}.
 The active learning framework has been extended to pushdown languages~\cite{Knobe76,Angluin95,GrammaticalInference,DBLP:conf/pldi/Bastani0AL17,DBLP:conf/kbse/KulkarniLS21}, 
 where the representations typically considered have been context-free grammars.
 However, 
-generating context-free grammars from queries is substantially more difficult than generating \DFA, as there is no counterpart to the Myhill-Nerode theorem for pushdown languages. 
+generating context-free grammars from queries is substantially more difficult than generating \DFA, as there is no counterpart to 
+the Myhill--Nerode theorem for pushdown languages. 
 Furthermore, the equivalence problem for context-free grammars is undecidable, and 
-for deterministic context-free grammars, which are equivalent to deterministic pushdown automata,
-the best currently known upper bound on the complexity of deciding equivalence is primitive recursive~\cite{DBLP:conf/icalp/Senizergues97,DBLP:journals/jcss/Jancar21}. 
+for deterministic context-free grammars, which are equivalent to deterministic pushdown automata, it is decidable, but
+the best currently known upper bound is primitive recursive~\cite{DBLP:conf/icalp/Senizergues97,DBLP:journals/jcss/Jancar21}. 
 However, a subclass of context-free languages called \emph{visibly pushdown languages (\VPLs)}~\cite{InputDrivenPDA,DBLP:conf/stoc/AlurM04}, where the stack operations are determined by the input letters, 
-admits a Myhill-Nerode-style characterization~\cite{alur2005congruences} and 
+admits a Myhill--Nerode-style characterization~\cite{alur2005congruences} and 
 language equivalence of deterministic visibly pushdown automata (\DVPA) is decidable in polynomial time~\cite{DBLP:conf/stoc/AlurM04}.
 
 \Paragraph{Learning \VPLs}
 While \DVPA share multiple good properties with \DFA such as polynomial-time closure over Boolean operations and subset-based determinization, 
 the minimization problem for \DVPA is \NP-complete~\cite{DBLP:journals/lmcs/GauwinMR19}, which
-rules out polynomial-time active learning algorithms (unless \PTIME=\NP).
+rules out polynomial-time active learning algorithms, unless \PTIME=\NP.
 There are different approaches to address this problem including 
-restricting the learning problem to a subclasses of \DVPA~\cite{DBLP:conf/concur/KumarMV06},
+restricting the learning problem to subclasses of \DVPA~\cite{DBLP:conf/concur/KumarMV06},
 working only with \DVPA in a special form such as 
 SEVPA, MeVPA or CDA~\cite{DBLP:phd/dnb/Isberner15, ValidatingXMLwithVPA,DBLP:journals/pacmpl/JiaT24}, 
 which may involve exponential blow-up upon transformation to \DVPA~\cite{alur2005congruences}, or
@@ -40,78 +41,87 @@ augmenting the oracle with queries that depend on the structure of the target \D
 \Paragraph{Applications of learning \VPLs}
 Learning \VPLs has been applied to a wide range of domains, 
 including 
-inference of specifications for document validation from JSON schemas, 
+inference of document-validation specifications from JSON schemas, 
 generation of valid program inputs~\cite{DBLP:conf/pldi/Bastani0AL17,DBLP:journals/pacmpl/JiaT24}, and 
 verification and explainability of Recurrent Neural Networks (RNNs)~\cite{DBLP:conf/icgi/BarbotBFHKLN0Y21}. 
-In these applications, equivalence queries are typically approximated because exact equivalence checking is 
+In these applications, membership queries can be implemented rather straightforwardly, but
+ equivalence queries are typically approximated because exact equivalence checking is 
 often infeasible or undecidable. 
 For instance, verifying the equivalence of a \DVPA against a general program is undecidable,
  while comparison with an RNN inevitably yields a negative result, as standard RNNs are limited to recognizing regular languages. 
  Furthermore, the non-equivalence witness can be prohibitively large~\cite{DBLP:conf/emnlp/HewittHGLM20}, 
  making the negative answer meaningless. 
-These factors make answering equivalence queries a significant challenge in such settings.
+Recently, Large Language Models (LLMs) have been employed to implement the teacher~\cite{learningEL,bhattamishraautomata,vazquezchanlatte2025ll}. 
+LLMs can only answer membership queries; again, equivalence queries are merely approximated by posing 
+a large number of membership queries.
+Consequently, reducing the number of equivalence queries is a key challenge in active automata learning, which 
+this paper addresses through the \emph{advice} mechanism.
 
-\Paragraph{Query complexity}
-Due to high cost of answering queries, 
-there is a large body of work on reducing the query complexity of active automata learning~\cite{TTTalgorithm,ADTalgorithm,Lsharp,KrugerJR24,DierlFHJST24} as well as implementing the teacher
-using Large Language Models~\cite{learningEL,bhattamishraautomata,vazquezchanlatte2025ll}.
-However, 
-LLMs can only answer membership queries, and equivalence query answers are merely approximated by a large number of membership queries, 
-which is also the standard approach to equivalence queries in other settings~\cite{ModelLearning}.
-Consequently, we adopt the alternative approach proposed in~\cite{ecai25}, 
-which restricts the algorithm's search space by supplying an additional information regarding the target language called \emph{advice}.
-Specifically, we focus on inferring responses to equivalence queries, 
-as this yields the greatest reduction in query complexity and improves the overall reliability of the learning process, particularly in contexts where equivalence queries are typically approximated.
     
 \Paragraph{Learning with advice}
-    We consider the active learning framework augmented with advice, 
-where the learning algorithm is provided with \emph{advice} expressing prior knowledge regarding the target language~\cite{ecai25}. 
-By using the advice to deductively infer query answers, this framework bridges two synthesis paradigms:
+We study the active learning framework augmented with advice~\cite{ecai25}, 
+where the learning algorithm is provided with \emph{advice} expressing prior knowledge regarding the target language.
+Given advice, 
+we run an active learning algorithm and intercept equivalence queries to first check whether a candidate automaton 
+is \emph{consistent} with the given advice.
+If it is not, we conclude that it is not equivalent; otherwise we forward the candidate automaton to the oracle. 
+By using the advice to answer queries deductively, this framework bridges two synthesis paradigms:
 deductive synthesis from specifications and inductive synthesis via queries. 
 This hybrid approach allows a language to be represented partially through queries and partially through advice expressed as a \emph{string rewriting system (SRS)}.
-Since SRSs and automata operate on fundamentally different principles, certain language properties admit far more succinct descriptions as rewriting rules than through query-answer interactions.
+Since SRSs and automata operate on fundamentally different principles, 
+certain language properties admit far more succinct descriptions as rewriting rules than they do as a sequence of 
+query-answer interactions.
+
+%The Learning with advice paragraph remains the densest in the section. The last two sentences introduce several new terms (SRS, deductive/inductive synthesis) in quick succession. Given that these are central to the paper, even one concrete sentence illustrating what an SRS advice rule looks like in practice would substantially help the reader at this early stage — though this may already be handled later in the introduction.
+
 
 \Paragraph{String rewriting rules for pushdown languages}
 A String Rewriting System (SRS) consists of rewrite rules $l \rightarrow r$, where $l,r$ are words.
 \emph{Rewriting} is the process of iteratively transforming words by replacing the infix that matches the left-hand side of a rule $\lhs \to \rhs$ with its corresponding right-hand side $\rhs$.                 
-For instance, commutativity of letters $a,b$ can be expressed with $ab \to ba$. 
+For instance, commutativity of letters $a,b$ can be expressed with $ab \to ba$, which may require multiple query-answer interactions
+to express.
 However, if $a$ is a call letter and $b$ is a return letter, 
 the commutativity rule disrupts the matching between call and return letters. 
-We discuss this issue in the paper and define a class of rules, which are compatible with the implicit structure of pushdown languages. 
-Furthermore, in the pushdown case, there are properties not expressible by simple rewrite rules such as 
-all content between comment tags can be discarded. 
-We address this issue by extending rewrite rules with variables. 
+We discuss this issue in the paper and define classes of
+\emph{well-matched} and \emph{matching-preserving}
+ rules, which are compatible with the implicit structure of pushdown languages. 
+Furthermore, a simple property ``all content between the opening comment tag and the corresponding closing tag can be discarded''
+is not expressible by simple rewrite rules, as it involves matching of the opening and closing tags.
+We address this issue by introducing rewrite rules with variables, which can be substituted with \emph{well-matched} words.
 
-\Paragraph{Modelling prior knowledge with string rewriting}
+\Paragraph{Consistency of an SRS with a Language}
 In our framework, an advice SRS induces an equivalence relation on words relative to the target language  $\lang$.
 Specifically, if a word $w$ belongs to $\lang$, then every word obtained by rewriting $w$ must also be in $\lang$; symmetrically, rewriting must respect the complement of $\lang$. 
-We also consider one-sided variants based on implication stating that 
-(1)~words from the language may only be rewritten words in the language, while there are no restrictions for words outside the language, or
-(2)~words outside the language may only be rewritten words outside the language.
+We also consider one-sided variants based on implication stating that:  
+(1)~words in the language may only be rewritten to words in the language, while there are no restrictions for words outside the language, or
+(2)~words outside the language may only be rewritten to words outside the language.
 This allows the SRS to capture high-level structural properties, such as commutativity or idempotence, without necessarily characterizing the learned language completely.
 
 \Paragraph{Contributions}
 While active automata learning with advice was introduced in~\cite{ecai25}, extending this framework 
-from regular languages to \VPLs and Deterministic Visibly Pushdown Automata (DVPAs) is non-trivial. 
-This transition requires addressing structural challenges of pushdown systems, which are absent in the regular case.
-The main contributions of presented in this paper are:  
+from regular languages to \VPLs and Deterministic Visibly Pushdown Automata (DVPAs) is technically demanding. 
+This transition requires addressing structural challenges that are absent in the regular case.
+The main contributions presented in this paper are:  
 \begin{enumerate}
     \item 
     We define \emph{well-matched} and \emph{matching-preserving} rules that are compatible with the structural properties of pushdown languages.
-    Furthermore, we extend these rules with (context) variables in order to capture natural properties of pushdown language.
-    \item We develop an algorithm that infers answers to equivalence queries for \DVPA. 
-    \item We establish the complexity of the rule synthesis problem
-    it is a functional problem, so we show that a related decision problem is \NP-complete.
+    Furthermore, we extend these rules with (context) variables in order to capture natural properties of pushdown languages.
+    \item We develop algorithms that infer answers to equivalence queries for \DVPA. 
+    \item We establish the complexity of the rule synthesis problem.
+    Since it is a functional problem, we instead show that a related decision problem is \NP-complete.
     \item We demonstrate the practical benefit of the advice mechanism through experiments.
 \end{enumerate}
-%The detailed proofs of presented results are relegated to the appendix.
+
 
 \Paragraph{Related work}
-There is a large body of work on active learning of context-free grammars~\cite{Knobe76, Shapiro82, Angluin87a, Sakakibara92, DBLP:conf/emnlp/SennhauserB18, GrammaticalInference, DBLP:conf/pldi/Bastani0AL17, DBLP:conf/pldi/BendrissouGZ22, DBLP:conf/kbse/KulkarniLS21, DBLP:conf/sigsoft/WuJYBSPX19}, as well as in learning visibly pushdown grammars and visibly pushdown automata~\cite{DBLP:phd/dnb/Isberner15, mfcs22, ValidatingXMLwithVPA, DBLP:conf/icgi/BarbotBFHKLN0Y21, DBLP:journals/pacmpl/JiaT24, DBLP:journals/corr/abs-2603-11648}.
-These works primarily aim to improve learning algorithms for arbitrary input languages by exploring alternative representation models, augmenting the learning framework with additional capabilities 
-(e.g., oracles that answer additional types of queries, or assuming the set of non-terminals is known), 
-or altering the mode of learning. These works are mostly orthogonal to ours. 
-In our work, we restrict the search space;
-improving the performance of active learning algorithms by specializing them to subclasses of languages is 
-an active research direction for Mealy machines~\cite{graybox-learning, DBLP:conf/dlt/BerthonBPR21, DBLP:conf/fossacs/LabbafGHM23, DBLP:journals/corr/abs-2405-08647, ProductAutomata} and tree automata~\cite{DBLP:conf/fossacs/HeerdtKR021, BjorklundBE17}. 
+There is a large body of work on active learning of context-free grammars~\cite{Knobe76, Shapiro82, Angluin87a, Sakakibara92, DBLP:conf/emnlp/SennhauserB18, GrammaticalInference, DBLP:conf/pldi/Bastani0AL17, DBLP:conf/pldi/BendrissouGZ22, DBLP:conf/kbse/KulkarniLS21, DBLP:conf/sigsoft/WuJYBSPX19}, as well as on learning visibly pushdown grammars and visibly pushdown automata~\cite{DBLP:phd/dnb/Isberner15, mfcs22, ValidatingXMLwithVPA, DBLP:conf/icgi/BarbotBFHKLN0Y21, DBLP:journals/pacmpl/JiaT24, DBLP:journals/corr/abs-2603-11648}.
+These works primarily aim to improve learning algorithms for arbitrary input languages by exploring alternative representation models, 
+augmenting the learning framework 
+ (e.g., oracles can answer additional types of queries, or the algorithm is given the set of non-terminals), 
+or altering the mode of learning. 
+These works address different aspects of the problem and are largely independent of our approach.
+Unlike these works, our approach restricts the search space of the learning algorithm.
+A similar approach is specializing the Angluin's algorithm to subclasses of languages in order to improve the performance of learning algorithms.
+A related approach involves specializing Angluin's algorithm to subclasses of languages to improve learning performance, 
+studied for Mealy machines~\cite{graybox-learning, DBLP:conf/dlt/BerthonBPR21, DBLP:conf/fossacs/LabbafGHM23, DBLP:journals/corr/abs-2405-08647, ProductAutomata} and tree automata~\cite{DBLP:conf/fossacs/HeerdtKR021, BjorklundBE17}. 
 %In contrast to these works, we do not commit to any fixed subclass of \VPLs; instead, the search space of our algorithm is parameterized by the advice SRS provided in the input.
