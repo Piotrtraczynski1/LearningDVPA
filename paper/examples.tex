@@ -33,14 +33,16 @@ We have extended the baseline algorithm with the advice mechanism, which interce
 passing them to the the equivalence oracle performs the consistency check. 
 The advice is given via rewrite rules with a {single} variable, and to make it more efficient instead of 
 the exact algorithm presented in the paper, we substitute for the variable one of few selected well-matched words.
+\todo{I have tested up to 200 well-matched words for a single check}
+A single consistency check is performed for all ground rules constructed in this way.
 We have observed that often testing with the substitution $X \mapsto \epsilon$ suffices to detect inconsistency.
 \todo{Is consistency test for ground rules optimized?}
 
 \Paragraph{Equivalence oracle}
 We have implemented two types of equivalence test: the exact test based on reachability in the product automaton, and
 the probabilistic test based on testing conformance of automata on a large number ($10^5$ and $10^6$) of randomly generated words.
-\todo{In the probabilistic test faster?}
-\todo{Are there any other important details?}
+\todo{In the probabilistic test faster? -- it's much faster}
+\todo{Are there any other important details? -- the length of random words was restricted to 100}
 
 \subsection{Experiments}
 
@@ -57,7 +59,9 @@ the probabilistic equivalence oracle?
 \Paragraph{Benchmarks}
 We have generated random benchmark \DVPA with multiple parameters such as the size of the alphabet 
 (the number of call, local and return letters are specified separately), the size of the stack alphabet, 
-number of states, density of transitions (\todo{??}) and the ratio of accepting states among all states. 
+number of states, density of transitions (the ratio of defined transitions to all possible transitions, where
+undefined ones are treated as valid transitions to a special sink state \todo{Is 'density of transitions' worth mentioning?})
+and the ratio of accepting states among all states. 
 We have observe that the number of states has the main infulence on the number of equivalence queries, while
 the size of the alphabet or the size of the stack alphabet have negligable impact on the number of required equivalence queries.
 We have also implemented random generation of a \DVPA that is (a)~a Single-Entry VPA (SEVPA),  (b)~Multi-Entry VPA (MeVPA), 
