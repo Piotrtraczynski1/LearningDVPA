@@ -3,40 +3,44 @@ A pushdown alphabet $\vAlph$ consists of three disjoint sets of letters $\vAlph 
 \emph{call}, \emph{local} and \emph{return} letters.
 
 \Paragraph{Well-matched words}
-The set of well-matched words over a pushwdown alphabet $\vAlph$ is the least set containing $\epsilon$ and closed under concatenation such that
-(1)~if $w$ is well matched, $c$ is a call letter and $r$ is a return letter, then $ c w r$ is well matched, and
-(2)~if $w$ is well matched and $l$ is a local letter, then $lw$ and $wl$ are well-matched.
-In a word $w$ (not necessarily well matched), if $w = x c y r z$, the word $y$ is well-matched, we say 
-that letters $c$ and $r$ are matched, and $r$ is the return letter corresponding to call $c$ and vice versa. 
-Formally, positions $|x|+1$ and $|x|+|y|+2$ are in the \emph{matching relation}.
+\newcommand{\dCall}{\textbf{c}}
+\newcommand{\dReturn}{\textbf{e}}
+The set of well-matched words over a pushwdown alphabet $\vAlph$ is the least set containing $\epsilon$ 
+such that
+(1)~if $w$ is well-matched, $c$ is a call letter and $r$ is a return letter, then $ c w r$ is well-matched, 
+(2)~if $w$ is well-matched and $l$ is a local letter, then $lw$ and $wl$ are well-matched, and
+(3)~if $w_1, w_2$ are well-matched, then the concatenation $w_1 w_2$ is well-matched.
+In a word $w$ (not necessarily well-matched), if $w = x \dCall y \dReturn z$ such that $y$ is a well-matched word, 
+we say that letters $\dCall$ and $\dReturn$ are matched, and $\dReturn$ is the return letter corresponding to call $\dCall$ and vice versa. 
+Formally, positions $|x|+1$ and $|x|+|y|+2$ in $w$ are in the \emph{matching relation}.
 
 \Paragraph{Visibly pushdown automata} 
 A \emph{(non-deterministic) visibly pushdown automaton} (\VPA) $\aut$ is a tuple $\aut = (\vAlph, \stackAlphabet, Q, Q_0, \delta, F)$  consisting of:
-(1)~$\vAlph$, a pushdown alphabet, 
+(1)~$\vAlph$, a finite pushdown alphabet, 
 (2)~$\stackAlphabet$, a finite stack alphabet, 
 (3)~$Q$, a finite set of states, 
 (4)~$Q_0 \subseteq Q$, a set of initial states, 
-(5)~$\delta$, a finite transition relation defined as below, and
+(5)~$\delta$, a transition relation defined as below, and
 (6)~$F \subseteq Q$, a set of accepting states.
 The transition relation $\delta$ is the union of relations $\delta_c \cup \delta_l \cup \delta_r$, where
-$\delta_c \subset Q \times \alphabet_c \times Q \times \stackAlphabet$
-$\delta_l \subset Q \times \alphabet_l \times Q$, and
-$\delta_r \subset Q \times \alphabet_r \times \stackAlphabetBot \times Q$.
+$\delta_c \subseteq Q \times \alphabet_c \times Q \times \stackAlphabet$, 
+$\delta_l \subseteq Q \times \alphabet_l \times Q$, and
+$\delta_r \subseteq Q \times \alphabet_r \times \stackAlphabetBot \times Q$.
 
 \Paragraph{Deterministic visibly pushdown automata} 
-A \VPA $(\vAlph, \stackAlphabet, Q, Q_0, \delta, F)$  is deterministic ($\DVPA$) if $|Q_0| = 1$ and 
-$\delta$ is a function being the union of three functions:
+A \VPA $(\vAlph, \stackAlphabet, Q, Q_0, \delta, F)$  is deterministic (called $\DVPA$), if $|Q_0| = 1$ and 
+its transition relation $\delta$ is a function, which is the union of three functions:
 $\delta_c \colon Q \times \alphabet_c \to Q \times \stackAlphabet$, 
-$\delta_l \colon  \times \alphabet_l \to Q$
-$\delta_r \colon  \times \alphabet_r \times \stackAlphabetBot \to Q$.
+$\delta_l \colon Q \times \alphabet_l \to Q$,
+$\delta_r \colon Q \times \alphabet_r \times \stackAlphabetBot \to Q$.
 
 \Paragraph{Semantics of \VPA} 
 Consider a \VPA $\aut = (\vAlph, \stackAlphabet, Q, Q_0, \delta, F)$.
  A~\emph{configuration} of $\aut$ is a pair consisting of the current state $q\in Q$ of $\aut$ and 
-its current stack content $u\in (\bot \cdot \stackAlphabet^*)$. 
-A \VPA defines an infinite-state transition system over its configurations $Q \times (\bot \cdot \stackAlphabet^*)$, 
+its current stack content $u\in \bot \cdot \stackAlphabet^*$. 
+A~\VPA defines an infinite-state transition system over its configurations $Q \times (\bot \cdot \stackAlphabet^*)$, 
 where configurations $Q_0 \times \set{\bot}$ are initial.
-For $a \in \vAlph$, let $\trans{\aut}{a}$ be an auxiliary relation defined such that 
+For $a \in \vAlph$, let $\trans{\aut}{a}$ be an auxiliary relation defined as follows:
 \begin{itemize}
 \item $(q,u) \trans{\aut}{a} (q',uB)$, if $a$ is a call letter and $(q,a,q',B) \in \delta_c$, 
 %where $q, q'$ are states, $uB$, $u v$ are stack contents with $B$ being a single (top) symbol.
@@ -45,10 +49,9 @@ For $a \in \vAlph$, let $\trans{\aut}{a}$ be an auxiliary relation defined such 
 \item $(q,\bot) \trans{\aut}{a} (q',\bot)$, if $a$ is a return letter $(q,a,\bot,q') \in \delta_r$.
 \end{itemize}
 For a word $w = a_1 \ldots a_n$, we define 
-$\trans{\aut}{w}$ as the composition of relation $\trans{\aut}{a_1} \dots \trans{\aut}{a_n}$, i.e.,
+$\trans{\aut}{w}$ as the composition of relations $\trans{\aut}{a_1}, \dots, \trans{\aut}{a_n}$, i.e.,
 $(q,u_0) \trans{\aut}{w} (q',u_n)$ if there exist intermediate configurations
 $(q_1, u_1), \ldots, (q_{n-1}, u_{n-1})$ such that for each $1 \leq i \leq n$ we have $(q_{i-1}, u_{i-1}) \trans{\aut}{a_i}  (q_{i}, u_{i})$.
-
 A word $w$ is \emph{accepted} by $\aut$ if there are $q_0 \in Q_0$, $q \in F$ and $u \in \bot \cdot \stackAlphabet^*$ such that $(q_0, \bot) \trans{\aut}{w} (q,u)$.
  The \emph{language recognized by $\aut$}, denoted $\lang(\aut)$, is the set of words accepted  by $\aut$. 
 %For a \VPA $\aut$, we define the stack content upon reading $w$, 
@@ -76,5 +79,7 @@ If not, the teacher returns a counterexample, which is a word from the symmetric
 \end{itemize}
 Additional types of queries are also possible~\cite{mfcs22}.
 The goal of the active learning algorithm is to return a minimal-size automaton recognizing the target language. 
-The automaton model is connected to the type of the learned language: regular languages are represented by \DFA, while \VPLs are represented by \DVPA, Single-Entry Visibly Pushdown Automata (SEVPA) or other restrictions of \DVPA~\cite{alur2005congruences,DBLP:conf/mfcs/ChervetW07}.
+The automaton model is connected to the type of the learned language: 
+regular languages are represented by \DFA, while \VPLs are represented in active learning by \DVPA, Single-Entry Visibly Pushdown Automata (SEVPA) or 
+other subclasses of \DVPA~\cite{alur2005congruences,DBLP:conf/mfcs/ChervetW07}.
 Our method focuses on inferring answers to equivalence queries; hence, it does not depend on the specific active learning algorithm used, as long as it asks such queries.
