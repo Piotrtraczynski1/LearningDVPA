@@ -103,16 +103,21 @@ improvements discussed in the next section.
 \Paragraph{Probabilistic equivalence check}
 In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
 Since SRS enables performing equivalence testing in two stages, we compare it against a baseline without
-SRS using two configurations: $10^5$ and $2 \cdot 10^5$ random words. 
+SRS using two configurations: $10^5$ and $2 \cdot 10^5$ random words.
 The second configuration is intended to verify whether the improvements observed with
 SRS are not merely a consequence of a larger number of random tests.
 
-The experimental setup consists of $10^4$ randomly generated automata, each with $10$ to $25$ states. 
-The input alphabet was generated individually for each automaton, with slight variations depending on the considered property. 
+The experimental setup consists of $10^4$ randomly generated automata, each with $10$ to $25$ states.
+The input alphabet was generated individually for each automaton, with slight variations depending on the considered property.
 In particular, the number of symbols of each type ranged from $2$ to $5$, while the number of stack symbols ranged from $2$ to $16$.
 The number of well-matched words used for SRS was limited to $200$.
 
-\begin{table}[h]
+\todo{
+    Should we present the time results here? Equivalence checks seem almost free,
+    the time overhead is caused by checking consistency with SRS, but is also negligible.
+    The final exact equivalence check isn't included here.
+}
+\begin{table}[H]
 \centering
 \begin{tabular}{cc|ccc}
 \hline
@@ -122,8 +127,8 @@ SRS rule & Metric
 & $10^5$ with SRS \\
 \hline
 \multirow{2}{*}{Cancellation}
-& Success ratio & 30.29\% & ... & 57.19\% \\
-& Avg. time [s] & 0.69 & ... & 2.6 \\
+& Success ratio & 30.29\% & 40.1\% & 57.19\% \\
+& Avg. time [s] & 0.69 & 1.28 & 2.6 \\
 \hline
 \multirow{2}{*}{Commutativity}
 & Success ratio & 73.93\% & ... & 74.11\% \\
@@ -138,3 +143,16 @@ SRS rule & Metric
 \end{table}
 
 \Paragraph{Summary}
+The presented results show a reduction of approximately $20\%$ in the number of queries for commutativity and idempotency,
+and around $50\%$ for cancellation rules. In our setup, the time measurements indicate that the use of SRS
+generally increases the overall execution time. However, this trend changes with the size of the automata,
+for the largest instances, SRS begins to provide performance improvements.
+This suggests that its usefulness increases with the size of the automaton.
+
+Based on experiments for DFA~\cite{ecai25}, we expected the most significant gains for commutativity.
+However, the obtained results differ substantially from these expectations. We hypothesize that the method
+used to generate the automata did not allow the full potential of this rule to be observed.
+
+The reliability results do not show a significant improvement.
+Nevertheless, SRS improves the success ratio of the heuristic approach, while introducing only a negligible time overhead.
+This suggests that SRS can be considered a useful feature when a heuristic approach is employed.
