@@ -184,9 +184,9 @@ The hardness result holds already for \DFA, which can be considered as \DVPA ove
 (2)~The positive (resp. negative) consistency problem over well-matched rules against a regular language given by a \DFA is \coNP-complete.
 \end{restatable}
 \begin{proof}[Proof's sketch]
-We show thus by reduction from the 3-SAT problem. Given a formula $\varaphi$, we rename variables to obtain $\varphi^*$, in which  each variable occurs at most once. 
-Then, $\aut$ moves over some instance of $\lhs$ from $q$ to $s_1$ if the variable substitution encodes a truth assignment, where all copies of the same variable have the same value.
-Next, $\aut$ moves over some instance of $\rhs$ from $q$ to $s_2$  if  the variable substitution encodes a truth assignment satisfying the formula $\varphi$.
+We show thus by reduction from the 3-SAT problem. Given a formula $\varphi$, we rename variables to obtain $\varphi^*$, in which  each variable occurs at most once. 
+Then, $\aut$ moves over some instance of $\lhs$ from $q$ to $s_1$ if the variable substitution of $\lhs$ encodes a truth assignment, where all copies of the same variable have the same value.
+Next, $\aut$ moves over some instance of $\rhs$ from $q$ to $s_2$  if  the variable substitution of $\rhs$ encodes a truth assignment satisfying the formula $\varphi$.
 Thus, $(q, s_1, s_2)$ belongs to $\DeltaRule$ if and only if $\varphi$ is satisfiable.
 Furthermore, we can reduce unsatisfiablity of $\varphi$ to positive (resp. negative) consistency. 
 We ensure that whenever a truth assignment is consistent among copies of the same propositional variable, it does
@@ -247,21 +247,18 @@ using emptiness of $\lang(\autExt) \cap \lang(\vAlph^* \return_1 \ldots \return_
 In consequence, we have:
 
 \begin{proposition}
-Consistency (resp.,  positive, negative consistency) of a ground matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in polynomial time via a single reachability check on a \DVPA obtained from the product $\aut \times \aut$, and the automaton for a regular expression. 
+Consistency (resp.,  positive, negative consistency) of a ground matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in polynomial time via a single reachability check on a \DVPA obtained from the product $\aut \times \aut \times \autB$, where $\autB$ is a \DFA depending only on the rule.
 \end{proposition}
 
 \Paragraph{Matching-preserving rules with variables} 
 Variables in matching-preserving rules can be eliminated as in the case of well-matched rules. 
 Consider a matching-preserving rule $\lhs \to \rhs$.
 It suffices to extend the alphabet with local letters $x^L, x^R$ for each variable and then consider a ground rule
-obtained from  $\lhs \to \rhs$ by replacing the occurrence of every variable $X$ in $\lhs$ with $x^L$ and in $\rhs$ (if it exists)
-with $x^R$.
-Finally, as in the well-matched case, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
+obtained from  $\lhs \to \rhs$ by replacing the occurrence of every variable $X$ with $x^L$ in $\lhs$ and with $x^R$ in $\rhs$ whenever appears.
+Finally, as described in Section~\ref{s:well-matched} for the well-matched case, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
 In consequence, we have the following:
 
 \begin{theorem}
 Consistency (resp., positive, negative consistency) of a matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in $\coNP$.
 Under a fixed bound on the number of variables per rule, it is decidable in polynomial time.
-%Assuming a bound on the number of variables in rules, consistency (resp., positive, negative consistency) of a matching-preserving rule
-%can be checked in polynomial time.
 \end{theorem}
