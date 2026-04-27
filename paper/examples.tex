@@ -141,8 +141,10 @@ Based on experiments for DFA~\cite{ecai25}, we expected the most significant gai
 However, the obtained results differ substantially from these expectations. We hypothesize that the method
 used to generate the automata did not allow the full potential of this rule to be observed.
 The reliability results do not show a significant improvement.
-Nevertheless, SRS improves the success ratio of the heuristic approach, while introducing only a negligible time overhead.
-This suggests that SRS can be considered a useful feature when a heuristic approach is employed.
+Nevertheless, SRS improves the success ratio, while the overhead mainly comes
+from an auxiliary heuristic for selecting well-matched words, intended to increase the chances of detecting inconsistency.
+Its cost is negligible with exact equivalence check but becomes noticeable with the probabilistic one.
+This suggests that SRS can be considered a useful feature in a heuristic approach.
 
 
 % %\begin{itemize}
