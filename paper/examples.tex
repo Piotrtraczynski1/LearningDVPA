@@ -6,14 +6,14 @@ demonstrating the practical advantages of the proposed method.
 \subsection{Examples of rewrite rules}
 We consider the following rules, which express natural properties of \VPLs.
 \begin{itemize}
-\item \emph{Well-matched commutativity}: $c_1 c_2 X r_2 r_1 \to c_2 c_1 X r_1 r_2$. Consider a \DVPA 
+\item \emph{(Well-matched) commutativity}: $c_1 c_2 X r_2 r_1 \to c_2 c_1 X r_1 r_2$. Consider a \DVPA 
 modelling a system consisting of two pushdown components such that $c_1, r_1$ are actions of the first component,
 while $c_2, r_2$ are actions of the second. Then, the trace language of the whole system satisfies 
-well-matched commutativity.
-\item \emph{Well-matched cancellation}: $c X r \to \epsilon$. Consider a markup language, in which $c$ is a tag opening comment section,
-while $r$ is a tag closing it. In such a case, well-matched cancellation holds.
-\item \emph{Well-matched idempotency}: $c c X r r \to c X r$. Consider a markup language, in which $c$ is a tag activating certain mode 
-(e.g. bold text) and $r$ is a tag deactivating it. In this setting well-matched idempotency holds.
+(well-matched) commutativity.
+\item \emph{(Well-matched) cancellation}: $c X r \to \epsilon$. Consider a markup language, in which $c$ is a tag opening comment section,
+while $r$ is a tag closing it. In such a case, (well-matched) cancellation holds.
+\item \emph{(Well-matched) idempotency}: $c c X r r \to c X r$. Consider a markup language, in which $c$ is a tag activating certain mode 
+(e.g. bold text) and $r$ is a tag deactivating it. In this setting (well-matched) idempotency holds.
 \end{itemize}
 
 % reserch questions
@@ -56,7 +56,7 @@ the size of the stack alphabet, number of states and others.
 %the size of the alphabet or the size of the stack alphabet have negligable impact on the number of required equivalence queries.
 We have also implemented random generation of  \DVPA that are SEVPA and random \DVPA  that are 
 consistent with each of advice rules discussed above. For instance, to randomly generate 
-a \DVPA consistent with \emph{well-matched commutativity}, we generate two random \DVPA over disjoint alphabets, take the product of these automata, where undefined transitions are defined as self-loops. 
+a \DVPA consistent with {(well-matched) commutativity}, we generate two random \DVPA over disjoint alphabets, take the product of these automata, where undefined transitions are defined as self-loops. 
 
 We have conducted a series of experiments to address the following research questions:
 \begin{enumerate}[Q1]
@@ -89,7 +89,7 @@ the candidate automaton with the target automaton.
 %and to $16$ for well-matched commutativity. 
 The results are aggregated over $100$ randomly generated automata for each number of states.
 The number of well-matched words used as substitutions for the variable in the SRS rule was limited to $40$.
-We observe that, for well-matched cancellation property ($c X r \to \epsilon$), increasing
+We observe that, for the cancellation property ($c X r \to \epsilon$), increasing
 the number of well-matched words for substitution does not improve results; the substitution $X \mapsto \epsilon$
 is sufficient to achieve the same effect. 
 However, this is not true for reliability, which is discussed below.
@@ -133,17 +133,22 @@ SRS rule & Metric
 \end{table}
 
 \Paragraph{Summary}
-The presented results show a reduction of approximately $20\%$ in the number of queries for (well-matched) commutativity and idempotency,
+The presented results show a reduction of approximately $20\%$ in the number of equivalence queries for commutativity and idempotency,
 and around $50\%$ for cancellation rules. In our setup, the time measurements indicate that the use of SRS
 generally increases the overall execution time. However, SRS reduces execution time for the largest instances.
 This suggests that the benefit of the advice mechanism grows with automaton size.
 Based on experiments for DFA~\cite{ecai25}, we expected the most significant gains for commutativity.
-However, the obtained results differ substantially from these expectations. We hypothesize that the method
-used to generate the automata did not allow the full potential of this rule to be observed.
+However, the obtained results differ substantially from these expectations.
+We suspect the generated \DVPA consistent commutativity with were too simple for advice to help. 
+%constrained limited the impact of the SRS --- the autmata were too simple. 
+%this rule.
+% We hypothesize that the method
+%used to generate the automata did not allow the full potential of this rule to be observed.
 The reliability results do not show a significant improvement.
 Nevertheless, SRS improves the success ratio, while the overhead mainly comes
 from an auxiliary heuristic for selecting well-matched words, intended to increase the chances of detecting inconsistency.
-Its cost is negligible with exact equivalence check but becomes noticeable with the probabilistic one.
+Its cost is negligible comparing to the exact equivalence check but becomes noticeable with the probabilistic one.
+%If the evaluation of words becomes more expensive (e.g. LLM as a membership oracle), the overhead of our method vanishes. 
 This suggests that SRS can be considered a useful feature in a heuristic approach.
 
 
