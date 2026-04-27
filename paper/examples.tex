@@ -80,12 +80,47 @@ undefined transitions are defined as self-loops.
 %\Paragraph{Scenarios}
 %\todo{Perefect eqivalence and probabilistic}
 
-We preset the results per rule.
+We present the results of two sets of experiments. The first set is based on an exact equivalence check and evaluates the reduction
+in the number of equivalence queries as well as the total execution time. The second set is based on a probabilistic
+equivalence check and evaluates the reliability and the execution time.
 
-\Paragraph{Results on well-matched cancellation}
+\Paragraph{Exact equivalence check}
 
-\Paragraph{Results on well-matched commutativity}
+\Paragraph{Probabilistic equivalence check}
+In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
+Since SRS enables performing equivalence testing in two stages, we compare it against a baseline without
+SRS using two configurations: $10^5$ and $2 \cdot 10^5$ random words. 
+The second configuration is intended to verify whether the improvements observed with
+SRS are not merely a consequence of a larger number of random tests.
 
-\Paragraph{Results on well-matched idempotency}
+The experimental setup consists of $10^4$ randomly generated automata, each with $10$ to $25$ states. 
+The input alphabet was generated individually for each automaton, with slight variations depending on the considered property. 
+In particular, the number of symbols of each type ranged from $2$ to $5$, while the number of stack symbols ranged from $2$ to $16$.
+The number of well-matched words used for SRS was limited to $200$.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cc|ccc}
+\hline
+SRS rule & Metric
+& $10^5$ random words
+& $2\cdot10^5$ random words
+& $10^5$ with SRS \\
+\hline
+\multirow{2}{*}{Cancellation}
+& Success ratio & 30.29\% & ... & 57.19\% \\
+& Avg. time [s] & 0.69 & ... & 2.6 \\
+\hline
+\multirow{2}{*}{Commutativity}
+& Success ratio & 73.93\% & ... & 74.11\% \\
+& Avg. time [s] & 0.69 & ... & 2.0 \\
+\hline
+\multirow{2}{*}{Idempotency}
+& Success ratio & 91.0\% & ... & 91.69\% \\
+& Avg. time [s] & 0.38 & ... & 0.92 \\
+\hline
+\end{tabular}
+\caption{Comparison of success ratio and average execution time for different SRS rule types}
+\end{table}
 
 \Paragraph{Summary}
