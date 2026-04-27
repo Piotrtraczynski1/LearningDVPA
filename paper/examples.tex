@@ -89,13 +89,11 @@ the candidate automaton with the target automaton.
 %and to $16$ for well-matched commutativity. 
 The results are aggregated over $100$ randomly generated automata for each number of states.
 The number of well-matched words used as substitutions for the variable in the SRS rule was limited to $40$.
-
-\input{plot.tex}
-
-We observe that, in the case of well-matched cancellation property ($c X r \to \epsilon$), the reduction in the number of equivalence
-queries is independent of the number of well-matched words used in SRS. Substituting $\epsilon$ for $X$
+We observe that, for well-matched cancellation property ($c X r \to \epsilon$), increasing
+the number of well-matched words for substitution does not improve results; the substitution $X \mapsto \epsilon$
 is sufficient to achieve the same effect. 
 However, this is not true for reliability, which is discussed below.
+\input{plot.tex}
 
 \Paragraph{The probabilistic setting}
 %In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
