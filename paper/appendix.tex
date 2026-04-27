@@ -163,8 +163,6 @@ Finally, positive and negative consistency are dual and hence negative consisten
 \end{proof}
 
 
-
->>>>>>> 40b6fcffd9c3a7cbbad600ff38249e026063da6f
 \NPHardnessOfClash*
 \begin{proof}
 Let us fix a parameter $n$. Before the reduction, we construct a gadget that distinguishes all words of length at most $n$ unless they consist one of the designated letters. 
@@ -180,7 +178,6 @@ Let $Y \subseteq \Sigma$ and $x \in \Sigma \setminus Y$. Consider the automaton 
     >={Stealth[bend]}
 ]
 
-  % State Definitions
   \node[state] (qn) {$q_n$};
    \node[draw=none] (dots) [right=of qn] {$\dots$};
   \node[state] (q2) [right=of dots] {$q_2$};
@@ -189,14 +186,13 @@ Let $Y \subseteq \Sigma$ and $x \in \Sigma \setminus Y$. Consider the automaton 
 
 \node[state] (sink) [below=of q2] {$s$};
 
-  % Transition Edges
   \path[->]
     (qn) edge node [above] {$\Sigma\setminus Y$} (dots)
     (dots) edge node [above] {$\Sigma\setminus Y$} (q2)
     (q2)  edge node [above] {$\Sigma\setminus Y$} (q1)
     % The top arc from qn back to q1
     (q1)  edge [bend right=45] node [above] {$\Sigma\setminus (Y \cup \set{x})$} (qn)
-    % The outgoing edge xi from q1
+
 %    (q1)  edge [nodes={at={(1, -0.5)}}] node {$x$} ++(1.5, 0);
     (q1)  edge node [above] {$x$} (qF)
     (q1) edge node [left] {$Y$} (sink)
@@ -255,4 +251,9 @@ Consequently, we have
 (a)~$w_1 \neq w_2$, (b)~$|w_1| = |w_2| = n$, and
 (c)~$f_{w_1}^{\aut_0}, f_{w_2}^{\aut_0}$, i.e., 
 the constructed instance of the minimal collision problem is positive.
+\end{proof}
+
+
+\ReductionToLocal*
+\begin{proof}
 \end{proof}

@@ -1,8 +1,7 @@
 \newcommand{\BalReach}{\mathcal{B}_{(4)}}
 \newcommand{\autPlus}{\aut_{\sigma}}
 We develop algorithms for deciding consistency (resp., positive or negative consistency). 
-We discuss separately well-matched rules (Section~\ref{s:well-matched}) and 
-matching-preserving rules that are not well-matched (Section~\ref{s:matching-preserving}).
+We discuss separately well-matched rules (Section~\ref{s:well-matched}) and the wider class of matching-preserving rules (Section~\ref{s:matching-preserving}).
 In both cases, we consider first rules without variables, and then the extension to rules with variables.
 Although the asymptotic complexity is the same in both cases, the algorithms for well-matched rules are conceptually simpler and admit more efficient implementations.
 Before studying particular types of rules, we make a general observation that reduces consistency checking to single-step rewriting.
@@ -147,7 +146,6 @@ It is computed iteratively in a similar way to reachability in pushdown automata
 \begin{restatable}{lemma}{BalancedReachability}
 Given a \DVPA $\aut$, the relation $\BalReach$ can be computed in polynomial time in the size of $\aut$.
 \end{restatable}
-
 We extend the alphabet $\vAlph$ to $\vAlph_+$ by adding a pair of fresh local letters $x^L$ and $x^R$ for every variable $X$ occurring in $\lhs \to \rhs$.
 Next, we substitute each variable $X$ with its corresponding local letters: $x^L$ for $X$ in $\lhs$ and $x^R$ for $X$ in $\rhs$, obtaining words $\lhsInst$ and $\rhsInst$ over the extended alphabet. 
 Then, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
@@ -250,6 +248,8 @@ In consequence, we have:
 Consistency (resp.,  positive, negative consistency) of a ground matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in polynomial time via a single reachability check on a \DVPA obtained from the product $\aut \times \aut \times \autB$, where $\autB$ is a \DFA depending only on the rule.
 \end{proposition}
 
+Now, we can move to rules with variables. We only briefly comment on the extension as it is similar as for well-matched rules.
+
 \Paragraph{Matching-preserving rules with variables} 
 Variables in matching-preserving rules can be eliminated as in the case of well-matched rules. 
 Consider a matching-preserving rule $\lhs \to \rhs$.
@@ -262,3 +262,18 @@ In consequence, we have the following:
 Consistency (resp., positive, negative consistency) of a matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in $\coNP$.
 Under a fixed bound on the number of variables per rule, it is decidable in polynomial time.
 \end{theorem}
+
+
+
+
+%%% IMPROVMENTS
+
+%The complexity discussion is split across two locations in the well-matched subsection. The proposition on ground rules states polynomial-time decidability, then the cubic bottleneck discussion follows, then the example, then the non-ground case introduces NP membership, and finally the hardness results appear at the end. This means the reader encounters upper bounds, then a digression, then more upper bounds, then lower bounds — all interleaved with algorithmic content. Consider consolidating the complexity discussion: state all upper bounds first (ground: polynomial, non-ground: coNP / polynomial with bounded variables), then present the hardness results together at the end of the subsection. This would give the reader a cleaner picture.
+
+%The example is well-motivated but interrupts the algorithmic narrative. It appears between the ground and non-ground cases, which is a natural break point. However, it makes the point that reachability is necessary, which is a lower-bound-style observation. Placing it after the complexity results — rather than between the two algorithmic cases — would keep the algorithmic development uninterrupted and group all complexity-related discussion together.
+
+%The matching-preserving subsection feels noticeably shorter and less developed than the well-matched one. The ground case is explained in reasonable detail, but the treatment of variables is compressed into two sentences that simply say "do the same as before." While this is accurate, it leaves the reader unsure whether there are genuinely no new complications. If the argument is indeed identical, a single explicit sentence confirming this — "The construction for variables in matching-preserving rules introduces no new difficulties beyond those already handled in the well-matched case" — would be more reassuring than a terse forward reference. If there are subtle differences, they should be flagged.
+
+%The two subsections are not fully parallel in structure. The well-matched subsection has: ground rules → proposition → complexity discussion → example → non-ground rules → \DeltaRule computation → lemma → theorem → hardness discussion. The matching-preserving subsection has: ground rules → proposition → variables in two sentences → theorem. The asymmetry is partly justified by the fact that the variable elimination is identical, but the reader may feel that something is missing. Either making the structure more explicitly parallel, or acknowledging the asymmetry and explaining why it is justified, would improve the overall coherence.
+
+% The open problem at the end of the well-matched subsection is a reasonable closing remark, but it lands somewhat flatly. Since it concerns only the lower bound for full consistency (not positive/negative), it is a precise and meaningful observation. Consider framing it slightly more prominently — for instance, as a named open question — so it does not read as an afterthought.
