@@ -80,11 +80,25 @@ undefined transitions are defined as self-loops.
 %\Paragraph{Scenarios}
 %\todo{Perefect eqivalence and probabilistic}
 
-We present the results of two sets of experiments. The first set is based on an exact equivalence check and evaluates the reduction
-in the number of equivalence queries as well as the total execution time. The second set is based on a probabilistic
-equivalence check and evaluates the reliability and the execution time.
-
 \Paragraph{Exact equivalence check}
+In this section, we present the reduction in the number of equivalence queries achieved by using SRS,
+as well as its impact on the average execution time required to process a single DVPA in our setup.
+
+The exact equivalence check dominates the overall computation time. When no inconsistency is detected during the SRS phase,
+the equivalence check must be performed twice. At the same time, the SRS phase is computationally cheaper, as it operates
+on smaller automata and requires constructing products of reduced size, which may lead to performance improvements.
+
+The experimental setup assumes an alphabet consisting of three symbols of each type. For the commutativity property,
+both automata use alphabets of this structure. The number of stack symbols is set to five for cancellation and idempotency,
+and to sixteen for commutativity. The results are aggregated over $100$ randomly generated automata for each number of states.
+The number of well-matched words used for SRS was limited to 40.
+
+\input{plot.tex}
+
+We observe that, in the case of cancellation ($c X r \to \epsilon$), the reduction in the number of equivalence
+queries is independent of the number of well-matched words used in SRS. Substituting $\epsilon$ for $X$
+is sufficient to capture the effect. However, this observation does not carry over to the reliability
+improvements discussed in the next section.
 
 \Paragraph{Probabilistic equivalence check}
 In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
