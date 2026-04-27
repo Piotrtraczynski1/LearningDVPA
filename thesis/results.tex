@@ -130,7 +130,7 @@ acceptingStatesDensity = 0.3
 N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
 \hline
 $10^5$ & 6971 & 69.71\% & 4281 & 42.81\% \\
-$10^6$ & 0 & 0\% & 0 & 0\% \\
+$10^6$ & 3593 & 35.93\% & 0 & 0\% \\
 \hline
 \end{tabular}
 \caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
@@ -169,5 +169,19 @@ $10^6$ & 0 & 0\% & 0 & 0\% \\
 \end{table}
 
 \paragraph{Idempotency}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|cc|cc}
+\hline
+ & \multicolumn{2}{c|}{Bez SRS} & \multicolumn{2}{c}{Z SRS} \\
+N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
+\hline
+$10^5$ & 900 & 9.00\% & 831 & 8.31\% \\
+$10^6$ & 0 & 0\% & 0 & 0\% \\
+\hline
+\end{tabular}
+\caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
+\end{table}
 
 

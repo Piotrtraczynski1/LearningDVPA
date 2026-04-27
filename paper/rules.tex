@@ -1,361 +1,174 @@
-\newcommand{\BalReach}{\mathcal{B}_{(4)}}
-\newcommand{\autPlus}{\aut_{\sigma}}
+We adapt an advice mechanism introduced for \DFA in~\cite{ecai25} to \DVPA. 
+The main aim of advice is to 
+provide the learning algorithm with prior knowledge about the learned language, which is used to reduce the number of equivalence queries.
 
-We adapt an advice mechanism introduced for \DFA in~\cite{ecai25} to \DVPA. The main aim of advice is to 
-provide the learning with prior knowledge about the learned language, which is used to reduce the number of equivalence queries.
+First, we present the general framework, which carries over from the regular case seamlessly.
+Next, We discuss which rewriting rules are compatible with \VPLs and how to extend the SRS formalism to capture natural 
+properties of \VPLs.
 
-While extending the framework from regular to visibly pushdown languages is straightforward, 
-both frameworks differ in considered rewriting rules.
-We characterize which rewrite rules are compatible with visibly pushdown languages and analyze the computational complexity of resolving queries using this advice.
+\subsection{Learning with advice}
+We adapt the framework of active learning with advice for \DFA~\cite{ecai25} to \DVPA. 
+The advice supplied to the learning  algorithm is expressed via string rewriting systems (SRSs), 
+which are connected to visibly pushdown languages through the following notions of consistency: 
 
-\subsection{Connecting SRS with VPL}
-%We adapt the framework of active learning with advice for \DFA~\cite{ecai25} to \DVPA. 
-The advice for the learning  algorithm  is given via string rewriting systems (SRSs), which
-are related to visibly pushdown languages through the notions of consistency:
 
 \begin{definition}[\cite{ecai25}]
 \label{def:consistent}
-Let $\vAlph$ be a pushdown alphabet, $\rew$ be an SRS over $\Sig$ and $\lang$ be a visibly pushdown language over $\vAlph$. 
-We say that 
+Let $\vAlph$ be a pushdown alphabet, $\rew$ be an SRS over $\vAlph$ and $\lang$ be a visibly pushdown language over $\vAlph$. 
+We say that the SRS $\rew$ is
 \begin{itemize}
-\item $\rew$ is \emph{(fully) consistent} with $\lang$ if and only if
-for all words $x,y$, if $x \rewrites_{\rew} y$, then $x \in \lang \iff y \in \lang$.  
-\item $\rew$ is \emph{positively consistent} with $\lang$ if and only if for all words $x,y$, if $x \rewrites_{\rew} y$, then $x \in \lang \implies y \in \lang$.  
-\item $\rew$ is \emph{negatively consistent} with $\lang$ if and only if for all words $x,y$, if $x \rewrites_{\rew} y$, then $x \notin \lang \implies y \notin \lang$.  
+\item {(fully) consistent} with $\lang$ if and only if
+for all words $x,y$, if $x \rewrites_{\rew} y$, then $x \in \lang \Leftrightarrow y \in \lang$.  
+\item {positively consistent} with $\lang$ if and only if for all  $x,y$, if $x \rewrites_{\rew} y$,
+then $x \in \lang \Rightarrow y \in \lang$.
+\item {negatively consistent} with $\lang$ if and only if for all  $x,y$, if $x \rewrites_{\rew} y$, then $x \notin \lang \implies y \notin \lang$.  
 \end{itemize}
 \end{definition}
 
 Note that an SRS $\rew$ is fully consistent with $\lang$ if and only if it is both positively and negatively consistent.
 %While more granular than standard consistency, positive and negative consistency are harder to infer.
 
-Having the notions of consistency present the framework of active learning with advice.
+With these notions of consistency in place, we can now present the active learning with advice framework.
 
-\Paragraph{Learning with advice}
-The active \DVPA learning with advice problem is as follows.
-Given an \emph{oracle} $\oracle$ answering membership and equivalence queries about the target visibly pushdown language $\lang$ (and possibly other queries), and three \emph{advice} SRSs 
-$\rew_{=}$, which is consistent with $\targetLang$, and 
-$\rew_{+}$ (resp. $\rew_{-}$), which is positively (resp., negatively) consistent with $\targetLang$, the task is to construct 
-a \DVPA recognizing $\lang$. 
-The advice is used to approximate the equivalence in order to reduce the number of equivalence queries. 
-Therefore, it can be integrated with any framework for active learning of visibly pushdown languages~\cite{DBLP:conf/icgi/BarbotBFHKLN0Y21,DBLP:journals/pacmpl/JiaT24} or \DVPA~\cite{mfcs22} as long as the oracle answers membership and equivalence queries.
-In particular, the oracle can answer other types of queries as in~\cite{mfcs22}.
+\Paragraph{Framework}
+The active \DVPA learning with advice problem is defined as follows.
+The algorithm is given an \emph{oracle} $\oracle$ answering membership and equivalence queries about the target visibly pushdown language $\lang$
+ (and possibly other queries), and three \emph{advice} SRSs:
+ \begin{itemize}
+ \item  $\rew_{=}$, which is consistent with $\lang$, and 
+ \item $\rew_{+}$, $\rew_{-}$, which are respectively positively and negatively consistent with $\lang$.
+\end{itemize}  
+The algorithm's the task is to construct a \DVPA recognizing $\lang$. 
+The advice is used to approximate equivalence checks, thereby reducing the number of equivalence queries posed to the oracle.
+Therefore, it can be integrated with any framework for active learning of visibly pushdown languages~\cite{DBLP:conf/icgi/BarbotBFHKLN0Y21,DBLP:journals/pacmpl/JiaT24} or \DVPA~\cite{mfcs22} with possibly different types of queries 
+provided that the oracle answers at least  membership and equivalence queries.
+In particular, the oracle may also answer additional types of queries as in~\cite{mfcs22}.
 
 
-\Paragraph{Reducing the query complexity regarding equivalence oracles}
-We can reduce the number of equivalence queries without affecting the learning algorithm.
-When the learning algorithm attempts to asks the oracle an equivalence query, we can capture the query and first check whether an advice SRS $\rew$ is consistent (resp., positively consistent or negatively consistent) with
+\Paragraph{Using advice}
+%We can reduce the number of equivalence queries without affecting the learning algorithm.
+%When the learning algorithm attempts to ask the oracle an equivalence query,
+We intercept  equivalence queries posed by the learning algorithm and first check whether the advice SRS $\rew$ is consistent (resp., positively consistent or negatively consistent) with
 the language of a given candidate automaton $\aut$. 
-If it is inconsistent, we know that $\lang(\aut)$ differs from the target language, with which $\rew$ is consistent (resp., positively consistent or negatively consistent).
-It suffices to compute a pair of words violating consistency (resp., positively consistent or negatively consistent), i.e., 
-words $x,y$ such that $x \rewrites_{\rew} y$ but $x \in \lang \implies y \in \lang$ does not hold.
-Then, one of the words $x, y$ has to be a counterexample to $\lang(\aut)$  being equal to the target language. 
-It can be decided which one with a single membership query.
+We forward $\aut$ to the oracle, only if it is consistent 
+Otherwise, if it is inconsistent, without the oracle we conclude that $\lang(\aut)$ differs from the target language with which $\rew$ is consistent (resp., positively/negatively consistent).
+It suffices to compute a pair of words violating consistency (resp., positive/negative consistency), i.e., 
+words $x,y$ such that $x \rewrites_{\rew} y$ but exactly of $x,y$ belongs to $\lang$.
+Then, one of the words $x, y$ must be a counterexample to $\lang(\aut)$ being equal to the target language. 
+Which one it is can be determined with a single membership query.
 
 
-\subsection{Rewrite rules for visibly pushdown languages}
+\subsection{Rewrite rules compatible with VPLs}
 
-While the notion of consistency with the language is the same for \DVPA as for \DFA, the main difference lies in the rewrite rules. 
+While the notion of consistency with the language is the same for \DVPA as for \DFA, the key difference lies in the choice of rewrite rules. 
+With regular languages, any pair of words is a valid string rewrite rule, but words in visibly pushdown languages 
+have an implicit structure induced by the matching relation between calls and returns.
+The intuition behind rewrite rules is that words are rewritten to other words that are equivalent with respect to a given language. 
+Rewrite rules should therefore preserve the call--return matching outside the rewritten subword. 
+In other words, rewriting should act locally and not affect the rest of the word.
+While this is trivially true for regular words, it is not for pushdown words. 
+For instance, by rewriting 
+\(
+\textcolor{Green}{c_1} \textcolor{red}{c_2} \textcolor{blue}{c_3} \textcolor{blue}{r_3} \textcolor{red}{r_2} \textcolor{Green}{r_1}
+\) with the rule $c_3 r_3 \to r_3 c_3$
+we get a well-matched word with a different matching relation (color coded) 
+\(
+\textcolor{Green}{c_1} \textcolor{red}{c_2} \textcolor{red}{r_3} \textcolor{blue}{c_3} \textcolor{blue}{r_2}  \textcolor{Green}{r_1}.
+\)
+%the matching $(c_1, r_1), (c_2, r_2), (c_3, r_3)$ changes to $(c_1, r_1), (c_2, r_3), (c_3, r_2)$
 
-In the case of regular languages, any pair of words is a valid string rewrite rule, but words in visibly pushdown languages 
-have an additional implicit structure (which has been made explicit in~\cite{DBLP:journals/jacm/AlurM09}).
-The intuition behind rewrite rules is that words are rewritten to other words that are equivalent w.r.t. a given language. 
-Therefore, rewrite rules should preserve the matching of pushdown letters except for letters in subwords being rewritten.
-Intuitively, rewriting one part of the word, should not affect other parts of the word, which is trivially true for
-words, but not for pushdown words. For instance, by rewriting $c_1 c_2 c_3 r_3 r_2 r_1$ with the rule $c_3 r_3 \to \epsilon r_3 c_3$
-we get a well-matched word with a very different matching $c_1 c_2 r_2 c_3 r_2 r_1$.
-%the matching $(c_1, r_1), (c_2, r_2), (c_3, r_3)$ changes to $(c_1, r_1), (c_2, r_3), (c_3 r_2)$
 
 \begin{definition}
-A rewrite rule $\lhs \to \rhs$ \emph{preserves matching} over $\vAlph$ if and only if for every word $w \in \vAlph^*$]
-such that $w = x \lhs y$ for some $x,y$ we have:
-for every call letter $c$ from $x$ in $\lhs$ has the corresponding return in $y$ 
-if and only if the same letter $x$ in  $w' = x \rhs y$ has the corresponding return letter in $y$.
+A rewrite rule $\lhs \to \rhs$ is {matching-preserving} over $\vAlph$ if and only if for all words $w,w' \in \vAlph^*$
+such that $w = x \lhs y$ and $w' = x \rhs y$, the matching relation between calls from $x$ and returns from $y$ in $w$
+coincides with the matching relation between calls from $x$ and returns from $y$ in $w'$.
+An SRS $\rew$ is {matching-preserving} if all rules in $\rew$ are matching-preserving. 
 \end{definition}
 
-Matching preserving rules does not brake matching between calls and returns that are not in the rewritten fragment of the word.
-A prominent example of matching preserving rules are \emph{well-matched rules}, which are natural and enjoy more efficient algorithms 
-for checking consistency:
+Matching-preserving rules do not break the matching between calls and returns that are not in the rewritten fragment of the word.
+A prominent subclass of matching-preserving rules is the set of \emph{well-matched rules}, 
+which arise naturally and enjoy more efficient algorithms for checking consistency:
 
 \begin{definition}
 A rewrite rule $\lhs \to \rhs$ is well-matched over $\vAlph$ if and only if words $\lhs$ and $\rhs$ are well-matched.
+An SRS $\rew$ is {well-matched} if all rules in $\rew$ are well-matched.
 \end{definition}
 
-Clearly, every well-matched rule preserves matching. However, a rewrite rule $c_1 c_2 r_2 \to c_1$ is a matching preserving rule, while it
-is not a well-matched rule. Still, most of our examples are well-matched rules.
+Every well-matched rule is matching-preserving. However, not every matching-preserving rule is well-matched: 
+for instance, a rewrite rule $c_1 c_2 r_2 \to c_1$
+is matching-preserving, but it is not well-matched. Most of our examples are well-matched rules.
 
-While we have restricted the set of admissible rules set to affect pushdown words locally, 
-we must also extend it to capture the inherent properties of pushdown languages. 
-We demonstrate this in the example below.
+\subsection{Rewrite rules with variables}
+While we have restricted admissible rules to those that affect pushdown words locally, we face another problem. 
+Natural properties of pushdown languages cannot be expressed with string rewriting rules, 
+which we illustrate with the example below.
 
 \begin{example}
 \newcommand{\OpenDelOne}{\ensuremath{\boldsymbol{\langle}}\,}
 \newcommand{\CloseDelOne}{\ensuremath{\boldsymbol{\rangle}}\,}
 \newcommand{\OpenDelTwo}{\ensuremath{\boldsymbol{[}}\,}
 \newcommand{\CloseDelTwo}{\ensuremath{\boldsymbol{]}}\,}
-Consider the Dyck language $\lang_2$ of well-matched brackets over tow pairs of brackets: \( \set{ \OpenDelOne, \CloseDelOne} \) and \( \set{\OpenDelTwo, \CloseDelTwo} \). 
-The language $\lang_2$ can be approximated by the property that the order of \OpenDelOne and \OpenDelTwo is irrelevant as long as each opening bracket matches the closing one. 
-For instance, in every word $\OpenDelOne \OpenDelTwo \CloseDelTwo \CloseDelOne \to  \OpenDelTwo  \OpenDelOne \CloseDelOne \CloseDelTwo$. 
-Unfortunately, this property cannot be expressed by a finite set of string rewriting rules as it requires  far apart letters to switch; for example 
-$\OpenDelOne \OpenDelTwo^n \OpenDelOne \CloseDelOne \CloseDelTwo^n \CloseDelOne$ is equivalent to $\OpenDelOne \OpenDelOne \OpenDelTwo^n \CloseDelTwo^n \CloseDelOne \CloseDelOne$. 
-However, we can express this property with a word variable $X$, for which any well-matched word can be substituted. Then, the rule
-\[
-\OpenDelOne \OpenDelTwo X \CloseDelTwo \CloseDelOne \to  \OpenDelTwo  \OpenDelOne X \CloseDelOne \CloseDelTwo
-\]
-expresses that the relative order of \OpenDelOne and \OpenDelTwo is irrelevant as long as the corresponding brackets match.
+Consider the Dyck language $\lang_2$ of well-matched brackets over two pairs of brackets: \( \set{ \OpenDelOne, \CloseDelOne} \) and \( \set{\OpenDelTwo, \CloseDelTwo} \). 
+The language $\lang_2$ satisfies the property that the order of \OpenDelOne and \OpenDelTwo is irrelevant provided that 
+each opening bracket is matched by its corresponding closing bracket. 
+For instance, in every word substituting $\OpenDelOne \OpenDelTwo \CloseDelTwo \CloseDelOne$ with 
+ $\OpenDelTwo  \OpenDelOne \CloseDelOne \CloseDelTwo$ neither breaks the matching between other brackets nor fixes unmatched brackets.
+Consequently,
+  $\OpenDelOne \OpenDelTwo \CloseDelTwo \CloseDelOne \to \OpenDelTwo  \OpenDelOne \CloseDelOne \CloseDelTwo$ rule is consistent with
+  $\lang_2$. 
+Unfortunately, this property cannot be expressed by any finite set of string rewriting rules as it requires  exchanging arbitrarily distant letters; for example, for any $n \geq 1$, the word 
+\(  \OpenDelOne \underbrace{\OpenDelTwo \ldots \OpenDelTwo}_\text{n} \OpenDelOne \CloseDelOne \underbrace{\CloseDelTwo \ldots \CloseDelTwo}_\text{n} \CloseDelOne \) 
+is equivalent to 
+\(  \OpenDelOne \OpenDelOne \underbrace{\OpenDelTwo \ldots \OpenDelTwo}_\text{n} \underbrace{\CloseDelTwo \ldots \CloseDelTwo}_\text{n} \CloseDelOne \CloseDelOne. \) 
+This property can, however, be expressed using a word variable $X$ ranging over well-matched words.
+Then, the rule
+\begin{align*}
+&& \OpenDelOne \OpenDelTwo X \CloseDelTwo \CloseDelOne \to  \OpenDelTwo  \OpenDelOne X \CloseDelOne \CloseDelTwo
+\end{align*}
+expresses that the relative order of \OpenDelOne and \OpenDelTwo is irrelevant provided their respective brackets match.
 \end{example}
 
-\todo{Is consistency defined for rules with variables?}
+In order to express properties as illustrated in the above example, we extend rules with variables. 
+
 \Paragraph{String rewriting systems with variables}
 Consider an infinite set of variables $\Vars$. 
-A string rewriting system with variables (\SRSV) $\rewV$ is a finite set of pairs of words $(\lhs,\rhs)$ over $\vAlph \cup \Vars$ such that 
-for every rule $\lhs \to \rhs \in \rewV$, 
-(1)~in each $\lhs$ and $\rhs$, every variable $X \in \Vars$ occurs at most once, and  
-(2)~if a variable $X \in \Vars$ occurs in $\rhs$, then it occurs in $\lhs$ as well.
+A \emph{string rewriting system with variables (\SRSV)} $\rewV$ is a finite set of rules $\lhs  \to \rhs$ over $\vAlph \cup \Vars$ satisfying
+(1)~every variable $X \in \Vars$ occurs at most once in $\lhs$ and  at most once in $\rhs$, and  
+(2)~every variable $X \in \Vars$ that occurs in $\rhs$, also occurs in $\lhs$.
 We consider \SRSVs as finite representations of infinite SRSs. 
 That is, we say that a rule $\lhs \to \rhs \in \rewV$ generates an infinite 
-SRS $\sem{\lhs \to \rhs}$ obtained by all instantiations of variables from $\lhs$ and $\rhs$ with well-matched words, where variable in both $\lhs$ and $\rhs$ are instantiated to the same word.
-E.g. a rule $c X r \to X$ generates an infinite set $\{ c r \to \epsilon,c c r r \to \epsilon cr, \ldots \}$.
+SRS $\sem{\lhs \to \rhs}$ 
+consisting of all ground instances obtained by substituting well-matched words for variables, with the same word substituted for each occurrence of a given variable across both $\lhs$ and $\rhs$.
+For example, a rule $c X r \to X$ generates an infinite set $\{ c r \to \epsilon, c c r r \to cr, \ldots \}$.
 Finally, an \SRSV $\rewV$ generates an SRS $\sem{\rewV}$ defined as the union of $\sem{\lhs \to \rhs}$  over all rules $\lhs \to \rhs$ from $\rewV$.
 
-\Paragraph{Matching preserving and well-matched rules with variables}
-Consider a rewrite rule with variables $\lhs \to \rhs$. 
-We say that $\lhs \to \rhs$ preserves matching (resp. is well-matched) if and only if the rule resulting from deletion of all variables from $\lhs \to \rhs$ preserves matching (resp. is well-matched).
-Observe that if $\lhs \to \rhs$ preserves matching (resp. is well-matched), then every rewrite rule for the generated SRS $\sem{\lhs \to \rhs}$ preserves matching (resp. is well-matched).
+\begin{remark}
+String rewriting rules can be considered as terms under the unary signature (all symbols have arity at most one) with a single variable.
+However, the variables in rules that we consider do not correspond to standard variables in the term-rewriting setting, 
+but to context variables.   
+\end{remark}
 
-%Since \SRSV is only a finite representation of infinite \SRS, all notions for \SRSs naturally extend to \SRSVs. 
-We only assign well-matched words to variables as otherwise the resulting rules would not preserve matching. 
-Consider a rule $c X r \to X$, which is well-matched if it is instantiated with a well-matched word for $X$. 
-However, instantiating $X$ with $r c$ results in a rule $c r c r \to r c$, which does not even preserve matching as $c r c r$ is well-matched, while
-$r c$ is not.
-Furthermore, considered only well-matched instantiations facilitates deciding consistency with a given \DVPA.
-
-\subsection{Deciding consistency}
-
-We discuss the complexity of deciding consistency (resp., positive or negative consistency) of an \SRS or \SRSV with the language of a given \DVPA $\aut$.
-Observe that an \SRSV $\rew$ is consistent with the language of $\aut$ if and only if for every rule $\lhs \to \rhs$ and all words $x,y$ we have
-$x \lhs y \in \lang(\aut) \iff x \rhs y \in \lang(\aut)$. Indeed, if this property holds for every rule, then by transitivity of the equivalence 
-if $w \rewrites_{\rew} w'$, then $w \in \lang \implies w' \in \lang$. Similarly, it suffices to check consistency of single-step rewriting for positive and negative consistency.
-
-\Paragraph{Ground well-matched rules.} Consider a well-matched rule $\lhs \to \rhs$ without variables, i.e., a standard string rewriting rule. 
-We extend the alphabet $\vAlph$ with a fresh local letter $\#$ and construct two \DVPA over the extended alphabet.
-Both \DVPA extend $\aut$ and differ only in behavior on the letter $\#$; in $\aut_1$ for any state $q$, the transition over $\#$ leads to the state $q'$ such that
-$\aut$ moves from $q$ to $q'$ over $\lhs$. Since $\lhs$ is well-matched, the run over $\lhs$ does not depend on the stack content and it does not modify the stack content. 
-Therefore, the \DVPA $\aut$ acts of $\lhs$ as on a local letter. 
-Next, the \DVPA $\aut_2$ is obtained in a similar way, but $\#$ acts as the word $\rhs$, which is also well-matched. 
-Therefore, to check consistency of  $\lhs \to \rhs$  with $\lang(\aut)$ it suffices to check whether there is a word $w$ such that exactly one of \DVPA $\aut_1, \aut_2$ accepts it, 
-which can be done by a single reachability check on the product \DVPA $\aut_1 \times \aut_2$, which simulates two copies of $\aut$ with two stacks.
-However, the visibility condition ensures that two stacks can be simulated with one over the product of stack alphabets. 
-Checking positive (resp., negative) consistency amounts to checking the existence of a word accepted by $\aut_1$ but not $\aut_2$ (resp., $\aut_2$ but not $\aut_1$ for negative consistency), 
-which also can be done with a single reachability check. 
-
-\begin{proposition}
-Consistency (resp.,  positive, negative consistency) of a ground well-matched rule with the language of a given \DVPA $\aut$ can be decided in polynomial time via a single 
-reachability check on a \DVPA obtained from the product of $\aut$ with itself. 
-\end{proposition}
+\Paragraph{Properties of SRSs with variables}
+The notions defined for SRSs carry over to SRSs with variables by applying the definition to the generated SRS.
+That is, we say that a rule with variables $\lhs \to \rhs$ is
+\begin{itemize}
+    \item consistent (resp., positively/negatively consistent) with a language $\lang$ if and only if 
+ the generated SRS $\sem{\lhs \to \rhs}$ is consistent (resp., positively/negatively consistent) with $\lang$,
+ \item matching-preserving (resp., well-matched) if and only if 
+ the generated SRS $\sem{\lhs \to \rhs}$ is matching-preserving (resp., well-matched).
+\end{itemize}
+The listed properties extend to SRSs with variables, by requiring that every rule is consistent, well-matched, e.t.c.    
+To check whether a rule with variables is matching-preserving (resp., well-matched) it suffices to delete variables, i.e.,
+a rule with variables $\lhs \to \rhs$  is matching-preserving (resp. is well-matched)
+it holds if and only if
+the rule without variables obtained by deleting all variables from $\lhs \to \rhs$ is matching-preserving (resp. is well-matched).
 
 
-Reachability in pushdown automata can be checked in $\bigO(|\aut|^3)$ with a slightly better bound $\bigO(|\aut|^3/\log(|\aut|))$ for \emph{recursive state machines}~\cite{DBLP:conf/popl/Chaudhuri08}, 
-which is still $\widetilde{\bigO}(|\aut|^3)$.
-Due to the lack of better upper bounds~\cite{DBLP:conf/popl/Chaudhuri08,DBLP:conf/lics/BalasubramanianCM25}, the complexity of reachability in pushdown systems is often referred to as the "cubic bottleneck." 
-Consequently, reachability in the product $\aut \times \aut$ amounts to $\widetilde{\bigO}(|\aut|^6)$. 
-In the case of \DFA, however, checking consistency of an SRS can be performed locally on the structure of the \DFA without checking reachability. 
-The following example illustrates that for pushdown systems, checking consistency must involve reachability.
+\Paragraph{Well-matched instantiations}
+We restrict variables to range over well-matched words only, since non-well-matched instantiations need not be matching-preserving.
+Consider the rule $c X r \to X$ that is even well-matched and hence
+every rule in $\sem{c X r \to X}$ is well-matched.
+However, 
+substituting $X$ with $r c$ yields $c r c r \to r c$, which is not even matching-preserving, since $c r c r$ is well-matched, while $r c$ is not.
+Furthermore, as discussed in the following section,  restricting to well-matched instantiations facilitates deciding consistency with a given \DVPA.
 
-\begin{example}
-Consider a \DVPA $\autB$ depicted in Figure~\ref{fig:nonsyntactic}, which is over the pushdown alphabet $(\set{c},\set{l_1, l_2}, \set{r})$ such that local letters $l_1, l_2$ induce self-loops over all states except for $q_1$. Its stack alphabet is a singleton $\set{a}$.
-In the state $q_1$ the \DVPA moves over $l_1$ to $q_2$ and over $l_2$ to $q_2$. The states $q_2, q_3$ have different behavior over the empty stack only, while they are indistinguishable 
-over a non-empty stack. Finally, $q_1$ is reachable only with non-empty stack, i.e., $q_1$ is reachable, but the configuration $(q_1, \bot)$ is not.
-Then, the rewrite rule $l_1 \to l_2$ is consistent with $\lang(\autB)$, but it requires reachability analysis for that. 
-\begin{figure}[h!]
-\centering
-\begin{tikzpicture}[
-    shorten >=1pt, 
-    node distance=3.0cm, 
-    on grid, 
-    auto,
-    >={Stealth[bend]}
-]
-
-  % State Definitions
-  \node[state] (q0) {$q_0$};
-  \node[state] (q1) [right=of q0] {$q_1$};
-  \node[state] (q2U) [above right=of q1] {$q_2$};
-  \node[state] (q2D) [below right=of q1] {$q_3$};
-  \node[state] (sink) [below right=of q2U] {$q_R$};
-  \node[state,accepting] (acc) [right=of q2U] {$q_F$};
-
-  % Transition Edges
-  \path[->]
-    (q0) edge node [above] {$c, push(a)$} (q1)
-    (q1) edge node [above] {$l_1$} (q2U)
-    (q1)  edge node [above] {$l_2$} (q2D)
-    (q2U) edge node [right] {$r, pop(a)$} (sink)
-    (q2U) edge node [above] {$r, pop(\bot)$} (acc)
-    (q2D)  edge [bend right=20] node [above left=0.6cm] {$r, pop(a)$} (sink) 
-    (q2D)  edge [bend left=20] node [below right=0.6cm] {$r, pop(\bot)$} (sink);
-    
-
-    %[bend right=45]
- %   (q1)  edge [bend right=45] node [above] {$\Sigma\setminus (Y \cup \set{x})$} (qn)
-    % The outgoing edge xi from q1
-%    (q1)  edge [nodes={at={(1, -0.5)}}] node {$x$} ++(1.5, 0);
-%    (q1)  edge node [above] {$x$} (qF)
-%    (q1) edge node [left] {$Y$} (sink)
-%    (q2) edge node [left] {$Y$} (sink)
-%    (qn) edge node [above] {$Y$} (sink)
-%    (qF) edge node [left] {$Y$} (sink)
-    ;
-
- \draw[loop right,->] (acc)  to node[right] {$\vAlph$} (acc);
- \draw[loop right,->] (sink) to node[right] {$\vAlph$} (sink);
-
-\end{tikzpicture}
-\caption{The automaton $\autB$. All transitions other than depicted are self-loops}
-\label{fig:nonsyntactic}
-\end{figure}
-\end{example} 
-
-
-\Paragraph{Non-ground well-matched rules}
-\newcommand{\autCon}{\aut_{\textrm{con}}}
-\newcommand{\DeltaRule}{\Delta[\lhs \to \rhs]}
-Consider a well-matched rule $\lhs \to \rhs$ with variables. 
-The general approach to decide consistency is, as in the ground case, to reduce it to reachability in a \VPA $\autCon$.
-This automaton simulates two copies of $\aut$ over the alphabet extended with a fresh local letter $\#$.
-The \VPA $\autCon$ is based on the product $\aut \times \aut$, where the stack simulates the stacks of both copies of the \DVPA $\aut$.
-The fresh local letter $\#$ simulates the word $\lhs$ in the first copy and the word $\rhs$ in the second copy.
-However, there are two main differences from the ground case.
-First, as $\lhs$ and $\rhs$ can be instantiated to (infinitely many) different words, transitions over $\#$ are non-deterministic.
-Second, the transitions in each copy of $\aut$ cannot be defined independently; they need to be define on the product to ensure that $\lhs$ and $\rhs$ are instantiated to the same word. 
-E.g., for a rule $c X r \to X$, there may be a transition in $\aut$ from $q$ to $q_1$ over $c w_1 r$ and from $q$ to $q_2$ over $w_2$, but we must ensure that $w_1 = w_2$.
-Therefore, we compute a set $\DeltaRule$ triples $(q, s_1, s_2)$ such that there are $\alpha, \beta$ satisfying:
-(1)~$(q,u) \trans{\aut}{\alpha} (s_1,u)$ and $(q,u) \trans{\aut}{\beta} (s_2,u)$ for every stack content $u$, and
-(2)~$\alpha \to \beta$ is an instance  of $\lhs \to \rhs$ obtained by substituting well-matched words for variables.
-Using $\DeltaRule$, we define a \VPA $\autCon$ over the pushdown alphabet $\vAlph$ extended with a local letter $\#$ as an extension of $\aut \times \aut$ such that for a state $(q_1, q_2)$ of $\autCon$:
-(a)~if $q_1 \neq q_2$, then $\autCon$ has no transition  over $\#$, and
-(b)~if $q_1 = q_2$, then for every $(q_1, s_1, s_2) \in \DeltaRule$, 
-the tuple $\langle (q_1, q_2), \#, (s_1, s_2) \rangle$ is a transition in $\autCon$. 
-Finally, the automaton accepts if in the reached state $(q_1, q_2)$, exactly one of $q_1, q_2$ is accepting in $\aut$. 
-Observe that the \VPA $\autCon$ accepts exactly words $w$ that are witnesses of inconsistency of $\lhs \to \rhs$ with $\lang(\aut)$.
-These are words $w$ with exactly one occurrence of $\#$ such that there is an instance $\alpha \to \beta$ of $\lhs \to \rhs$ obtained by substituting well-matched word for variables, and
-by substituting $\#$ with $\alpha$ and $\beta$ we obtain words $w_1, w_2$ respectively satisfying 
-(i)~$w_1 \to w_2$, and 
-(ii)~exactly one of $w_1, w_2$ belongs to $\lang(\aut)$.
-By modifying the acceptance condition, we can also decide positive and negative consistency. 
-
-In the following, we focus on computing $\DeltaRule$ for rules with variables. 
-It suffices to compute how well-matched words transform pairs of states of the \DVPA.
-
-\Paragraph{Computing $\DeltaRule$}
-We compute a quaternary relation $\BalReach \subseteq Q^4$, where $(q_1, q_2, s_1, s_2) \in \BalReach$ if and only if there is a well-matched word $w$ such that
-$q_1 \trans{\aut}{w} s_1$ and $q_2 \trans{\aut}{w} s_2$. 
-It is computed iteratively in a similar way to reachability in pushdown automata.  
-\begin{lemma}
-Given a \DVPA $\aut$, the relation $\BalReach$ can be computed in polynomial time in the size of $\aut$.
-\end{lemma}
-Now, we extend the alphabet $\vAlph$ to $\vAlph_+$ with a pair of fresh local letters $x^L$ and $x^R$ for every variable $X$ from $\lhs \to \rhs$.
-Next, we substitute each variable $X$ with its corresponding local letters: $x^L$ in $\lhs$ and $x^R$ in $\rhs$ and obtaining words $\alpha^+$ and $\beta^+$ over the extended alphabet. 
-
-We compute $\BalReach$ and then we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
-For a given assignment $\sigma$, we extend the \DVPA $\aut$ to a \VPA $\autPlus$ working over the extended alphabet.
-If $\sigma(X) = (q_1, q_2, q_1', q_2')$, we define the transitions for the new letters as follows: 
-$\autPlus$ has a transition over $x^L$ from $q_1$ to $q_1'$ and over $x^R$ from $q_2$ to $q_2'$; there are no other transitions over $x^L$ or $x^R$.
-Finally, we evaluate $\lhs$ and $\rhs$ by evaluating $\alpha^+$ and $\beta^+$ in $\autPlus$.
-If $(q,\bot) \trans{\autPlus}{\alpha^+} (s_1,\bot)$ and $(q,\bot) \trans{\autPlus}{\beta^+} (s_2,\bot)$, we add the triple $(q,s_1, s_2)$  to $\DeltaRule$.
-Not that the stack content $\bot$ does not influence reachability since $\alpha^+, \beta^+$ are well-matched.
-
-
-\begin{lemma}
-Deciding membership to $\DeltaRule$ over well-matched rules is in \NP.
-It can be done in polynomial time assuming a bound on the number of variables in rules.
-\end{lemma}
-
-In consequence, checking if there is an inconsistency an be done in \NP and hence:
-
-\begin{theorem}
-Consistency (resp., positive, negative consistency) of a well-matched rule with the language of a given \DVPA $\aut$ can be decided in $\coNP$.
-Assuming a bound on the number of variables in rules, consistency (resp., positive, negative consistency) of a well-matched rule
-can be check in polynomial time.
-\end{theorem}
-
-
-\Paragraph{Complexity of checking (positive) consistency}
-The proposed algorithm checks all assignments of transitions for variables, which is exponential in the number of variables, but it works in polynomial time if the number of variables is bounded. 
-Improving the proposed exponential-time algorithm is unlikely as the membership problem for $\DeltaRule$ is \NP-complete in general. 
-The hardness result hols already for \DFA, which can be considered as \DVPA over only local letters.
-Furthermore, the problem of deciding positive (resp. negative) consistency is \coNP-complete as well.
-
-\begin{restatable}{theorem}{NPHardness}
-(1)~The problem, given a rewrite rule $\lhs \to \rhs$, a DFA $\aut$ and its states $q, s_1, s_2$, does the tuple $(q, s_1, s_2)$ belongs to $\DeltaRule$, is \NP-complete. 
-(2)~The positive (resp. negative) consistency problem over well-matched rules against a regular language given by a \DFA is 
-\coNP-complete.
-\end{restatable}
-
-The above \coNP-hardness result does not extend to consistency and hence 
-the complexity lower bound for checking consistency  of well-matched rules remains an open problem.
-
-Now, we discuss matching-preserving rules, which are not well-matched. 
-The overall approach is similar to the well-matched; we extend the alphabet with auxiliary letters.
-In contrast to well-matched rules, the new letters are call and return letters. 
-
-\Paragraph{Ground matching-preserving rules}
-\newcommand{\autExt}{\aut_E}
-\newcommand{\return}{\bar{r}}
-\newcommand{\call}{\bar{c}}
-Consider a matching preserving rule $\lhs \to \rhs$ without variables, which is not a well-matched rule.
-Observe that $\lhs$ and $\rhs$ have the same number of unmatched calls $m$ and unmatched returns $k$, and since it 
-is not well-matched, there are unmatched letters (at least one of $k, m$ is non-zero). 
-Furthermore,  $\lhs$ and $\rhs$ can be partitioned into well-matched words and unmatched calls and returns, where
-unmatched returns precede unmatched calls.
-It follows that  
-\begin{align*}
-\lhs &= v_0 r_1 v_1 \ldots r_k v_k c_1 v_{k+1} c_2 \ldots c_m v_{k+m} \\
-\rhs &= v_0' r_1' v_1' \ldots r_k' v_k' c_1' v_{k+1}' c_2' \ldots c_m' v_{k+m}'
-\end{align*}
-where $v_i, v_i'$ are well-matched word, $r_i, r_i'$ are return letters and $c_i,c_i'$ are call letters. 
-Now, as in the well-matched case,  consider a \DVPA $\autExt$ being the product of $\aut$ with itself, i.e., 
-the set of states is $Q \times Q$ and the stack alphabet is $\stackAlphabet \times \stackAlphabet$.
-The automaton $\autExt$ works over an extended alphabet, where 
-the additional letters are $k$ fresh return letters
-$\return_1, \ldots, \return_k$
-and $m$ fresh call letters $\call_1, \ldots, \call_m$.
-The transitions over the letter $\return_1$ simulates the word $v_0 r_1 v_1$  on the first component of $\autExt$
-and it simulates the word $v_0' r_1' v_1'$ on the second component.
-While doing so, it pops a single letter from the stack, which is a pair of stack symbols of $\aut$. 
-Formally, $\delta_E((q_1, q_2),\return_i, (b_1, b_2)) = (s_1, s_2)$ if $(q_1,u b_1) \trans{\aut}{v_0 r_1 v_1} (s_1, u)$ and 
-$(q_2,u b_2) \trans{\aut}{v_0' r_1' v_1'} (s_2, u)$ for every stack content $u$. 
-For the remaining return letters $\return_i$, where $i \in \set{2, \ldots,k}$
-the transitions on $\return_i$ are equivalent to processing  $r_i v_i$  on the first component and $r_i' v_i'$ on the second component.
-For new call letter $\call_i$ the transition over $\call_i$ is equivalent to 
-the transition over the word $c_i v_{k+1}$ on the first component and $c_i' v_{i+k}'$ on the second component.
-Finally, a state $(q_1, q_2)$ of $\autExt$ are accepting if exactly one of $q_1, q_2$ is accepting in $\aut$.
-
-Observe that a word  $w_1 \return_1 \ldots \return_k \call_1 \cdots \call_m w_2$, where $w_1, w_2$ are over the original alphabet $\vAlph$, 
-is accepted by $\autExt$  
-if and only if $\aut$ accepts exactly one of the words $w_1 \lhs w_2, w_1 \rhs w_2$. 
-The latter is equivalent to $\lhs \to \rhs$ being not consistent with $\lang(\aut)$.
-Therefore, the rule $\lhs \to \rhs$ is consistent with $\lang(\aut)$ if and only if
-the language $\lang(\autExt) \cap \lang(\vAlph^* \return_1 \ldots \return_k \call_1 \cdots \call_m \vAlph^*)$ is empty.
-
-By changing the accepting states of $\autExt$ as discussed in the well-matched case, we can decide positive and negative consistency 
-using emptiness of $\lang(\autExt) \cap \lang(\vAlph^* \return_1 \ldots \return_k \call_1 \cdots \call_m \vAlph^*)$.
-In consequence, we have:
-
-\begin{proposition}
-Consistency (resp.,  positive, negative consistency) of a ground matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in polynomial time via a single reachability check on a \DVPA obtained from the product of $\aut$ with itself and a regular expression. 
-\end{proposition}
-
-\Paragraph{Matching-preserving rules with variables} 
-Variables in matching-preserving rules can be eliminated as in the case of well-matched rules. 
-Consider a matching-preserving rule $\lhs \to \rhs$.
-It suffices to extend the alphabet with local letters $x^L, x^R$ for each variable and then consider a ground rule
-obtained from  $\lhs \to \rhs$ by replacing the occurrence of every variable $X$ in $\lhs$ with $x^L$ and in $\rhs$ (if it exists)
-with $x^R$.
-Finally, we as in the well-matched case, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
-In consequence, we have 
-
-\begin{theorem}
-Consistency (resp., positive, negative consistency) of a matching-preserving rule with the language of a given \DVPA $\aut$ can be decided in $\coNP$.
-Assuming a bound on the number of variables in rules, consistency (resp., positive, negative consistency) of a matching-preserving rule
-can be check in polynomial time.
-\end{theorem}

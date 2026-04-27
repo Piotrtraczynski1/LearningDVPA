@@ -15,6 +15,7 @@ We consider the following types rules:
 \todo{c, r are comment tags}
 
 \item \emph{Well-matched idempotency}: $c c X r r \to c X r$.
+
 \end{itemize}
 
 % reserch questions
@@ -28,30 +29,62 @@ that read as well modify the stack content and hence it depends on a concrete \D
 On the positive side, the learning algorithm works in polynomial time. 
 
 \Paragraph{The advice mechanism}
-We have extended the baseline algorithm with the advice mechanism, where the advice is given via rewrite rules with a \textbf{single}
- variable. 
-\todo{how the advice is computed}
+We have extended the baseline algorithm with the advice mechanism, which intercepts equivalence queries before
+passing them to the the equivalence oracle performs the consistency check. 
+The advice is given via rewrite rules with a {single} variable, and to make it more efficient instead of 
+the exact algorithm presented in the paper, we substitute for the variable one of few selected well-matched words.
+\todo{I have tested up to 200 well-matched words for a single check}
+A single consistency check is performed for all ground rules constructed in this way.
+We have observed that often testing with the substitution $X \mapsto \epsilon$ suffices to detect inconsistency.
+\todo{Is consistency test for ground rules optimized?}
 
-\Paragraph{Equivalence tests}
-\todo{two types of equivalence checks -- exact and probabilistic}
+\Paragraph{Equivalence oracle}
+We have implemented two types of equivalence test: the exact test based on reachability in the product automaton, and
+the probabilistic test based on testing conformance of automata on a large number ($10^5$ and $10^6$) of randomly generated words.
+\todo{In the probabilistic test faster? -- it's much faster}
+\todo{Are there any other important details? -- the length of random words was restricted to 100}
 
 \subsection{Experiments}
 
-\todo{Reserch questions:}
+We have conducted a series of experiments to address the following research questions:
+\begin{enumerate}[Q1]
+\item What is the average reduction in the number of equivalence queries avoided using advice? 
+Are there any features that influence performance of the advice mechanism?
+\item Does the use of the advice mechanism lead to better running time of the whole learning setup 
+(i.e., the runtime of the learning algorithm plus the runtime of the probabilistic equivalence oracle)? 
+\item Does the use of the advice mechanism lead to higher reliability of the learning setup in presence of
+the probabilistic equivalence oracle?
+\end{enumerate}
 
 \Paragraph{Benchmarks}
-\todo{Note that the number of equivalence queries depends on the number  of states, not the size of the alphabet}
+We have generated random benchmark \DVPA with multiple parameters such as the size of the alphabet 
+(the number of call, local and return letters are specified separately), the size of the stack alphabet, 
+number of states, density of transitions (the ratio of defined transitions to all possible transitions, where
+undefined ones are treated as valid transitions to a special sink state \todo{Is 'density of transitions' worth mentioning?})
+and the ratio of accepting states among all states. 
+We have observe that the number of states has the main infulence on the number of equivalence queries, while
+the size of the alphabet or the size of the stack alphabet have negligable impact on the number of required equivalence queries.
+We have also implemented random generation of a \DVPA that is (a)~a Single-Entry VPA (SEVPA),  (b)~Multi-Entry VPA (MeVPA), 
+(c)~Call-Driven Automata (CDA), and Expanded Call-Driven Automata (eCDA). 
+Moreover, we have implemented random generation  of \DVPA that are consistent which each type of advice discussed above:
+\begin{itemize}
+    \item For \emph{well-matched commutativity}, we generate two \DVPA over disjoint alphabets, take the product of these automata, where
+undefined transitions are defined as self-loops. 
+    \item For \emph{well-matched cancellation}, we generate a \DVPA $\aut$ randomly over the alphabet without letter $c,r$. 
+    Then, $\aut$ is extended to $\aut'$ over the alphabet including $c,r$ such that the rule $c X r \to \epsilon$ is consistent.   
+    \item For \emph{Well-matched idempotency}, we generate a SEVPA with the condition that returning to 
+    the same module does not change the state, which implies that $c c X rr \to c  X r$ is consistent.
+\end{itemize}
 
-\Paragraph{Scenarios}
-\todo{Perefect eqivalence and probabilistic}
 
- We preset the results per rule.
+%\Paragraph{Scenarios}
+%\todo{Perefect eqivalence and probabilistic}
+
+We preset the results per rule.
 
 \Paragraph{Results on well-matched cancellation}
-$c r \to \epsilon$ usually does the trick
 
 \Paragraph{Results on well-matched commutativity}
-Idempotency
 
 \Paragraph{Results on well-matched idempotency}
 

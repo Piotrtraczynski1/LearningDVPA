@@ -1,9 +1,170 @@
+\BalancedReachability*
+\begin{proof}
+\end{proof}
+
 \NPHardness*
 \begin{proof}
+First, we show \NP-hardness of membership to $\BalReach$ via reduction from the 3-SAT problem. 
 
+Consider a 3-CNF formula $\varphi = \bigwedge_{1\leq i \leq k} C_i$. 
+We split every variable $x_j$ in $\varphi$ into $x_j^1, \ldots, x_j^m$, where $m$ is the number of occurrences of $x_j$ in $\varphi$.
+Let $\varphi^*$ be obtained from $\varphi$ by substituting every (propositional) variable $x_j$ with $x_j^1, \ldots, x_j^m$ such that each (propositional) variable in $\varphi^*$ occurs exactly once.
+Observe that $\varphi$ is satisfiable if and only if $\varphi^*$ has a satisfying assignment, which is consistent among copies of each variable, i.e., 
+$x_j^1, \ldots, x_j^m$ have the same value assigned. 
+
+We construct a rule with variables $\lhs \to \rhs$ and two \DFA $\aut_1, \aut_2$ over $\set{t,f,\#}$ 
+such that variables in $\lhs \to \rhs$ correspond to variables in $\varphi^*$ and for an instantiation of $\lhs \to \rhs$ 
+$\aut_1$ checks that it corresponds to a truth assignment, which is consistent among copies of the variable, an
+$\aut_2$ checks that the truth assignment satisfies $\varphi^*$.
+
+Let $\lhs$ be the rule of the from $X_1^1 \# X_1^2 \ldots \# X_1^m \# X_2^1 \# \ldots \# X_n^{m'}$, which consists of all word variables corresponding to propositional variables from $\varphi^*$
+which are grouped so that first are all (variables corresponding to) copies of $x_1$, next copies of $x_2$ and so on. There is letter $\#$ between any two variables. 
+Then, we define $\aut_1$ as in the following diagram, where all transitions that are not depicted here lead to the sink state.
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+    shorten >=1pt, 
+    node distance=2cm, 
+    on grid, 
+    auto,
+    inner sep=0.05cm,
+    >={Stealth[bend]}
+]
+
+
+  \node[state] (start) {$q_{1,1}$};
+  \node[state] (q01) [above right=of start] {$q^f_{1,2}$};
+  \node[state] (q02) [right=of q01] {$q^f_{1,3}$};
+  \node[state] (q03) [right=of q02] {$q^f_{1,4}$};
+  \node[state] (q04) [right=of q03] {$q^f_{1,5}$};
+  \node[draw=none] (dots0) [right=of q04] {$\dots$};
+  \node[state] (q0m) [right=of dots0] {$q^f_{1,2m}$};
+
+  \node[state] (q11) [below right=of start] {$q^t_{1,2}$};
+  \node[state] (q12) [right=of q11] {$q^t_{1,3}$};
+  \node[state] (q13) [right=of q12] {$q^t_{1,4}$};
+  \node[state] (q14) [right=of q13] {$q^t_{1,5}$};
+  \node[draw=none] (dots1) [right=of q14] {$\dots$};
+  \node[state] (q1m) [right=of dots1] {$q^t_{1,2m}$};
+
+  \node[state] (q2)  [below right=of q0m] {$q_{2,1}$};
+
+
+
+  \path[->]
+    (start) edge node [above] {$f$} (q01)
+    (q01) edge node [above] {$\#$} (q02)
+    (q02) edge node [above] {$f$} (q03)
+    (q03) edge node [above] {$\#$} (q04)
+    (q04) edge  (dots0)
+    (dots0) edge  (q0m)
+    (q0m) edge node [above] {$\#$} (q2)
+
+    (start) edge node [above] {$t$} (q11)
+    (q11) edge node [above] {$\#$} (q12)
+    (q12) edge node [above] {$t$} (q13)
+    (q13) edge node [above] {$\#$} (q14)
+    (q14) edge  (dots1)
+    (dots1) edge  (q1m)
+    (q1m) edge node [above] {$\#$} (q2)
+    
+    
+    ;
+
+ 
+\end{tikzpicture}
+%\label{The gadget \DFA $\autB_{Y,x}$, which parially distingushes words of length at most $n$, which do not contain any letter from $Y$ }
+\end{figure}
+Observe that if each variable in $\lhs$ is instantiated to $t$ or $f$, then $\aut_1$ moves from $q_{1,1}$ to $q_{1, n+1}$ if and only if 
+the corresponding truth assignment is consistent among all copies of the variable from $\varphi$.
+If there is an instantiation of $\lhs$ such that $\aut_1$ moves from $q_{1,1}$ to $q_{1, n+1}$ over the resulting word, but some of the variables
+is not instantiated to $t$ or $f$, then there is (possibly the same) variable instantiated to a word containing $\#$. 
+Next, we define $\rhs$ and $\aut_2$ so that  in the instantiation no variable contains $\#$ and if the corresponding instantiation defines a
+truth assignment, then it satisfies $\varphi$.
+
+Let $\rhs$ be the list of variables of all clauses $c_1, \ldots, c_k$ of $\varphi^*$, i.e., first are $3$ variables from $c_1$, next $3$ variables from $c_2$ and so on.
+Now, we define $\aut_2$, which is a sequential composition of subautomata $\autB_{j}$ corresponding to clauses $c_1, \ldots, c_k$. 
+Assume that $c_j  = y_1 \land \neq y_2 \land y_3$ and $Y_1 Y_2 Y_3$ is a subword in $\rhs$ (the order in $\rhs$ is the same).
+Then, the \DFA $\autB_{j}$ is illustrated below:
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+    shorten >=1pt, 
+    node distance=2cm, 
+    on grid, 
+    auto,
+    inner sep=0.05cm,
+    >={Stealth[bend]}
+]
+
+
+  \node[state] (start) {$s_{j,0}$};
+  \node[state] (s11) [above right=of start] {$s^t_{j,1}$};
+  \node[state] (s12) [right=of s11] {$s^t_{j,2}$};
+  \node[state] (s13) [right=of s12] {$s^t_{j,3}$};
+  \node[state] (s14) [right=of s13] {$s_{j+1,0}$};
+  
+  \node[state] (s01) [right=of start] {$s^f_{j,1}$};
+  \node[state] (s02) [right=of s01] {$s^f_{1,2}$};
+  
+
+  \path[->]
+    (start) edge node [above] {$t$} (s11)
+    (s11) edge node [above] {$t,f$} (s12)
+    (s12) edge node [above] {$t,f$} (s13)
+    (s13) edge node [above] {$t,f$} (s14)
+    
+    (start) edge node [above] {$f$} (s01)
+    (s01) edge node [above] {$t$} (s02)
+    (s01) edge node [above] {$f$} (s12)
+    (s02) edge node [above] {$t$} (s13)
+
+
+    
+    ;
+
+ 
+\end{tikzpicture}
+%\label{The gadget \DFA $\autB_{Y,x}$, which parially distingushes words of length at most $n$, which do not contain any letter from $Y$ }
+\end{figure}
+All transitions not depicted here lead to the sink state. 
+Consider $\aut_2$ to be the \DFA obtained from $\autB_1, \ldots, \autB_k$, where the states $s_{j+1,0}$ is $\aut_{j}$ and $\aut_{j+1}$ are merged into a single state,
+Observe that if there is an instantiation of $\rhs$ such that $\aut_2$ moves from $s_{1,0}$ to $s_{k+1,0}$, then this instantiation does not contain letter $\#$ as it leads to the sink state.
+Furthermore, if every variable is instantiated to $f$ or $t$
+and $\aut_2$ moves from $s_{1,0}$ to $s_{k+1,0}$, then every clause of $\varphi^*$, and hence it has to satisfy $\varphi^*$.
+
+Now, consider an instantiation of $\lhs \to \rhs$ such that over the instance of $\lhs$ the \DFA $\aut_1$ moves from $q_{1,1}$ to $q_{1, n+1}$ and 
+over the instance of $\rhs$ the \DFA $\aut_2$ moves from $s_{1,0}$ to $s_{k+1,0}$, then the instantiation encodes a truth assignment that is consistent among all copies of
+the same variable from $\varphi$ and satisfies $\varphi^*$. Thus, $\varphi$ is satisfiable.
+Conversely, if $\varphi$ is satisfiable, then the satisfying assignment induces an instantiation of $\lhs \to \rhs$ such that 
+$\aut_1$ moves from $q_{1,1}$ to $q_{1, n+1}$ and 
+$\aut_2$ moves from $s_{1,0}$ to $s_{k+1,0}$.
+Therefore, $(q_{1,1}, s_{1,0},q_{1, n+1},s_{k+1,0})$ belongs to $\BalReach$ of the disjoint union of $\aut_1$ and $\aut_2$ 
+ if and only if $\varphi$ is satisfiable. 
+
+Now, consider $\aut$ over $\set{t,f,\#,a_1,a_2}$, which consists of the start state $q_0$ and disjoint union of $\aut_1$ and $\aut_2$.
+In the state $q_0$ the automaton has self loops over $t,f,\#$ and it moves over $a_1$ to $q_{1,1}$ and over $a_2$ to $s_{1,0}$.
+Finally, in all states of $\aut_1$ and $\aut_2$ letters $a_1,a_2$ lead to the sink state.
+Consider a rule $a_1 \lhs \to a_2 \rhs$, where  $\lhs \to \rhs$  is defined as above. 
+Then, $(q_0, q_{1, n+1},s_{k+1,0})$ belong to $\DeltaRule$ if and only if $\varphi^*$ is reachable.
+
+Finally, consider $\aut$ defined as above, but we mark $q_{1, n+1}$ and the sink state of $\aut_2$ as accepting. 
+If there an instantiation of $a_1 \lhs \to a_2 \rhs$ such that the instance of $a_1 \lhs$ is satisfiable and 
+$a_2 \rhs$ is not, then in $\aut_1$ the instance of $\lhs$ leads from $q_{1,1}$ to $q_{1, n+1}$, and
+in $\aut_2$ the instance of $\rhs$ leads from $s_{1,0}$ to any other state than the sink, and 
+hence no variable instance consists $\#$. It follows that each variable is instantiated to $t$ or $f$, and hence
+over the instance of $\rhs$, the automaton $\aut_2$ moves from $s_{1,0}$ to either the sink or $s_{k+1,0}$.
+Therefore, it has to be $s_{k+1,0}$. 
+In summary, if $a_1 \lhs \to a_2 \rhs$ is positively consistent with $\lang(\aut)$, then $\varphi$ is unsatisfiable.
+Conversely, one can see that any satisfying assignment for  $\varphi$  can be transformed to the counterexample to positive consistency. 
+Thus, positive consistency is \coNP-hard.
+
+Finally, positive and negative consistency are dual and hence negative consistency is \coNP-hard as well.
 \end{proof}
 
 
+
+>>>>>>> 40b6fcffd9c3a7cbbad600ff38249e026063da6f
 \NPHardnessOfClash*
 \begin{proof}
 Let us fix a parameter $n$. Before the reduction, we construct a gadget that distinguishes all words of length at most $n$ unless they consist one of the designated letters. 
