@@ -31,7 +31,7 @@ in this framework the automaton is learned rather than the language. This allowe
 We have implemented two types of equivalence test: the exact test based on reachability in the product automaton, and
 the probabilistic test based on testing conformance of automata on a large number ($10^5$ and $10^6$) of randomly generated words
 of a random length bounded by $100$.
-The probabilistic equivalence test is significantly faster than the exact one.
+The probabilistic equivalence test is significantly faster than the exact one (from 10x to even 100x faster for 25-state automata).
 
 \Paragraph{The advice mechanism}
 We have extended the baseline algorithm with the advice mechanism, which intercepts equivalence queries before
