@@ -13,7 +13,7 @@ class BaseSrsScenario : public Scenario
     const std::string dim2Name{"useSrs"};
 
 protected:
-    static constexpr uint16_t numOfTestsInSingleIteration{10};
+    static constexpr uint16_t numOfTestsInSingleIteration{100};
     TesterParameters parameters{
         .minNumOfStates = 2,
         .maxNumOfStates = 2,

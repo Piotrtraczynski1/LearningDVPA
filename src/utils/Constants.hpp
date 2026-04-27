@@ -7,11 +7,11 @@
 namespace utils
 {
 constexpr uint16_t MaxNumOfAutomatonStates{42};
-constexpr uint16_t MaxNumOfLetters{250};
+constexpr uint16_t MaxNumOfLetters{70};
 constexpr uint16_t MaxNumOfStackSymbols{40};
 
 constexpr uint16_t MaxNumOfRevealedWellMatchedWordsForSrsCheck{3000};
-constexpr uint16_t MaxNumOfWellMatchedWordsForSrsCheck{200};
+constexpr uint16_t MaxNumOfWellMatchedWordsForSrsCheck{40};
 
 constexpr uint16_t MaxNumOfCombinedAutomatonStates{
     (MaxNumOfAutomatonStates + 2) * (MaxNumOfAutomatonStates + 1) + 2};
