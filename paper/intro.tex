@@ -35,7 +35,7 @@ restricting the learning problem to subclasses of \DVPA~\cite{DBLP:conf/concur/K
 working only with \DVPA in a special form such as 
 SEVPA, MeVPA or CDA~\cite{DBLP:phd/dnb/Isberner15, ValidatingXMLwithVPA,DBLP:journals/pacmpl/JiaT24}, 
 which may involve exponential blow-up upon transformation to \DVPA~\cite{alur2005congruences}, or
-augmenting the oracle with queries that depend on the structure of the target \DVPA~\cite{mfcs22}.
+augmenting the oracle with queries that depend on the structure of the target automaton~\cite{mfcs22}.
 
 \Paragraph{Applications of learning \VPLs}
 Learning \VPLs has been applied to a wide range of domains, 
@@ -59,14 +59,15 @@ this paper addresses through the \emph{advice} mechanism.
     
 \Paragraph{Learning with advice}
 We study the active learning framework augmented with advice~\cite{ecai25}, 
-where the learning algorithm is provided with \emph{advice} expressing prior knowledge regarding the target language.
+where the learner is provided with \emph{advice} expressing prior knowledge regarding the target language.
 Given advice, 
 we run an active learning algorithm and intercept equivalence queries to first check whether a candidate automaton 
 is \emph{consistent} with the given advice.
 If it is not, we conclude that it is not equivalent; otherwise we forward the candidate automaton to the oracle. 
-By using the advice to answer queries deductively, this framework bridges two synthesis paradigms:
-deductive synthesis from specifications and inductive synthesis via queries. 
-This hybrid approach allows a language to be represented partially through queries and partially through advice expressed as a \emph{string rewriting system (SRS)}.
+By using advice to answer queries deductively, this framework bridges two synthesis paradigms:
+deductive synthesis from specifications and inductive synthesis from queries. 
+This hybrid approach allows a language to be represented partially through queries and 
+partially through advice expressed via \emph{string rewriting systems}.
 Since SRSs and automata operate on fundamentally different principles, 
 certain language properties admit far more succinct descriptions as rewriting rules than they do as a sequence of 
 query-answer interactions.
@@ -84,9 +85,9 @@ the commutativity rule disrupts the matching between call and return letters.
 We discuss this issue in the paper and define classes of
 \emph{well-matched} and \emph{matching-preserving}
  rules, which are compatible with the implicit structure of pushdown languages. 
-Furthermore, a simple property ``all content between the opening comment tag and the corresponding closing tag can be discarded''
-is not expressible by simple rewrite rules, as it involves matching of the opening and closing tags.
-We address this issue by introducing rewrite rules with variables, which can be substituted with \emph{well-matched} words.
+Conversely, a pushdown property ``everything between the opening comment tag and the corresponding closing tag can be discarded''
+is not expressible by rewrite rules, as it involves matching of the opening and closing tags.
+We address this issue by introducing rewrite rules with variables, which range over      \emph{well-matched} words.
 
 \Paragraph{Consistency of an SRS with a Language}
 In our framework, an advice SRS induces an equivalence relation on words relative to the target language  $\lang$.
@@ -97,8 +98,8 @@ We also consider one-sided variants based on implication stating that:
 This allows the SRS to capture high-level structural properties, such as commutativity or idempotence, without necessarily characterizing the learned language completely.
 
 \Paragraph{Contributions}
-While active automata learning with advice was introduced in~\cite{ecai25}, extending this framework 
-from regular languages to \VPLs and Deterministic Visibly Pushdown Automata (DVPAs) is technically demanding. 
+Active automata learning with advice has been introduced in~\cite{ecai25}, but extending this framework 
+from regular languages to \VPLs is technically demanding. 
 This transition requires addressing structural challenges that are absent in the regular case.
 The main contributions presented in this paper are:  
 \begin{enumerate}

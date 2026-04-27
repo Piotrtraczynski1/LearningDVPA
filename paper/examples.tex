@@ -1,21 +1,19 @@
-We evaluate our framework by expressing natural VPL properties as rewrite rules with variables. 
-Our experiments confirm that this learning with advice approach yields a substantial reduction in equivalence queries,
-confirming the practical advantages of the proposed method.
+We evaluate our framework by expressing natural properties of \VPLs as rewrite rules with variables. 
+Our experiments show that learning with advice yields 
+a substantial reduction in the number of equivalence queries, runtime reduction and improved accuracy,
+demonstrating the practical advantages of the proposed method.    
 
 \subsection{Examples of rewrite rules}
-We consider the following types rules:
+We consider the following rules, which express natural properties of \VPLs.
 \begin{itemize}
-\item \emph{Well-matched commutativity}: $c_1 c_2 X r_2 r_1 \to c_2 c_1 X r_1 r_2$.
-% two components 
-% independent markings
-
-\item \emph{Well-matched join}: $c X r c Y r \to c X Y r$.
-
-\item \emph{Well-matched cancellation}: $c X r \to \epsilon$.
-\todo{c, r are comment tags}
-
-\item \emph{Well-matched idempotency}: $c c X r r \to c X r$.
-
+\item \emph{Well-matched commutativity}: $c_1 c_2 X r_2 r_1 \to c_2 c_1 X r_1 r_2$. Consider a \DVPA 
+modelling a system consisting of two pushdown components such that $c_1, r_1$ are actions of the first component,
+while $c_2, r_2$ are actions of the second. Then, the trace language of the whole system satisfies 
+well-matched commutativity.
+\item \emph{Well-matched cancellation}: $c X r \to \epsilon$. Consider a markup language, in which $c$ is a tag opening comment section,
+while $r$ is a tag closing it. In such a case, well-matched cancellation holds.
+\item \emph{Well-matched idempotency}: $c c X r r \to c X r$. Consider a markup language, in which $c$ is a tag activating certain mode 
+(e.g. bold text) and $r$ is a tag deactivating it. In this setting well-matched idempotency holds.
 \end{itemize}
 
 % reserch questions
@@ -24,99 +22,93 @@ We consider the following types rules:
 
 \Paragraph{Baseline}
 As a baseline for our experiments, we have implemented a polynomial-time active learning algorithm for \DVPA~\cite{mfcs22}.
-The algorithm from~\cite{mfcs22} assumes a stronger teacher model than the typical MAT; it allows queries extended membership queries
-that read as well modify the stack content and hence it depends on a concrete \DVPA rather than \VPL.
-On the positive side, the learning algorithm works in polynomial time. 
-
-\Paragraph{The advice mechanism}
-We have extended the baseline algorithm with the advice mechanism, which intercepts equivalence queries before
-passing them to the the equivalence oracle performs the consistency check. 
-The advice is given via rewrite rules with a {single} variable, and to make it more efficient instead of 
-the exact algorithm presented in the paper, we substitute for the variable one of few selected well-matched words.
-\todo{I have tested up to 200 well-matched words for a single check}
-A single consistency check is performed for all ground rules constructed in this way.
-We have observed that often testing with the substitution $X \mapsto \epsilon$ suffices to detect inconsistency.
-\todo{Is consistency test for ground rules optimized?}
+The algorithm from~\cite{mfcs22} assumes a stronger teacher model than the typical MAT; it allows extended membership queries
+that both read and modify the stack content. Moreover, these queries depend on a concrete \DVPA rather than \VPL, and hence
+in this framework the automaton is learned rather than the language. This allowed for
+ the learning algorithm to work in polynomial time. 
 
 \Paragraph{Equivalence oracle}
 We have implemented two types of equivalence test: the exact test based on reachability in the product automaton, and
-the probabilistic test based on testing conformance of automata on a large number ($10^5$ and $10^6$) of randomly generated words.
-\todo{In the probabilistic test faster? -- it's much faster}
-\todo{Are there any other important details? -- the length of random words was restricted to 100}
+the probabilistic test based on testing conformance of automata on a large number ($10^5$ and $10^6$) of randomly generated words
+of a random length bounded by $100$.
+The probabilistic equivalence test is significantly faster than the exact one.
+
+\Paragraph{The advice mechanism}
+We have extended the baseline algorithm with the advice mechanism, which intercepts equivalence queries before
+passing them to the equivalence oracle, and performs the consistency check.
+The advice is given via rewrite rules with a {single} variable.
+We have implemented the exact algorithm presented in the paper, and two independent heuristics. 
+The first heuristic is to instantiate a rule with variables to 40--200 ground rules and work with those.
+%We select well-matched words to be pairwise maximally different functions from $Q$ to $Q$, using them as candidates for substitution.
+The second heuristic is the probabilistic consistency test, which, analogously to the equivalence test, is
+approximated by evaluation of a large number of randomly generated words.
+ 
 
 \subsection{Experiments}
+
+\Paragraph{Benchmarks}
+We have generated random benchmark \DVPA with multiple parameters such as the size of the alphabet, 
+the size of the stack alphabet, number of states and others.
+%
+%, density of transitions (the ratio of defined transitions to all possible transitions, where
+%undefined transitions lead to the sink state), and the ratio of accepting states among all states. 
+%We have observe that the number of states has the main influence on the number of equivalence queries, while
+%the size of the alphabet or the size of the stack alphabet have negligable impact on the number of required equivalence queries.
+We have also implemented random generation of  \DVPA that are SEVPA and random \DVPA  that are 
+consistent with each of advice rules discussed above. For instance, to randomly generate 
+a \DVPA consistent with \emph{well-matched commutativity}, we generate two random \DVPA over disjoint alphabets, take the product of these automata, where undefined transitions are defined as self-loops. 
 
 We have conducted a series of experiments to address the following research questions:
 \begin{enumerate}[Q1]
 \item What is the average reduction in the number of equivalence queries avoided using advice? 
-Are there any features that influence performance of the advice mechanism?
 \item Does the use of the advice mechanism lead to better running time of the whole learning setup 
-(i.e., the runtime of the learning algorithm plus the runtime of the probabilistic equivalence oracle)? 
-\item Does the use of the advice mechanism lead to higher reliability of the learning setup in presence of
+(i.e., both the learning algorithm and the equivalence oracle)? 
+\item Does the use of the advice mechanism lead to higher reliability in presence of
 the probabilistic equivalence oracle?
 \end{enumerate}
 
-\Paragraph{Benchmarks}
-We have generated random benchmark \DVPA with multiple parameters such as the size of the alphabet 
-(the number of call, local and return letters are specified separately), the size of the stack alphabet, 
-number of states, density of transitions (the ratio of defined transitions to all possible transitions, where
-undefined ones are treated as valid transitions to a special sink state \todo{Is 'density of transitions' worth mentioning?})
-and the ratio of accepting states among all states. 
-We have observe that the number of states has the main infulence on the number of equivalence queries, while
-the size of the alphabet or the size of the stack alphabet have negligable impact on the number of required equivalence queries.
-We have also implemented random generation of a \DVPA that is (a)~a Single-Entry VPA (SEVPA),  (b)~Multi-Entry VPA (MeVPA), 
-(c)~Call-Driven Automata (CDA), and Expanded Call-Driven Automata (eCDA). 
-Moreover, we have implemented random generation  of \DVPA that are consistent which each type of advice discussed above:
-\begin{itemize}
-    \item For \emph{well-matched commutativity}, we generate two \DVPA over disjoint alphabets, take the product of these automata, where
-undefined transitions are defined as self-loops. 
-    \item For \emph{well-matched cancellation}, we generate a \DVPA $\aut$ randomly over the alphabet without letter $c,r$. 
-    Then, $\aut$ is extended to $\aut'$ over the alphabet including $c,r$ such that the rule $c X r \to \epsilon$ is consistent.   
-    \item For \emph{Well-matched idempotency}, we generate a SEVPA with the condition that returning to 
-    the same module does not change the state, which implies that $c c X rr \to c  X r$ is consistent.
-\end{itemize}
+Research questions Q1, Q2 have been investigated in the \textbf{exact setting}, where the equivalence check as well as consistency check are 
+computed based on  reachability, while questions Q2 and Q3 have been investigated in the \emph{probabilistic setting}, where 
+the equivalence and consistency checks are approximated.
 
 
-%\Paragraph{Scenarios}
-%\todo{Perefect eqivalence and probabilistic}
 
-\Paragraph{Exact equivalence check}
-In this section, we present the reduction in the number of equivalence queries achieved by using SRS,
-as well as its impact on the average execution time required to process a single DVPA in our setup.
-
-The exact equivalence check dominates the overall computation time. When no inconsistency is detected during the SRS phase,
-the equivalence check must be performed twice. At the same time, the SRS phase is computationally cheaper, as it operates
-on smaller automata and requires constructing products of reduced size, which may lead to performance improvements.
-
-The experimental setup assumes an alphabet consisting of three symbols of each type. For the commutativity property,
-both automata use alphabets of this structure. The number of stack symbols is set to five for cancellation and idempotency,
-and to sixteen for commutativity. The results are aggregated over $100$ randomly generated automata for each number of states.
-The number of well-matched words used for SRS was limited to 40.
+\Paragraph{The exact setting}
+%In this section, we present the reduction in the number of equivalence queries achieved by using SRS,
+%as well as its impact on the average execution time required to process a single DVPA in our setup.
+The exact equivalence checks dominate the overall computation time. 
+When no inconsistency with an SRS is detected,
+we need to perform the actual equivalence check, which amounts to two reachability checks.
+However, the consistency check is computationally cheaper, as it operates
+on smaller automata; the product of the candidate automaton with itself is considerably smaller than the product of
+the candidate automaton with the target automaton.
+% and hence the reachability check is performed on the products automaton of considerably smaller size.
+%In experiments, the alphabet consists of three symbols of each type. For the well-matched commutativity property,
+%both automata use such alphabets, and hence the resulting automaton has twice as many letters. 
+%The number of stack symbols is set to $5$ for well-matched cancellation and idempotency,
+%and to $16$ for well-matched commutativity. 
+The results are aggregated over $100$ randomly generated automata for each number of states.
+The number of well-matched words used as substitutions for the variable in the SRS rule was limited to $40$.
 
 \input{plot.tex}
 
-We observe that, in the case of cancellation ($c X r \to \epsilon$), the reduction in the number of equivalence
+We observe that, in the case of well-matched cancellation property ($c X r \to \epsilon$), the reduction in the number of equivalence
 queries is independent of the number of well-matched words used in SRS. Substituting $\epsilon$ for $X$
-is sufficient to capture the effect. However, this observation does not carry over to the reliability
-improvements discussed in the next section.
+is sufficient to achieve the same effect. 
+However, this is not true for reliability, which is discussed below.
 
-\Paragraph{Probabilistic equivalence check}
-In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
-Since SRS enables performing equivalence testing in two stages, we compare it against a baseline without
-SRS using two configurations: $10^5$ and $2 \cdot 10^5$ random words.
-The second configuration is intended to verify whether the improvements observed with
-SRS are not merely a consequence of a larger number of random tests.
-
+\Paragraph{The probabilistic setting}
+%In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
+Since the SRS enables equivalence testing to be performed in two stages, 
+we compare the algorithm with advice against the baseline, using two configurations for the latter: 
+$10^5$ and $2 \cdot 10^5$ random words.
+The second configuration checks whether the improvements observed with advice are genuinely due to the SRS, 
+rather than a result of evaluating a larger number of random words.
 The experimental setup consists of $10^4$ randomly generated automata, each with $10$ to $25$ states.
-The input alphabet was generated individually for each automaton, with slight variations depending on the considered property.
-In particular, the number of symbols of each type ranged from $2$ to $5$, while the number of stack symbols ranged from $2$ to $16$.
+%The input alphabet was generated individually for each automaton, with slight variations depending on the considered property.
+%In particular, the number of symbols of each type ranged from $2$ to $5$, while the number of stack symbols ranged from $2$ to $16$.
 The number of well-matched words used for SRS was limited to $200$.
 
-\todo{
-    Should we present the time results here? Equivalence checks seem almost free,
-    the time overhead is caused by checking consistency with SRS, but is also negligible.
-    The final exact equivalence check isn't included here.
-}
 \begin{table}[H]
 \centering
 \begin{tabular}{cc|ccc}
@@ -143,16 +135,25 @@ SRS rule & Metric
 \end{table}
 
 \Paragraph{Summary}
-The presented results show a reduction of approximately $20\%$ in the number of queries for commutativity and idempotency,
+The presented results show a reduction of approximately $20\%$ in the number of queries for (well-matched) commutativity and idempotency,
 and around $50\%$ for cancellation rules. In our setup, the time measurements indicate that the use of SRS
-generally increases the overall execution time. However, this trend changes with the size of the automata,
-for the largest instances, SRS begins to provide performance improvements.
-This suggests that its usefulness increases with the size of the automaton.
-
+generally increases the overall execution time. However, SRS reduces execution time for the largest instances.
+This suggests that the benefit of the advice mechanism grows with automaton size.
 Based on experiments for DFA~\cite{ecai25}, we expected the most significant gains for commutativity.
 However, the obtained results differ substantially from these expectations. We hypothesize that the method
 used to generate the automata did not allow the full potential of this rule to be observed.
-
 The reliability results do not show a significant improvement.
 Nevertheless, SRS improves the success ratio of the heuristic approach, while introducing only a negligible time overhead.
 This suggests that SRS can be considered a useful feature when a heuristic approach is employed.
+
+
+% %\begin{itemize}
+%     \item For \emph{well-matched commutativity}, we generate two \DVPA over disjoint alphabets, take the product of these automata, where
+% undefined transitions are defined as self-loops. 
+%     \item For \emph{well-matched cancellation}, we generate a \DVPA $\aut$ randomly over the alphabet without letter $c,r$. 
+%     Then, $\aut$ is extended to $\aut'$ over the alphabet including $c,r$ such that the rule $c X r \to \epsilon$ is consistent.   
+%     \item For \emph{well-matched idempotency}, we generate a SEVPA with the condition that returning to 
+%     the same module does not change the state, which implies that $c c X r r \to c  X r$ is consistent.
+% \end{itemize}
+
+

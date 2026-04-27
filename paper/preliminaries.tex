@@ -4,12 +4,12 @@ A pushdown alphabet $\vAlph$ consists of three disjoint sets of letters $\vAlph 
 
 \Paragraph{Well-matched words}
 \newcommand{\dCall}{\textbf{c}}
-\newcommand{\dReturn}{\textbf{e}}
+\newcommand{\dReturn}{\textbf{r}}
 The set of well-matched words over a pushwdown alphabet $\vAlph$ is the least set containing $\epsilon$ 
-such that
-(1)~if $w$ is well-matched, $c$ is a call letter and $r$ is a return letter, then $ c w r$ is well-matched, 
-(2)~if $w$ is well-matched and $l$ is a local letter, then $lw$ and $wl$ are well-matched, and
-(3)~if $w_1, w_2$ are well-matched, then the concatenation $w_1 w_2$ is well-matched.
+such that if $w_1, w_2$ are well-matched, then
+(1)~the concatenation $w_1 w_2$ is well-matched, 
+(1)~for every call letter $c$ and return letter $r$, the word $ c w r$ is well-matched, and
+(2)~for every local letter $l$, words $lw$ and $wl$ are well-matched.
 In a word $w$ (not necessarily well-matched), if $w = x \dCall y \dReturn z$ such that $y$ is a well-matched word, 
 we say that letters $\dCall$ and $\dReturn$ are matched, and $\dReturn$ is the return letter corresponding to call $\dCall$ and vice versa. 
 Formally, positions $|x|+1$ and $|x|+|y|+2$ in $w$ are in the \emph{matching relation}.

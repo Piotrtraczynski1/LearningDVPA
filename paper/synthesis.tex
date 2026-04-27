@@ -15,15 +15,14 @@ Therefore, \textit{Synthesis from Oracles} suffers from these same shortcomings,
 Consequently, for the remainder of this section we focus on \textit{Synthesis from Automata}.
 
 
-We consider a \DVPA $\aut$ with the set of states $Q$ over a non-trivial alphabet, i.e., either there are at least two local letters or at least one pair of a call and a return letter.
-Under these assumptions, there are exponentially many well-matched words.
-
 
 We establish a polynomial upper bound on the lengths of words in minimal-length rules consistent with $\aut$, which implies that such rules
 can be computed in non-deterministic polynomial time. 
-In order to achieve that, we give  sufficient conditions for pairs of words to form a rewrite rule consistent with $\lang(\aut)$.
-We consider first rules without variables, and then move to rules with a single variable, which is finally generalized to any bounded number
-of variables.
+In order to achieve that, we give  sufficient conditions for a pair of words to form a rewrite rule consistent with $\lang(\aut)$.
+We consider first rules without variables, and then move to rules with variables.
+
+We consider a \DVPA $\aut$ with the set of states $Q$ over a non-trivial alphabet, i.e., either there are at least two local letters or at least one pair of a call and a return letter.
+Under these assumptions, there are exponentially many well-matched words.
 
 \Paragraph{The length of a minimal consistent well-matched rule: the ground case}
 Consider a well-matched word $w$. We associate with this word a function $f_w \colon Q \to Q$.
@@ -32,7 +31,7 @@ Formally, for a state $q \in Q$ we define $f_w(q) = q'$ if and only if for some 
 Note that the existential quantifier over $u$ can be replaced by a universal one, since transitions over well-matched words are stack-independent. 
 If $w_1, w_2$ are well-matched words such that $f_{w_1} = f_{w_2}$, 
 then for all words $x,y$ we have $x w_1 y \in \lang(\aut) \iff x w_2 y \in \lang(\aut)$~\cite[Theorem~1]{alur2005congruences}.
-It follows that $w_1 \to w_2$ is a string rewrite rule consistent with $\lang(\aut)$. 
+It follows that $w_1 \to w_2$ is consistent with $\lang(\aut)$. 
 Setting $n = |Q|$, there are $n^n$ functions from $Q$ to $Q$, and hence there are $n^n = 2^{\bigO(n \log n)}$ distinct functions $f_w$ over all well-matched words $w$.
 There are $2^{\Theta(k)}$ well-matched words of the length $k$, and hence among well-matched words of length $\bigO(n \log n)$ 
 there is a pair of well-matched words $\lhs, \rhs$ such that $f_{\lhs} = f_{\rhs}$. 
@@ -52,9 +51,9 @@ $f_{w_0} = f_{v_0}, \ldots, f_{w_{k}} = f_{v_k}$, then the rewrite rule $\lhs \t
 To see this, consider an instantiation of $\lhs \to \rhs$, i.e., 
 consider a sequence of well-matched words $b_1, \ldots, b_k$, which we substitute for $X_1, \ldots, X_k$
 obtaining the ground rewrite rule:
-\[
-	w_0 b_1 w_1 b_2 \ldots  b_k w_{k} \to v_0 b_1 v_1 b_2 \ldots  b_k v_{k}
-\]
+\begin{align*}
+&&	w_0 b_1 w_1 b_2 \ldots  b_k w_{k} &\to v_0 b_1 v_1 b_2 \ldots  b_k v_{k}
+\end{align*}
 Observe that the left hand side and the right hand side define the same function, and hence this ground rule is 
 consistent with $\lang(\aut)$.
 It follows that every rule from $\sem{\lhs \to \rhs}$ is consistent with $\lang(\aut)$, which by definition means that 
@@ -65,7 +64,7 @@ among words of the form $w_0 X_1 w_1 X_2 \ldots  X_k w_{k}$ such that
 the sum of lengths of $w_0, \ldots, w_k$ is bounded by  ${c \cdot k\cdot n \cdot \log(n)}$, 
 there is a pair of words that forms a rewriting rule consistent with $\lang(\aut)$.
 
-\Paragraph{Rule synthesis in non-deterministic polynomial time}
+%\Paragraph{Rule synthesis in non-deterministic polynomial time}
 The counting argument shows that for a given $\DVPA$ $\aut$ there are short (of polynomial length in $|\aut|$) 
 rewrite rules that are consistent with $\lang(\aut)$. 
 Since testing whether a given rule (with a bounded number of variables)
@@ -96,7 +95,7 @@ The minimal collision problem is \NP-complete.
 \end{restatable}
 \begin{proof}[Proof's sketch]
 The proof is by reduction from the 3-SAT problem.
-The main difficulty of the proof is to ensure that if the formula is unsatisfiable, 
+The main difficulty is to ensure that if the formula is unsatisfiable, 
 then no pair of short words defines the same function from $Q$ to $Q$ .
 We construct a gadget \DFA such that unless one of the designed letters occurs in a word, 
 each word of length at most $n$ generates a unique function.
@@ -105,25 +104,26 @@ With that gadget \DFA, we enforce that short words having a collision must conta
 represent an assignment, and these words must contain a literal from each clause.
 \end{proof}
 
-In the minimal collision problem, both sides of the rule are unknown words.
-We discuss another decision problem associated with rule synthesis, in which the right-hand side of the rule is fixed. 
-For simplicity, we consider the right-hand side to be a local letter.
-The \emph{bounded rewriting to single letter} problem asks, given a \DFA $\aut$ over $\Sigma$,  a letter $a \in \Sigma$, and a bound $k>0$, 
-whether there exists a word $w \in (\Sigma \setminus \set{a})^*$ such that 
-(1)~$w \to a$ is a rule consistent with $\lang(\aut)$, and
-(2)~$|w| \leq k$. 
-This problem is closely related to the \emph{membership}  problem for monoids~\cite{Kozen77} and groups~\cite{DBLP:journals/tcs/Jerrum85}.
-The membership problem for monoids reduces to the \emph{bounded automata intersection} problem~\cite{Kozen77,DBLP:conf/wia/Wareham00}, which 
-asks, given $m,k>0$ and \DFA $\aut_1, \ldots, \aut_m$, whether there exists a word $w$ such that $|w| \leq k$ and $w \in \lang(\aut_i)$ for every $i$.
-The bounded automata intersection problem is \PSPACE-complete if $k$ is given in binary~\cite{Kozen77} and \NP-complete if $k$ is given in unary~\cite{DBLP:conf/wia/Wareham00}.
-The same complexity bounds apply to the bounded rewriting to single letter problem as there is a straightforward reduction from the bounded automata intersection problem.
-Clearly, the problem is in $\PSPACE$ for $k$ given in binary and $\NP$ for $k$ given in unary.
 
-\begin{restatable}{lemma}{ReductionToLocal}
-The bounded rewriting to a single letter with the parameter $k$ is 
-(a)~\PSPACE-complete, if $k$ is given in binary, and
-(b)~\NP-complete, if $k$ is given in unary.
-\end{restatable}
+% In the minimal collision problem, both sides of the rule are unknown words.
+% We discuss another decision problem associated with rule synthesis, in which the right-hand side of the rule is fixed. 
+% For simplicity, we consider the right-hand side to be a local letter.
+% The \emph{bounded rewriting to single letter} problem asks, given a \DFA $\aut$ over $\Sigma$,  a letter $a \in \Sigma$, and a bound $k>0$, 
+% whether there exists a word $w \in (\Sigma \setminus \set{a})^*$ such that 
+% (1)~$w \to a$ is a rule consistent with $\lang(\aut)$, and
+% (2)~$|w| \leq k$. 
+% This problem is closely related to the \emph{membership}  problem for monoids~\cite{Kozen77} and groups~\cite{DBLP:journals/tcs/Jerrum85}.
+% The membership problem for monoids reduces to the \emph{bounded automata intersection} problem~\cite{Kozen77,DBLP:conf/wia/Wareham00}, which 
+% asks, given $m,k>0$ and \DFA $\aut_1, \ldots, \aut_m$, whether there exists a word $w$ such that $|w| \leq k$ and $w \in \lang(\aut_i)$ for every $i$.
+% The bounded automata intersection problem is \PSPACE-complete if $k$ is given in binary~\cite{Kozen77} and \NP-complete if $k$ is given in unary~\cite{DBLP:conf/wia/Wareham00}.
+% The same complexity bounds apply to the bounded rewriting to single letter problem as there is a straightforward reduction from the bounded automata intersection problem.
+% Clearly, the problem is in $\PSPACE$ for $k$ given in binary and $\NP$ for $k$ given in unary.
+
+% \begin{restatable}{lemma}{ReductionToLocal}
+% The bounded rewriting to a single letter with the parameter $k$ is 
+% (a)~\PSPACE-complete, if $k$ is given in binary, and
+% (b)~\NP-complete, if $k$ is given in unary.
+% \end{restatable}
 
 In summary, there is no algorithm for generating minimal-length consistent rules in deterministic polynomial time unless \PTIME = \NP.
 %\todo{ soften it slightly}

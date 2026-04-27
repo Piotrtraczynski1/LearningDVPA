@@ -28,7 +28,8 @@ then $x \in \lang \Rightarrow y \in \lang$.
 Note that an SRS $\rew$ is fully consistent with $\lang$ if and only if it is both positively and negatively consistent.
 %While more granular than standard consistency, positive and negative consistency are harder to infer.
 
-With these notions of consistency in place, we can now present the active learning with advice framework.
+%With these notions of consistency in place, we can now present the active learning with advice framework.
+With these notions of consistency in place, we can present our framework.
 
 \Paragraph{Framework}
 The active \DVPA learning with advice problem is defined as follows.
@@ -121,10 +122,7 @@ Unfortunately, this property cannot be expressed by any finite set of string rew
 is equivalent to 
 \(  \OpenDelOne \OpenDelOne \underbrace{\OpenDelTwo \ldots \OpenDelTwo}_\text{n} \underbrace{\CloseDelTwo \ldots \CloseDelTwo}_\text{n} \CloseDelOne \CloseDelOne. \) 
 This property can, however, be expressed using a word variable $X$ ranging over well-matched words.
-Then, the rule
-\begin{align*}
-&& \OpenDelOne \OpenDelTwo X \CloseDelTwo \CloseDelOne \to  \OpenDelTwo  \OpenDelOne X \CloseDelOne \CloseDelTwo
-\end{align*}
+Then, the rule \(  \OpenDelOne \OpenDelTwo X \CloseDelTwo \CloseDelOne \to  \OpenDelTwo  \OpenDelOne X \CloseDelOne \CloseDelTwo \)
 expresses that the relative order of \OpenDelOne and \OpenDelTwo is irrelevant provided their respective brackets match.
 \end{example}
 
@@ -132,15 +130,15 @@ In order to express properties as illustrated in the above example, we extend ru
 
 \Paragraph{String rewriting systems with variables}
 Consider an infinite set of variables $\Vars$. 
-A \emph{string rewriting system with variables (\SRSV)} $\rewV$ is a finite set of rules $\lhs  \to \rhs$ over $\vAlph \cup \Vars$ satisfying
+A \emph{string rewriting system with variables} $\rewV$ is a finite set of rules $\lhs  \to \rhs$ over $\vAlph \cup \Vars$ satisfying
 (1)~every variable $X \in \Vars$ occurs at most once in $\lhs$ and  at most once in $\rhs$, and  
 (2)~every variable $X \in \Vars$ that occurs in $\rhs$, also occurs in $\lhs$.
-We consider \SRSVs as finite representations of infinite SRSs. 
+We consider \SRSs with variables as finite representations of infinite SRSs. 
 That is, we say that a rule $\lhs \to \rhs \in \rewV$ generates an infinite 
 SRS $\sem{\lhs \to \rhs}$ 
 consisting of all ground instances obtained by substituting well-matched words for variables, with the same word substituted for each occurrence of a given variable across both $\lhs$ and $\rhs$.
 For example, a rule $c X r \to X$ generates an infinite set $\{ c r \to \epsilon, c c r r \to cr, \ldots \}$.
-Finally, an \SRSV $\rewV$ generates an SRS $\sem{\rewV}$ defined as the union of $\sem{\lhs \to \rhs}$  over all rules $\lhs \to \rhs$ from $\rewV$.
+Finally, an \SRS with variables $\rewV$ generates an SRS $\sem{\rewV}$ defined as the union of $\sem{\lhs \to \rhs}$  over all rules $\lhs \to \rhs$ from $\rewV$.
 
 \begin{remark}
 String rewriting rules can be considered as terms under the unary signature (all symbols have arity at most one) with a single variable.
