@@ -9,7 +9,7 @@ using Step = std::pair<uint16_t, uint16_t>;
 const std::array<Step, CommutationIncreasingNumOfStates::numOfIterationsIn1Dim>
     CommutationIncreasingNumOfStates::dim1Steps = {Step{1, 1}, Step{1, 2}, Step{2, 2},
                                                    Step{3, 2}, Step{4, 2}, Step{3, 3},
-                                                   Step{5, 2}, Step{4, 3}, Step{5, 4}};
+                                                   Step{5, 2}, Step{4, 3}, Step{4, 4}};
 
 uint16_t CommutationIncreasingNumOfStates::getNumOfIterationsIn1Dim()
 {
