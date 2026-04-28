@@ -104,8 +104,8 @@ The \VPA $\autCon$ is built on the product $\aut \times \aut$, whose stack track
 The fresh local letter $\#$ simulates the word $\lhs$ in the first copy and the word $\rhs$ in the second copy.
 However, there are two key differences.
 First, since $\lhs$ and $\rhs$ can be instantiated to (infinitely many) different words, transitions over $\#$ are non-deterministic.
-Second, the transitions in each copy of $\aut$ cannot be defined independently; they must be defined jointly on the product to ensure that both sides of the rule $\lhs \to \rhs$ are instantiated to the same word. 
-For example, for a rule $c X r \to X$, there may be a transition in $\aut$ from $q$ to $q_1$ over $c w_1 r$ and from $q$ to $q_2$ over $w_2$, but we must ensure that $w_1 = w_2$.
+Second, transitions in each copy of $\aut$ must be defined jointly on the product to ensure that both sides of the rule $\lhs \to \rhs$ are instantiated to the same word. 
+For example, for a rule $c X r \to X$, there may be a transition in $\aut$ from $q$ to $q_1$ over $c w_1 r$ and from $q$ to $q_2$ over $w_2$, but not with $w_1 = w_2$.
 To this end, we compute a set $\DeltaRule$ of triples $(q, s_1, s_2)$ such that there are words $\alpha, \beta$ satisfying:
 (1)~$s_1 \neq s_2$, 
 (3)~$(q,u) \trans{\aut}{\alpha} (s_1,u)$ and $(q,u) \trans{\aut}{\beta} (s_2,u)$ for every stack content $u$, and
