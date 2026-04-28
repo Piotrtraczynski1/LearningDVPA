@@ -1,9 +1,8 @@
 We adapt an advice mechanism introduced for \DFA in~\cite{ecai25} to \DVPA. 
 The main aim of advice is to 
 provide the learning algorithm with prior knowledge about the learned language, which is used to reduce the number of equivalence queries.
-
-First, we present the general framework, which carries over from the regular case seamlessly.
-Next, We discuss which rewriting rules are compatible with \VPLs and how to extend the \SRS formalism to capture natural 
+We first present the general framework, which carries over from the regular case seamlessly.
+Next, we discuss which rewriting rules are compatible with \VPLs and how to extend them to capture natural 
 properties of \VPLs.
 
 \subsection{Learning with advice}
@@ -39,7 +38,7 @@ The algorithm is given an \emph{oracle} $\oracle$ answering membership and equiv
  \item  $\rew_{=}$, which is consistent with $\lang$, and 
  \item $\rew_{+}$, $\rew_{-}$, which are respectively positively and negatively consistent with $\lang$.
 \end{itemize}  
-The algorithm's the task is to construct a \DVPA recognizing $\lang$. 
+The algorithm's task is to construct a \DVPA recognizing $\lang$. 
 The advice is used to approximate equivalence checks, thereby reducing the number of equivalence queries posed to the oracle.
 Therefore, it can be integrated with any framework for active learning of visibly pushdown languages~\cite{DBLP:conf/icgi/BarbotBFHKLN0Y21,DBLP:journals/pacmpl/JiaT24} or \DVPA~\cite{mfcs22} with possibly different types of queries 
 provided that the oracle answers at least  membership and equivalence queries.
@@ -51,10 +50,10 @@ In particular, the oracle may also answer additional types of queries as in~\cit
 %When the learning algorithm attempts to ask the oracle an equivalence query,
 We intercept  equivalence queries posed by the learning algorithm and first check whether the advice \SRS $\rew$ is consistent (resp., positively consistent or negatively consistent) with
 the language of a given candidate automaton $\aut$. 
-We forward $\aut$ to the oracle, only if it is consistent 
+We forward $\aut$ to the oracle, only if it is consistent.
 Otherwise, if it is inconsistent, without the oracle we conclude that $\lang(\aut)$ differs from the target language with which $\rew$ is consistent (resp., positively/negatively consistent).
 It suffices to compute a pair of words violating consistency (resp., positive/negative consistency), i.e., 
-words $x,y$ such that $x \rewrites_{\rew} y$ but exactly of $x,y$ belongs to $\lang$.
+words $x,y$ such that $x \rewrites_{\rew} y$ but exactly one of $x,y$ belongs to $\lang$.
 Then, one of the words $x, y$ must be a counterexample to $\lang(\aut)$ being equal to the target language. 
 Which one it is can be determined with a single membership query.
 
@@ -140,11 +139,6 @@ consisting of all ground instances obtained by substituting well-matched words f
 For example, a rule $c X r \to X$ generates an infinite set $\{ c r \to \epsilon, c c r r \to cr, \ldots \}$.
 Finally, an \SRS with variables $\rewV$ generates an \SRS $\sem{\rewV}$ defined as the union of $\sem{\lhs \to \rhs}$  over all rules $\lhs \to \rhs$ from $\rewV$.
 
-\begin{remark}
-String rewriting rules can be considered as terms under the unary signature (all symbols have arity at most one) with a single variable.
-However, the variables in rules that we consider do not correspond to standard variables in the term-rewriting setting, 
-but to context variables.   
-\end{remark}
 
 \Paragraph{Properties of \SRSs with variables}
 The notions defined for \SRSs carry over to \SRSs with variables by applying the definition to the generated \SRS.
@@ -155,11 +149,11 @@ That is, we say that a rule with variables $\lhs \to \rhs$ is
  \item matching-preserving (resp., well-matched) if and only if 
  the generated \SRS $\sem{\lhs \to \rhs}$ is matching-preserving (resp., well-matched).
 \end{itemize}
-The listed properties extend to \SRSs with variables, by requiring that every rule is consistent, well-matched, e.t.c.    
+The listed properties extend to \SRSs with variables, by requiring that every rule is consistent, well-matched, etc.    
 To check whether a rule with variables is matching-preserving (resp., well-matched) it suffices to delete variables, i.e.,
 a rule with variables $\lhs \to \rhs$  is matching-preserving (resp. is well-matched)
 it holds if and only if
-the rule without variables obtained by deleting all variables from $\lhs \to \rhs$ is matching-preserving (resp. is well-matched).
+the rule obtained by deleting all variables from $\lhs \to \rhs$ is matching-preserving (resp. is well-matched).
 
 
 \Paragraph{Well-matched instantiations}
@@ -170,3 +164,9 @@ However,
 substituting $X$ with $r c$ yields $c r c r \to r c$, which is not even matching-preserving, since $c r c r$ is well-matched, while $r c$ is not.
 Furthermore, as discussed in the following section,  restricting to well-matched instantiations facilitates deciding consistency with a given \DVPA.
 
+
+\begin{remark}
+String rewriting rules can be considered as terms under the unary signature (all symbols have arity at most one) with a single variable.
+However, the variables in rules that we consider do not correspond to standard variables in the term-rewriting setting, 
+but to context variables.   
+\end{remark}

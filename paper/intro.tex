@@ -63,7 +63,7 @@ where the learner is provided with \emph{advice} expressing prior knowledge rega
 Given advice, 
 we run an active learning algorithm and intercept equivalence queries to first check whether a candidate automaton 
 is \emph{consistent} with the given advice.
-If it is not, we conclude that it is not equivalent; otherwise we forward the candidate automaton to the oracle. 
+If it is not, we conclude that it is not equivalent; otherwise, we forward the candidate automaton to the oracle. 
 By using advice to answer queries deductively, this framework bridges two synthesis paradigms:
 deductive synthesis from specifications and inductive synthesis from queries. 
 This hybrid approach allows a language to be represented partially through queries and 
@@ -78,8 +78,7 @@ query-answer interactions.
 \Paragraph{String rewriting rules for pushdown languages}
 A String Rewriting System (SRS) consists of rewrite rules $l \rightarrow r$, where $l,r$ are words.
 \emph{Rewriting} is the process of iteratively transforming words by replacing the infix that matches the left-hand side of a rule $\lhs \to \rhs$ with its corresponding right-hand side $\rhs$.                 
-For instance, commutativity of letters $a,b$ can be expressed with $ab \to ba$, which may require multiple query-answer interactions
-to express.
+For instance, commutativity of letters $a,b$ can be expressed with $ab \to ba$, which may require multiple query-answer interactions to capture.
 However, if $a$ is a call letter and $b$ is a return letter, 
 the commutativity rule disrupts the matching between call and return letters. 
 We discuss this issue in the paper and define classes of
@@ -108,7 +107,7 @@ The main contributions presented in this paper are:
     Furthermore, we extend these rules with (context) variables in order to capture natural properties of pushdown languages.
     \item We develop algorithms that infer answers to equivalence queries for \DVPA. 
     \item We establish the complexity of the rule synthesis problem.
-    Since it is a functional problem, we instead show that a related decision problem is \NP-complete.
+    Since it is a search problem, we instead show that a related decision problem is \NP-complete.
     \item We demonstrate the practical benefit of the advice mechanism through experiments.
 \end{enumerate}
 
@@ -121,8 +120,8 @@ augmenting the learning framework
 or altering the mode of learning. 
 These works address different aspects of the problem and are largely independent of our approach.
 Unlike these works, our approach restricts the search space of the learning algorithm.
-A similar approach is specializing the Angluin's algorithm to subclasses of languages in order to improve the performance of learning algorithms.
 A related approach involves specializing Angluin's algorithm to subclasses of languages to improve learning performance, 
-studied for Mealy machines~\cite{graybox-learning, DBLP:conf/dlt/BerthonBPR21, DBLP:conf/fossacs/LabbafGHM23, DBLP:journals/corr/abs-2405-08647, ProductAutomata} and tree automata~\cite{DBLP:conf/fossacs/HeerdtKR021, BjorklundBE17}. 
+studied for Mealy machines~\cite{graybox-learning, DBLP:conf/dlt/BerthonBPR21, DBLP:conf/fossacs/LabbafGHM23, DBLP:journals/corr/abs-2405-08647, ProductAutomata} and 
+tree automata~\cite{DBLP:conf/fossacs/HeerdtKR021, BjorklundBE17}. 
 %In contrast to these works, we do not commit to any fixed subclass of \VPLs; instead, the search space of our algorithm is parameterized by the advice SRS provided in the input.
 

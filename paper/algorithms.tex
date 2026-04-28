@@ -8,32 +8,31 @@ Before studying particular types of rules, we make a general observation that re
 
 \Paragraph{Reduction to single-step rewriting}
  Observe that a rule with variables $\lhs \to \rhs$ is consistent with the language of $\aut$ 
- if and only if for all words $x,y$, we have $x$ can be rewritten in a single step to $y$ implies that
- $x \in \in \lang(\aut) \iff y \in \lang(\aut)$.
+ if and only if for all words $x,y$ such that $x$ can be rewritten in a single step to $y$,  it holds that
+  $x \in \lang(\aut) \iff y \in \lang(\aut)$.
 % $x \lhs y \in \lang(\aut) \iff x \rhs y \in \lang(\aut)$. 
- Indeed, if this property holds for every rule, then 
- consistency under multi-step rewriting follows by transitivity.
- This holds due to the assumption that the $\aut$ and $\rew$ are over the same alphabet~\cite{ecai25}.
-%by transitivity of the equivalence 
-%if $w \rewrites_{\rew} w'$, then $w \in \lang \implies w' \in \lang$.
+ Indeed, if this property holds for every rule, then  consistency under multi-step rewriting follows by transitivity.
+While this observation may seem trivial, it holds due to the assumption that $\aut$ and the rewrite rule are over the same alphabet~\cite{ecai25}.
 Analogously, for positive and negative consistency it suffices to verify the property for each individual rewriting step.
 
 \subsection{Consistency of well-matched rules}
 \label{s:well-matched}
 
-\Paragraph{Ground well-matched rules} Consider a well-matched rule $\lhs \to \rhs$ without variables, i.e., a standard string rewriting rule. 
+\Paragraph{Ground well-matched rules} 
+Consider a well-matched rule $\lhs \to \rhs$ without variables. 
 We extend the alphabet $\vAlph$ with a fresh local letter $\#$ and construct two \DVPA over the extended alphabet.
 Both \DVPA extend $\aut$ and differ only in their behavior on the letter $\#$; in $\aut_1$ for any state $q$, 
 the transition over $\#$ leads to the state $q'$ such that
 $\aut$ moves from $q$ to $q'$ over $\lhs$. 
-Since $\lhs$ is well-matched, the run over $\lhs$ does not depend on the stack content and it does not modify the stack content. 
-Thus, the effect of reading $\lhs$ in the \DVPA $\aut$ is equivalent to a transition over a single local letter. 
+Since $\lhs$ is well-matched, the run over $\lhs$ does not depend on the stack content and it does not modify the stack content, and hence
+it is equivalent to a transition over a single local letter. 
 The \DVPA $\aut_2$ is defined analogously, but $\#$ simulates the word $\rhs$ instead. Again, word $\rhs$ is well-matched. 
-Therefore, to check consistency of  $\lhs \to \rhs$  with $\lang(\aut)$ it suffices to check whether there is a word $w$ such that exactly one of \DVPA $\aut_1, \aut_2$ accepts it, 
-which can be done by a single reachability check on the product \DVPA $\aut_1 \times \aut_2$, a \DVPA simulating two copies of $\aut$ in parallel.
+To check consistency of  $\lhs \to \rhs$  with $\lang(\aut)$ it suffices to check whether there is a word $w$ such that exactly one of \DVPA $\aut_1, \aut_2$ accepts it.
+This is done by a single reachability check on the product \DVPA $\aut_1 \times \aut_2$, a \DVPA simulating two copies of $\aut$ in parallel.
 The visibility condition ensures that a single stack over the product of stack alphabets is sufficient to simulate both \DVPA.
 Checking positive (resp., negative) consistency amounts to checking whether $\lang(\aut_1) \setminus \lang(\aut_2)$  (resp., $\lang(\aut_2) \setminus \lang(\aut_1)$ for negative consistency) is non-empty, 
 which again amounts to a single reachability check. 
+
 
 \begin{proposition}
 Consistency (resp.,  positive, negative consistency) of a ground well-matched rule with the language of a given \DVPA $\aut$ can be decided in polynomial time via a single 
@@ -82,17 +81,7 @@ The rule $l_1 \to l_2$ is consistent with $\lang(\autB)$, but establishing this 
     (q2U) edge node [above] {$r, pop(\bot)$} (acc)
     (q2D)  edge [bend right=20] node [above left=0.6cm] {$r, pop(a)$} (sink) 
     (q2D)  edge [bend left=20] node [below right=0.6cm] {$r, pop(\bot)$} (sink);
-    
 
-    %[bend right=45]
- %   (q1)  edge [bend right=45] node [above] {$\Sigma\setminus (Y \cup \set{x})$} (qn)
-    % The outgoing edge xi from q1
-%    (q1)  edge [nodes={at={(1, -0.5)}}] node {$x$} ++(1.5, 0);
-%    (q1)  edge node [above] {$x$} (qF)
-%    (q1) edge node [left] {$Y$} (sink)
-%    (q2) edge node [left] {$Y$} (sink)
-%    (qn) edge node [above] {$Y$} (sink)
-%    (qF) edge node [left] {$Y$} (sink)
     ;
 
  \draw[loop right,->] (acc)  to node[right] {$\vAlph$} (acc);
@@ -111,7 +100,7 @@ The rule $l_1 \to l_2$ is consistent with $\lang(\autB)$, but establishing this 
 Consider a well-matched rule $\lhs \to \rhs$ with variables. 
 The general approach, as in the ground case, is to reduce consistency checking to reachability in a product \VPA.
 We construct a \VPA $\autCon$ that simulates two copies of $\aut$ over the alphabet extended with a fresh local letter $\#$.
-The \VPA $\autCon$ is built on the product $\aut \times \aut$, whose stack track contents of both copies of $\aut$.
+The \VPA $\autCon$ is built on the product $\aut \times \aut$, whose stack tracks the contents of both copies of $\aut$.
 The fresh local letter $\#$ simulates the word $\lhs$ in the first copy and the word $\rhs$ in the second copy.
 However, there are two key differences.
 First, since $\lhs$ and $\rhs$ can be instantiated to (infinitely many) different words, transitions over $\#$ are non-deterministic.
@@ -143,13 +132,8 @@ It suffices to compute how well-matched words transform pairs of states of the \
 \newcommand{\rhsInst}{\bar{\beta}}
 We compute a quaternary relation $\BalReach \subseteq Q^4$ such that $(q_1, q_2, s_1, s_2) \in \BalReach$ if and only if there is a well-matched word $w$ such that
 $q_1 \trans{\aut}{w} s_1$ and $q_2 \trans{\aut}{w} s_2$. 
-It is computed iteratively in a similar way to reachability in pushdown automata, but applied to the product automaton $\aut \times \aut$.
- %we compute the closure with respect to 
-%enclosing the word with a call and a return letter, joining a local letter and concatenation computed simultaneously.
-\begin{restatable}{lemma}{BalancedReachability}
-Given a \DVPA $\aut$, the relation $\BalReach$ can be computed in polynomial time in the size of $\aut$.
-\end{restatable}
-We extend the alphabet $\vAlph$ to $\vAlph_+$ by adding a pair of fresh local letters $x^L$ and $x^R$ for every variable $X$ occurring in $\lhs \to \rhs$.
+It can be computed iteratively in polynomial time; it amounts to reachability in the product automaton $\aut \times \aut$.
+Next, we extend the alphabet $\vAlph$ to $\vAlph_+$ by adding a pair of fresh local letters $x^L$ and $x^R$ for every variable $X$ occurring in $\lhs \to \rhs$.
 Next, we substitute each variable $X$ with its corresponding local letters: $x^L$ for $X$ in $\lhs$ and $x^R$ for $X$ in $\rhs$, obtaining words $\lhsInst$ and $\rhsInst$ over the extended alphabet. 
 Then, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
 For a given assignment $\sigma$, we extend the \DVPA $\aut$ to a \VPA $\autPlus$ working over the extended alphabet, where transitions over new letters are defined as follows.
@@ -184,19 +168,16 @@ The hardness result holds already for \DFA, which can be considered as \DVPA ove
 (1)~The problem of deciding, given a rewrite rule $\lhs \to \rhs$, a DFA $\aut$ and its states $q, s_1, s_2$, whether $(q, s_1, s_2)$ belongs to $\DeltaRule$, is \NP-complete. 
 (2)~The positive (resp. negative) consistency problem over well-matched rules against a regular language given by a \DFA is \coNP-complete.
 \end{restatable}
-
-% \begin{proof}[Proof's sketch]
-% We show this by reduction from the 3-SAT problem. 
-% Given a formula $\varphi$, we rename variables to obtain $\varphi^*$, in which  each variable occurs at most once. 
-% Then, variables in rules correspond to variables in $\varphi^*$, and
+%\begin{proof}[Proof sketch]
+% We reduce from the 3-SAT problem.
+% Given a 3-CNF $\varphi$, we rename variables to obtain $\varphi^*$, in which each variable occurs at most once. 
+% Then, we define $\lhs \to \rhs$ such that variables in rules correspond to variables in $\varphi^*$, and
 % $\aut$ moves over some instance of $\lhs$ from $q$ to $s_1$ if 
 % the substitution of $\lhs$ encodes a truth assignment, where all copies of the same variable from $\varphi$ have the same value.
-% Next, $\aut$ moves over some instance of $\rhs$ from $q$ to $s_2$  if  the substitution of $\rhs$ 
-% encodes a truth assignment satisfying $\varphi^*$.
-% These two conditions hold precisely when $\varphi$ is satisfiable, 
-% Thus, $(q, s_1, s_2) \in \DeltaRule$ if and only if the above two conditions hold.
-% The latter holds precisely when $\varphi$ is satisfiable.
-
+% Next, $\aut$ moves over some instance of $\rhs$ from $q$ to $s_2$  if the  truth assignment satisfies $\varphi^*$.
+% These two conditions hold precisely when $\varphi$ is satisfiable.
+ %Thus, $(q, s_1, s_2) \in \DeltaRule$ if and only if the above two conditions hold.
+ %The latter holds precisely when $\varphi$ is satisfiable.
 % We can reduce unsatisfiablity of $\varphi$ to positive (resp. negative) consistency. 
 % We ensure that whenever a truth assignment is consistent among copies of the same propositional variable, it does
 % not satisfy $\varphi^*$. Thus, $\varphi$ is unsatisfiable.
@@ -241,9 +222,7 @@ $(q_2,u b_2) \trans{\aut}{v_0^R r_1^R v_1^R} (s_2, u)$ for every stack content $
 For the remaining return letters $\return_i$, where $i \in \set{2, \ldots,k}$,
 the transitions on $\return_i$ simulate reading  $r_i^L v_i^L$  on the first component and $r_i^R v_i^R$ on the second component.
 For each new call letter $\call_i$, the transition over $\call_i$ simultaneously  simulates reading $c_i^L v_{k+i}^L$ on the first component and $c_i^R v_{i+k}^R$ on the second.
-Finally, a state $(q_1, q_2)$ of $\autExt$ is accepting if exactly one of $q_1, q_2$ is accepting in $\aut$.
-
-The following condition holds:
+Finally, a state $(q_1, q_2)$ of $\autExt$ is accepting if exactly one of $q_1, q_2$ is accepting in $\aut$. The following condition holds:
 \begin{claim}
 A  word  $w_1 \return_1 \ldots \return_k \call_1 \cdots \call_m w_2$, where $w_1, w_2$ are over the original alphabet $\vAlph$, is accepted by $\autExt$  
 if and only if $\aut$ accepts exactly one of the words $w_1 \lhs w_2, w_1 \rhs w_2$, which holds precisely when $\lhs \to \rhs$ is inconsistent with $\lang(\aut)$.
@@ -265,7 +244,7 @@ Now, we can move to rules with variables. We only briefly comment on the extensi
 Variables in matching-preserving rules can be eliminated as in the case of well-matched rules. 
 Consider a matching-preserving rule $\lhs \to \rhs$.
 It suffices to extend the alphabet with local letters $x^L, x^R$ for each variable and then consider a ground rule
-obtained from  $\lhs \to \rhs$ by replacing the occurrence of every variable $X$ with $x^L$ in $\lhs$ and with $x^R$ in $\rhs$ whenever appears.
+obtained from  $\lhs \to \rhs$ by replacing the occurrence of every variable $X$ with $x^L$ in $\lhs$ and with $x^R$ in $\rhs$ whenever it appears.
 Finally, as described in Section~\ref{s:well-matched} for the well-matched case, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
 In consequence, we have the following:
 

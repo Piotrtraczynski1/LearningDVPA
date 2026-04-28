@@ -27,7 +27,7 @@ Under these assumptions, there are exponentially many well-matched words.
 \Paragraph{The length of a minimal consistent well-matched rule: the ground case}
 Consider a well-matched word $w$. We associate with this word a function $f_w \colon Q \to Q$.
 Such functions correspond to equivalence classes of the syntactic congruence of a \DFA.
-Formally, for a state $q \in Q$ we define $f_w(q) = q'$ if and only if for some stack content $u$, we have $(q,u) \trans{\aut}{a} (q',u)$.
+Formally, for a state $q \in Q$ we define $f_w(q) = q'$ if and only if for some stack content $u$, we have $(q,u) \trans{\aut}{w} (q',u)$.
 Note that the existential quantifier over $u$ can be replaced by a universal one, since transitions over well-matched words are stack-independent. 
 If $w_1, w_2$ are well-matched words such that $f_{w_1} = f_{w_2}$, 
 then for all words $x,y$ we have $x w_1 y \in \lang(\aut) \iff x w_2 y \in \lang(\aut)$~\cite[Theorem~1]{alur2005congruences}.
@@ -54,7 +54,7 @@ obtaining the ground rewrite rule:
 \begin{align*}
 &&	w_0 b_1 w_1 b_2 \ldots  b_k w_{k} &\to v_0 b_1 v_1 b_2 \ldots  b_k v_{k}
 \end{align*}
-Observe that the left hand side and the right hand side define the same function, and hence this ground rule is 
+Observe that the left-hand side and the right-hand side define the same function, and hence this ground rule is 
 consistent with $\lang(\aut)$.
 It follows that every rule from $\sem{\lhs \to \rhs}$ is consistent with $\lang(\aut)$, which by definition means that 
 $\lhs \to \rhs$ is consistent with $\lang(\aut)$.
@@ -69,15 +69,7 @@ The counting argument shows that for a given $\DVPA$ $\aut$ there are short (of 
 rewrite rules that are consistent with $\lang(\aut)$. 
 Since testing whether a given rule (with a bounded number of variables)
 is consistent with $\lang(\aut)$ is decidable in polynomial time, we can find (some) rules consistent with $\lang(\aut)$ in non-deterministic polynomial time. 
-
-\Paragraph{Rules of exponential length}
-While minimal-length rules are of polynomial length, some consistent rules are of exponential length even if we consider ``nonredundant'' rules. 
-Even in the \DFA case, consider automata $\aut_n$ such that $|Q| = n$  and for all $a \in \Sigma$, the function $f_a$ is the same permutation of states of an exponential order, e.g., the composition 
-of disjoint cycles of prime orders $p_1, \ldots, p_k$ has the order $p_1 \cdot \ldots \cdot p_k$.
-Then, there exist words $w \neq \epsilon$ such that $w \to \epsilon$ is a rule consistent with $\lang(\aut_n)$, but every such word $w$ has length at least exponential in $n$.
-
-While we have shown that rules can be generated in non-deterministic polynomial time, 
-a natural question is whether this is optimal.
+Now, a natural question is whether non-determinism is necessary.  
 
 \Paragraph{Complexity of finding consistent rules}
 We have established an upper bound on the minimal length of words defining the same function. 
@@ -93,7 +85,7 @@ Consequently, the problem is in \NP. We show that it is \NP-complete.
 \begin{restatable}{lemma}{NPHardnessOfClash}
 The minimal collision problem is \NP-complete.
 \end{restatable}
-\begin{proof}[Proof's sketch]
+\begin{proof}[Proof sketch]
 The proof is by reduction from the 3-SAT problem.
 The main difficulty is to ensure that if the formula is unsatisfiable, 
 then no pair of short words defines the same function from $Q$ to $Q$ .
@@ -124,8 +116,19 @@ represent an assignment, and these words must contain a literal from each clause
 % (a)~\PSPACE-complete, if $k$ is given in binary, and
 % (b)~\NP-complete, if $k$ is given in unary.
 % \end{restatable}
-
 In summary, there is no algorithm for generating minimal-length consistent rules in deterministic polynomial time unless \PTIME = \NP.
+
+\Paragraph{Rules with one side fixed}
+While minimal-length rules are polynomial, certain consistent rules can be exponential in length—even when restricted to ``nonredundant'' rules. 
+Even in the \DFA case, consider a family of \DFA  $\aut_n$ with $|Q| = n$ where for every $a \in \Sigma$, the function $f_a$ is the same permutation of states of an exponential order.
+For example, a permutation composed of disjoint cycles of prime orders $p_1, \ldots, p_k$ has the order of $p_1 \cdot \ldots \cdot p_k$.
+In this setting, there exist non-empty words $w$ such that $w \to \epsilon$ is consistent with $\lang(\aut_n)$, but every such word $w$ has a length at least exponential in $n$.
+Furthermore, if one side of the rule is fixed, i.e., for a fixed $v$ and given $K>0$, we ask whether there exists $w$ such that $|w| \leq K$ and $w \to v$ is consistent, the problem becomes \PSPACE-complete, as it corresponds to the \emph{membership}  problem for monoids~\cite{Kozen77}.
+  
+ % For simplicity, we consider the right-hand side to be a local letter.
+
+
+
 %\todo{ soften it slightly}
 %Consequently, further research on the rule synthesis problem should focus on efficient heuristics rather than exact algorithms.
 

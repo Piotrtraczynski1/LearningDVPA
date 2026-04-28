@@ -5,11 +5,11 @@ A pushdown alphabet $\vAlph$ consists of three disjoint sets of letters $\vAlph 
 \Paragraph{Well-matched words}
 \newcommand{\dCall}{\textbf{c}}
 \newcommand{\dReturn}{\textbf{r}}
-The set of well-matched words over a pushwdown alphabet $\vAlph$ is the least set containing $\epsilon$ 
+The set of well-matched words over a pushdown alphabet $\vAlph$ is the least set containing $\epsilon$ 
 such that if $w_1, w_2$ are well-matched, then
 (1)~the concatenation $w_1 w_2$ is well-matched, 
-(1)~for every call letter $c$ and return letter $r$, the word $ c w r$ is well-matched, and
-(2)~for every local letter $l$, words $lw$ and $wl$ are well-matched.
+(2)~for every call letter $c$ and return letter $r$, the word $ c w r$ is well-matched, and
+(3)~for every local letter $l$, words $lw$ and $wl$ are well-matched.
 In a word $w$ (not necessarily well-matched), if $w = x \dCall y \dReturn z$ such that $y$ is a well-matched word, 
 we say that letters $\dCall$ and $\dReturn$ are matched, and $\dReturn$ is the return letter corresponding to call $\dCall$ and vice versa. 
 Formally, positions $|x|+1$ and $|x|+|y|+2$ in $w$ are in the \emph{matching relation}.
@@ -28,7 +28,7 @@ $\delta_l \subseteq Q \times \alphabet_l \times Q$, and
 $\delta_r \subseteq Q \times \alphabet_r \times \stackAlphabetBot \times Q$.
 
 \Paragraph{Deterministic visibly pushdown automata} 
-A \VPA $(\vAlph, \stackAlphabet, Q, Q_0, \delta, F)$  is deterministic (called $\DVPA$), if $|Q_0| = 1$ and 
+A deterministic \VPA (called $\DVPA$) is a \VPA $(\vAlph, \stackAlphabet, Q, Q_0, \delta, F)$ such that $|Q_0| = 1$ and 
 its transition relation $\delta$ is a function, which is the union of three functions:
 $\delta_c \colon Q \times \alphabet_c \to Q \times \stackAlphabet$, 
 $\delta_l \colon Q \times \alphabet_l \to Q$,
