@@ -76,7 +76,7 @@ The rule $l_1 \to l_2$ is consistent with $\lang(\autB)$, but establishing this 
   \path[->]
     (q0) edge node [above] {$c, push(a)$} (q1)
     (q1) edge node [above] {$l_1$} (q2U)
-    (q1)  edge node [above] {$l_2$} (q2D)
+    (q1)  edge node [below] {$l_2$} (q2D)
     (q2U) edge node [right] {$r, pop(a)$} (sink)
     (q2U) edge node [above] {$r, pop(\bot)$} (acc)
     (q2D)  edge [bend right=20] node [above left=0.6cm] {$r, pop(a)$} (sink) 
@@ -84,8 +84,8 @@ The rule $l_1 \to l_2$ is consistent with $\lang(\autB)$, but establishing this 
 
     ;
 
- \draw[loop right,->] (acc)  to node[right] {$\vAlph$} (acc);
- \draw[loop right,->] (sink) to node[right] {$\vAlph$} (sink);
+% \draw[loop right,->] (acc)  to node[right] {$\vAlph$} (acc);
+% \draw[loop right,->] (sink) to node[right] {$\vAlph$} (sink);
 
 \end{tikzpicture}
 \caption{The automaton $\autB$. All transitions other than depicted are self-loops}
@@ -183,8 +183,8 @@ The hardness result holds already for \DFA, which can be considered as \DVPA ove
 % not satisfy $\varphi^*$. Thus, $\varphi$ is unsatisfiable.
 % \end{proof}
 
-The \coNP-hardness result for positive (resp. negative) consistency does not extend to consistency, and hence 
-the complexity lower bound for checking consistency  of well-matched rules remains open.
+The \coNP-hardness result for positive consistency does not extend to consistency.
+The complexity lower bound for checking consistency  of well-matched rules remains open.
 
 \subsection{Consistency of matching-preserving rules}
 \label{s:matching-preserving}
@@ -241,8 +241,8 @@ Consistency (resp.,  positive, negative consistency) of a ground matching-preser
 Now, we can move to rules with variables. We only briefly comment on the extension as it is similar as for well-matched rules.
 
 \Paragraph{Matching-preserving rules with variables} 
-Variables in matching-preserving rules can be eliminated as in the case of well-matched rules. 
-Consider a matching-preserving rule $\lhs \to \rhs$.
+%Consistency of matching-preserving rules with variables reduces to the ground case as in the setting of well-matched rules. 
+Consider a matching-preserving rule $\lhs \to \rhs$ with variables.
 It suffices to extend the alphabet with local letters $x^L, x^R$ for each variable and then consider a ground rule
 obtained from  $\lhs \to \rhs$ by replacing the occurrence of every variable $X$ with $x^L$ in $\lhs$ and with $x^R$ in $\rhs$ whenever it appears.
 Finally, as described in Section~\ref{s:well-matched} for the well-matched case, we iterate over all possible assignments from variables of $\lhs \to \rhs$ to $\BalReach$. 
