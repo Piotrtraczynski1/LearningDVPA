@@ -45,7 +45,7 @@ Reachability in pushdown automata can be checked in $\bigO(|\aut|^3)$, with a sl
 both of which fall into $\widetilde{\bigO}(|\aut|^3)$.
 Due to the lack of better upper bounds~\cite{DBLP:conf/popl/Chaudhuri08,DBLP:conf/lics/BalasubramanianCM25}, the complexity of reachability in pushdown systems is often referred to as the ``cubic bottleneck.''
 Consequently, reachability in the product $\aut \times \aut$ amounts to $\widetilde{\bigO}(|\aut|^6)$. 
-However, checking consistency of an SRS with the language of a \DFA can be performed locally on the structure of the \DFA without checking reachability~\cite{ecai25}. 
+However, checking consistency of an \SRS with the language of a \DFA can be performed locally on the structure of the \DFA without checking reachability~\cite{ecai25}. 
 In contrast, the following example illustrates that for pushdown systems, checking consistency must involve reachability.
 
 \begin{example}

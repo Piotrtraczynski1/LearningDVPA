@@ -77,7 +77,7 @@ the equivalence and consistency checks are approximated.
 %In this section, we present the reduction in the number of equivalence queries achieved by using SRS,
 %as well as its impact on the average execution time required to process a single DVPA in our setup.
 The exact equivalence checks dominate the overall computation time. 
-When no inconsistency with an SRS is detected,
+When no inconsistency with an \SRS is detected,
 we need to perform the actual equivalence check, which amounts to two reachability checks.
 However, the consistency check is computationally cheaper, as it operates
 on smaller automata; the product of the candidate automaton with itself is considerably smaller than the product of
@@ -88,7 +88,7 @@ the candidate automaton with the target automaton.
 %The number of stack symbols is set to $5$ for well-matched cancellation and idempotency,
 %and to $16$ for well-matched commutativity. 
 The results are aggregated over $100$ randomly generated automata for each number of states.
-The number of well-matched words used as substitutions for the variable in the SRS rule was limited to $40$.
+The number of well-matched words used as substitutions for the variable in the rewrite rule was limited to $40$.
 We observe that, for the cancellation property ($c X r \to \epsilon$), increasing
 the number of well-matched words for substitution does not improve results; the substitution $X \mapsto \epsilon$
 is sufficient to achieve the same effect. 
@@ -97,15 +97,15 @@ However, this is not true for reliability, which is discussed below.
 
 \Paragraph{The probabilistic setting}
 %In this section, we evaluate two aspects: the impact of SRS on reliability and the reduction in processing time.
-Since the SRS enables equivalence testing to be performed in two stages, 
+Since the \SRS enables equivalence testing to be performed in two stages, 
 we compare the algorithm with advice against the baseline, using two configurations for the latter: 
 $10^5$ and $2 \cdot 10^5$ random words.
-The second configuration checks whether the improvements observed with advice are genuinely due to the SRS, 
+The second configuration checks whether the improvements observed with advice are genuinely due to the \SRS, 
 rather than a result of evaluating a larger number of random words.
-The experimental setup consists of $10^4$ randomly generated automata, each with $10$ to $25$ states.
+The experimental setup consists of $10^4$ randomly generated automata with $10 -- 25$ states.
 %The input alphabet was generated individually for each automaton, with slight variations depending on the considered property.
 %In particular, the number of symbols of each type ranged from $2$ to $5$, while the number of stack symbols ranged from $2$ to $16$.
-The number of well-matched words used for SRS was limited to $200$.
+The number of well-matched words used for substitutions was limited to $200$.
 
 \begin{table}[H]
 \centering
@@ -137,7 +137,7 @@ The presented results show a reduction of approximately $20\%$ in the number of 
 and around $50\%$ for cancellation rules. In our setup, the time measurements indicate that the use of SRS
 generally increases the overall execution time. However, SRS reduces execution time for the largest instances.
 This suggests that the benefit of the advice mechanism grows with automaton size.
-Based on experiments for DFA~\cite{ecai25}, we expected the most significant gains for commutativity.
+Based on experiments for \DFA~\cite{ecai25}, we expected the most significant gains for commutativity.
 However, the obtained results differ substantially from these expectations.
 We suspect the generated \DVPA consistent commutativity with were too simple for advice to help. 
 %constrained limited the impact of the SRS --- the autmata were too simple. 
@@ -145,11 +145,12 @@ We suspect the generated \DVPA consistent commutativity with were too simple for
 % We hypothesize that the method
 %used to generate the automata did not allow the full potential of this rule to be observed.
 The reliability results do not show a significant improvement.
-Nevertheless, SRS improves the success ratio, while the overhead mainly comes
+Nevertheless, \SRS improves the success ratio, while the overhead mainly comes
 from an auxiliary heuristic for selecting well-matched words, intended to increase the chances of detecting inconsistency.
-Its cost is negligible comparing to the exact equivalence check but becomes noticeable with the probabilistic one.
+Its cost is negligible comparing to the exact equivalence check but becomes noticeable with the probabilistic one. 
+%due to very low cost of evaluation of a word in a \DVPA.
 %If the evaluation of words becomes more expensive (e.g. LLM as a membership oracle), the overhead of our method vanishes. 
-This suggests that SRS can be considered a useful feature in a heuristic approach.
+This suggests that \SRS is a useful feature in a heuristic approach.
 
 
 % %\begin{itemize}

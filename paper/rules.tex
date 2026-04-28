@@ -3,19 +3,19 @@ The main aim of advice is to
 provide the learning algorithm with prior knowledge about the learned language, which is used to reduce the number of equivalence queries.
 
 First, we present the general framework, which carries over from the regular case seamlessly.
-Next, We discuss which rewriting rules are compatible with \VPLs and how to extend the SRS formalism to capture natural 
+Next, We discuss which rewriting rules are compatible with \VPLs and how to extend the \SRS formalism to capture natural 
 properties of \VPLs.
 
 \subsection{Learning with advice}
 We adapt the framework of active learning with advice for \DFA~\cite{ecai25} to \DVPA. 
-The advice supplied to the learning  algorithm is expressed via string rewriting systems (SRSs), 
+The advice supplied to the learning  algorithm is expressed via \SRSs, 
 which are connected to visibly pushdown languages through the following notions of consistency: 
 
 
 \begin{definition}[\cite{ecai25}]
 \label{def:consistent}
-Let $\vAlph$ be a pushdown alphabet, $\rew$ be an SRS over $\vAlph$ and $\lang$ be a visibly pushdown language over $\vAlph$. 
-We say that the SRS $\rew$ is
+Let $\vAlph$ be a pushdown alphabet, $\rew$ be an \SRS over $\vAlph$ and $\lang$ be a visibly pushdown language over $\vAlph$. 
+We say that the \SRS $\rew$ is
 \begin{itemize}
 \item {(fully) consistent} with $\lang$ if and only if
 for all words $x,y$, if $x \rewrites_{\rew} y$, then $x \in \lang \Leftrightarrow y \in \lang$.  
@@ -25,7 +25,7 @@ then $x \in \lang \Rightarrow y \in \lang$.
 \end{itemize}
 \end{definition}
 
-Note that an SRS $\rew$ is fully consistent with $\lang$ if and only if it is both positively and negatively consistent.
+Note that an \SRS $\rew$ is fully consistent with $\lang$ if and only if it is both positively and negatively consistent.
 %While more granular than standard consistency, positive and negative consistency are harder to infer.
 
 %With these notions of consistency in place, we can now present the active learning with advice framework.
@@ -34,7 +34,7 @@ With these notions of consistency in place, we can present our framework.
 \Paragraph{Framework}
 The active \DVPA learning with advice problem is defined as follows.
 The algorithm is given an \emph{oracle} $\oracle$ answering membership and equivalence queries about the target visibly pushdown language $\lang$
- (and possibly other queries), and three \emph{advice} SRSs:
+ (and possibly other queries), and three \emph{advice} \SRSs:
  \begin{itemize}
  \item  $\rew_{=}$, which is consistent with $\lang$, and 
  \item $\rew_{+}$, $\rew_{-}$, which are respectively positively and negatively consistent with $\lang$.
@@ -49,7 +49,7 @@ In particular, the oracle may also answer additional types of queries as in~\cit
 \Paragraph{Using advice}
 %We can reduce the number of equivalence queries without affecting the learning algorithm.
 %When the learning algorithm attempts to ask the oracle an equivalence query,
-We intercept  equivalence queries posed by the learning algorithm and first check whether the advice SRS $\rew$ is consistent (resp., positively consistent or negatively consistent) with
+We intercept  equivalence queries posed by the learning algorithm and first check whether the advice \SRS $\rew$ is consistent (resp., positively consistent or negatively consistent) with
 the language of a given candidate automaton $\aut$. 
 We forward $\aut$ to the oracle, only if it is consistent 
 Otherwise, if it is inconsistent, without the oracle we conclude that $\lang(\aut)$ differs from the target language with which $\rew$ is consistent (resp., positively/negatively consistent).
@@ -83,7 +83,7 @@ we get a well-matched word with a different matching relation (color coded)
 A rewrite rule $\lhs \to \rhs$ is {matching-preserving} over $\vAlph$ if and only if for all words $w,w' \in \vAlph^*$
 such that $w = x \lhs y$ and $w' = x \rhs y$, the matching relation between calls from $x$ and returns from $y$ in $w$
 coincides with the matching relation between calls from $x$ and returns from $y$ in $w'$.
-An SRS $\rew$ is {matching-preserving} if all rules in $\rew$ are matching-preserving. 
+An \SRS $\rew$ is {matching-preserving} if all rules in $\rew$ are matching-preserving. 
 \end{definition}
 
 Matching-preserving rules do not break the matching between calls and returns that are not in the rewritten fragment of the word.
@@ -92,7 +92,7 @@ which arise naturally and enjoy more efficient algorithms for checking consisten
 
 \begin{definition}
 A rewrite rule $\lhs \to \rhs$ is well-matched over $\vAlph$ if and only if words $\lhs$ and $\rhs$ are well-matched.
-An SRS $\rew$ is {well-matched} if all rules in $\rew$ are well-matched.
+An \SRS $\rew$ is {well-matched} if all rules in $\rew$ are well-matched.
 \end{definition}
 
 Every well-matched rule is matching-preserving. However, not every matching-preserving rule is well-matched: 
@@ -135,10 +135,10 @@ A \emph{string rewriting system with variables} $\rewV$ is a finite set of rules
 (2)~every variable $X \in \Vars$ that occurs in $\rhs$, also occurs in $\lhs$.
 We consider \SRSs with variables as finite representations of infinite SRSs. 
 That is, we say that a rule $\lhs \to \rhs \in \rewV$ generates an infinite 
-SRS $\sem{\lhs \to \rhs}$ 
+\SRS $\sem{\lhs \to \rhs}$ 
 consisting of all ground instances obtained by substituting well-matched words for variables, with the same word substituted for each occurrence of a given variable across both $\lhs$ and $\rhs$.
 For example, a rule $c X r \to X$ generates an infinite set $\{ c r \to \epsilon, c c r r \to cr, \ldots \}$.
-Finally, an \SRS with variables $\rewV$ generates an SRS $\sem{\rewV}$ defined as the union of $\sem{\lhs \to \rhs}$  over all rules $\lhs \to \rhs$ from $\rewV$.
+Finally, an \SRS with variables $\rewV$ generates an \SRS $\sem{\rewV}$ defined as the union of $\sem{\lhs \to \rhs}$  over all rules $\lhs \to \rhs$ from $\rewV$.
 
 \begin{remark}
 String rewriting rules can be considered as terms under the unary signature (all symbols have arity at most one) with a single variable.
@@ -146,16 +146,16 @@ However, the variables in rules that we consider do not correspond to standard v
 but to context variables.   
 \end{remark}
 
-\Paragraph{Properties of SRSs with variables}
-The notions defined for SRSs carry over to SRSs with variables by applying the definition to the generated SRS.
+\Paragraph{Properties of \SRSs with variables}
+The notions defined for \SRSs carry over to \SRSs with variables by applying the definition to the generated \SRS.
 That is, we say that a rule with variables $\lhs \to \rhs$ is
 \begin{itemize}
     \item consistent (resp., positively/negatively consistent) with a language $\lang$ if and only if 
- the generated SRS $\sem{\lhs \to \rhs}$ is consistent (resp., positively/negatively consistent) with $\lang$,
+ the generated \SRS $\sem{\lhs \to \rhs}$ is consistent (resp., positively/negatively consistent) with $\lang$,
  \item matching-preserving (resp., well-matched) if and only if 
- the generated SRS $\sem{\lhs \to \rhs}$ is matching-preserving (resp., well-matched).
+ the generated \SRS $\sem{\lhs \to \rhs}$ is matching-preserving (resp., well-matched).
 \end{itemize}
-The listed properties extend to SRSs with variables, by requiring that every rule is consistent, well-matched, e.t.c.    
+The listed properties extend to \SRSs with variables, by requiring that every rule is consistent, well-matched, e.t.c.    
 To check whether a rule with variables is matching-preserving (resp., well-matched) it suffices to delete variables, i.e.,
 a rule with variables $\lhs \to \rhs$  is matching-preserving (resp. is well-matched)
 it holds if and only if

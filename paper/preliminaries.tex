@@ -59,14 +59,14 @@ A word $w$ is \emph{accepted} by $\aut$ if there are $q_0 \in Q_0$, $q \in F$ an
 %$(q_0, \bot) \trans{\aut}{w} (q',u)$ for some $q'$. 
 
 \Paragraph{String rewriting} 
-A \emph{string rewriting system (SRS)} $\rew$ over an alphabet $\Sigma$ is 
+A \emph{string rewriting system (\SRS)} $\rew$ over an alphabet $\Sigma$ is 
 a (possibly infinite) set of pairs of words $(l,r)$ over $\Sigma$.
 A pair of words  $(l,r)$  from $\rew$ is called a \emph{string rewrite rule} and denoted with $l \rightarrow r$.
-For an SRS $\rew$, we define a \emph{single-step rewrite relation} $\rewritesOneStep_{\rew}$ over words from $\Sigma^*$ as follows:
+For an \SRS $\rew$, we define a \emph{single-step rewrite relation} $\rewritesOneStep_{\rew}$ over words from $\Sigma^*$ as follows:
 for all $s,t \in \Sigma^*$, we have $s \rewritesOneStep_{\rew} t$ if and only if there are words $x,y \in \Sigma^*$ and a rewrite rule
 $(l,r) \in \rew$ such that $s = x l y$ and $t = x r y$. 
 The (string) rewriting relation $\rewrites_{\rew}$ is the transitive and reflexive closure of $\rewritesOneStep_{\rew}$.
-We will omit the $\rew$ subscript if the SRS is clear from the context. 
+We will omit the $\rew$ subscript if the \SRS is clear from the context. 
 For further details and notions on the topic of string rewriting see~\cite{book1993string}.
 
 \Paragraph{Active learning of languages and automata}
