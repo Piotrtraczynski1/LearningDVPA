@@ -10,7 +10,7 @@ void IdempotencyAccuracy::runSingleIteration()
         Tester{
             numOfTestsInSingleIteration,
             std::unique_ptr<generator::Generator>(new generator::srs::IdempotencyGenerator()),
-            parameters, rand()}
+            parameters, static_cast<uint16_t>(rand())}
             .run();
 }
 

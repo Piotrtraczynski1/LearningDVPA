@@ -9,7 +9,7 @@ namespace benchmark::scenario
 {
 class CommutationIncreasingNumOfStates : public BaseSrsScenario
 {
-    static constexpr uint16_t numOfIterationsIn1Dim{1};
+    static constexpr uint16_t numOfIterationsIn1Dim{10};
     static const std::array<std::pair<uint16_t, uint16_t>, numOfIterationsIn1Dim> dim1Steps;
     uint16_t dim1Step{0};
 

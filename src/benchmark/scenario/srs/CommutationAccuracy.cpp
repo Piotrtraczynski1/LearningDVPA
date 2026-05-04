@@ -10,7 +10,7 @@ void CommutationAccuracy::runSingleIteration()
         Tester{
             numOfTestsInSingleIteration,
             std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
-            parameters, rand()}
+            parameters, static_cast<uint16_t>(rand())}
             .run();
 }
 

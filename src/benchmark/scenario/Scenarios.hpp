@@ -10,6 +10,7 @@
 #include "benchmark/scenario/increasingNumOfStates/IncreasingNumOfStatesAndCalls.hpp"
 #include "benchmark/scenario/increasingNumOfStates/IncreasingNumOfStatesAndReturns.hpp"
 #include "benchmark/scenario/increasingNumOfStates/IncreasingNumOfStatesAndLocals.hpp"
+#include "benchmark/scenario/increasingNumOfStates/IncreasingNumOfStatesAndStackSymbols.hpp"
 
 // srs scenarios
 #include "benchmark/scenario/srs/CancellationIncreasingNumOfStates.hpp"
@@ -30,6 +31,7 @@ static const std::map<std::string, ScenarioFactory> scenariosRegistry{
     {"increasing-number-of-states-and-calls", [] { return std::make_unique<scenario::IncreasingNumOfStatesAndCalls>(); }},
     {"increasing-number-of-states-and-returns", [] { return std::make_unique<scenario::IncreasingNumOfStatesAndReturns>(); }},
     {"increasing-number-of-states-and-locals", [] { return std::make_unique<scenario::IncreasingNumOfStatesAndLocals>(); }},
+    {"increasing-number-of-states-and-stack-symbols", [] { return std::make_unique<scenario::IncreasingNumOfStatesAndStackSymbols>(); }},
     {"cancellation-increasing-number-of-states", [] { return std::make_unique<scenario::CancellationIncreasingNumOfStates>(); }},
     {"commutation-increasing-number-of-states", [] { return std::make_unique<scenario::CommutationIncreasingNumOfStates>(); }},
     {"idempotency-increasing-number-of-states", [] { return std::make_unique<scenario::IdempotencyIncreasingNumOfStates>(); }},
