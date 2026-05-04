@@ -33,7 +33,8 @@ void IncreasingNumOfStatesBase::runSingleIteration()
 {
     Tester{
         numOfTestsInSingleIteration,
-        std::unique_ptr<generator::Generator>(new generator::RandomGenerator()), parameters, rand()}
+        std::unique_ptr<generator::Generator>(new generator::RandomGenerator()), parameters,
+        static_cast<uint16_t>(rand())}
         .run();
 }
 

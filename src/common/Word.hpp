@@ -25,4 +25,45 @@ Word &operator+=(Word &lhs, const Word &rhs);
 Word &operator+=(Word &lhs, const Symbol &rhs);
 std::ostream &operator<<(std::ostream &os, const Symbol &symbol);
 std::ostream &operator<<(std::ostream &os, const Word &word);
+
+struct WordHasher
+{
+    size_t operator()(const Word &word) const
+    {
+        size_t seed = word.size();
+
+        for (const auto &symbol : word)
+        {
+            size_t symbolHash = symbol.index();
+
+            switch (symbol.index())
+            {
+            case CallSymbolVariant:
+                hash_combine(
+                    symbolHash, static_cast<uint16_t>((std::get<symbol::CallSymbol>(symbol))));
+                break;
+            case ReturnSymbolVariant:
+                hash_combine(
+                    symbolHash, static_cast<uint16_t>((std::get<symbol::ReturnSymbol>(symbol))));
+                break;
+            case LocalSymbolVariant:
+                hash_combine(
+                    symbolHash, static_cast<uint16_t>((std::get<symbol::LocalSymbol>(symbol))));
+                break;
+            case ControlWordSymbolVariant:
+                break;
+            }
+
+            hash_combine(seed, symbolHash);
+        }
+
+        return seed;
+    }
+
+private:
+    inline void hash_combine(size_t &seed, uint16_t value) const
+    {
+        seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+};
 } // namespace common

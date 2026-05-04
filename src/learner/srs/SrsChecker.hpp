@@ -19,6 +19,7 @@ class SrsChecker
     const teacher::Teacher &oracle;
     std::shared_ptr<SpecialSymbolAdder> specialSymbolAdder;
     std::unordered_map<uint16_t, SrsRule> specialSymbolToRule;
+    std::unordered_map<common::Word, uint8_t, common::WordHasher> seenWords{};
 
     const uint16_t numOfCalls;
     const uint16_t numOfReturns;

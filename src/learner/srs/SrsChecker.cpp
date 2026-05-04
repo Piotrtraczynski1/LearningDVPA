@@ -40,7 +40,7 @@ common::Word SrsChecker::check(std::shared_ptr<common::VPA<AutomatonKind::Normal
     auto convertedAutomata{specialSymbolAdder->getConvertedAutomata()};
     auto word{checkEquivalence(convertedAutomata, specialSymbol)};
 
-    if (word != emptyWord)
+    if (word != emptyWord and seenWords[word]++ < 5)
     {
         return prepareCounterexample(hypothesis, word);
     }
@@ -79,7 +79,6 @@ uint16_t SrsChecker::buildConvertedAutomata()
 void SrsChecker::prepareWellMatchedWords(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
-    TIME_MARKER("[SrsChecker]: prepareWellMatchedWords");
     wellMatchedWords.clear();
     nodes.clear();
     numOfStates = hypothesis->getNumOfStates();
@@ -285,10 +284,7 @@ common::Word SrsChecker::checkEquivalence(
 common::Word SrsChecker::prepareCounterexample(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &word)
 {
-    TIME_MARKER("[SrsChecker]: counterexample found");
-    LOG("[SrsChecker]: counterexample found");
-
-    std::cout << "found! word: " << word << std::endl;
+    std::cout << "[SrsChecker]: counterexample found: " << word << std::endl;
 
     common::Word firstCandidate{};
     common::Word secondCandidate{};
@@ -304,9 +300,6 @@ common::Word SrsChecker::prepareCounterexample(
                 const auto srsRule = specialSymbolToRule[specialSymbol];
                 firstCandidate += srsRule.left;
                 secondCandidate += srsRule.right;
-
-                std::cout << "applied Srs Rule: {" << srsRule.left << ", " << srsRule.right
-                          << "}\n";
             }
             else
             {
