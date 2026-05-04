@@ -1,1 +1,28 @@
 \chapter{Podsumowanie}
+
+Celem pracy była implementacja oraz analiza wydajności algorytmu aktywnego
+uczenia się deterministycznych automatów visibly pushdown. W ramach pracy
+przedstawiono podstawy teoretyczne dotyczące automatów DVPA oraz aktywnego
+uczenia automatów, a następnie opisano zaimplementowany algorytm ucznia i
+nauczyciela. Omówiono również najważniejsze decyzje implementacyjne oraz moduły
+projektu umożliwiające testowanie algorytmu na przygotowanych klasach automatów.
+
+Drugim istotnym elementem pracy było rozszerzenie algorytmu o wykorzystanie
+więzów opartych na systemach przepisywania termów. W pracy opisano sposób
+adaptacji tej idei do rozważanego modelu automatów DVPA oraz przedstawiono
+implementację mechanizmu sprawdzania zgodności hipotezy z zadanym systemem
+SRS. Przygotowane eksperymenty pozwoliły zbadać wpływ tej funkcjonalności na
+liczbę zadawanych zapytań o równoważność oraz na dokładność uczenia w przypadku
+heurystycznego sprawdzania równoważności.
+
+Przeprowadzone eksperymenty pokazały, że ... (TODO)
+
+Należy zaznaczyć, że przeprowadzona analiza miała charakter eksperymentalny i
+była ograniczona do przygotowanych klas generatorów oraz wybranych konfiguracji
+parametrów. Możliwym kierunkiem dalszego rozwoju jest rozszerzenie zbioru
+generatorów, w szczególności w kontekście badania różnych typów reguł SRS oraz
+ich wpływu na wydajność uczenia. Interesującym zagadnieniem implementacyjnym
+pozostaje również poszukiwanie dalszych optymalizacji w obrębie algorytmu
+nauczyciela. Powstała architektura może także służyć jako punkt wyjścia do
+porównywania oraz testowania heurystycznych algorytmów sprawdzania
+równoważności w algorytmach aktywnego uczenia.

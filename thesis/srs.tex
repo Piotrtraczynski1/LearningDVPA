@@ -34,17 +34,17 @@ skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
     Dlatego znalezienie reguły $r \to l \in R$ i konfiguracji $(q, s)$, takich że konfiguracje $H(q, l, s)$ i $H(q, r, s)$
     się różnią nie gwarantuje nam, że automat nie jest zgodny z systemem SRS $R$.
     
-    \item Nie jesteśmy w stanie sprawdzić wszystkich osiągalnych konfiguracji dla hipotezy, bo w ogólności jest ich nieskończenie wiele.
+    \item Nie jest możliwe sprawdzenie wszystkich osiągalnych konfiguracji dla hipotezy, bo w ogólności jest ich nieskończenie wiele.
     Musimy ograniczyć się tylko do części osiągalnych konfiguracji.
 \end{enumerate}
 
-Z powodu trudności w zastosowaniu tego podejścia, zaostały nałożone dodatkowe obostrzenia na system SRS, który może być wskazówką dla algorytmu.
+Z powodu trudności w zastosowaniu tego podejścia, zostały nałożone dodatkowe obostrzenia na system SRS, który może być wskazówką dla algorytmu.
 Każda reguła postaci $l \rightarrow r$ powinna składać się z słów $l$ oraz $r$, które są dobrze zbalansowane. Ponieważ nie zależą one od stosu,
 ani nie zmieniają jego zawartości, odpowiadają one pewnemu przekształceniu stanów analogicznie jak dla automatów DFA.
 
-Umożliwia to sprawdzenie czy automat jest zgodny z daną regułą $l \rightarrow r$, poprzez sprawdzenie równoważności dwóch automatów $H_l$ oraz $H_r$, utworznych
+Umożliwia to sprawdzenie czy automat jest zgodny z daną regułą $l \rightarrow r$, poprzez sprawdzenie równoważności dwóch automatów $H_l$ oraz $H_r$, utworzonych
 na podstawie hipotezy $H$, z alfabetem rozszerzonym o dodatkową literę $l'$ typu local.
-Automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którm znalazłby się automat $H$ po przeczytaniu słowa $l$, a $H_r$ po przeczytaniu $l'$
+Automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którym znalazłby się automat $H$ po przeczytaniu słowa $l$, a $H_r$ po przeczytaniu $l'$
 trafia do stanu w którym znalazłaby się hipoteza po przeczytaniu słowa $r$. Jest to możliwe, gdyż słowa dobrze
 zbalansowane nie zależą od stosu ani go nie modyfikują.
 
@@ -57,7 +57,7 @@ proces uczenia się automatu.
 $wl_1Xl_2v \in L \Leftrightarrow wr_1Xr_2v \in L$, gdzie $w,v \in \Sigma^*$, $X \in \Sigma^*$ jest słowem dobrze zbalansowanym oraz słowa $l_1l_2, r_1r_2$
 są dobrze zbalansowane.
 
-Algorytm w celu sprawdzenia zgodności hiptezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia zbioru 
+Algorytm w celu sprawdzenia zgodności hipotezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia zbioru 
 słów dobrze zbalansowanych, które mogą zostać podstawione jako parametr $X$.
 Ponieważ liczba tych słów powinna być ogarniczona, obliczana jest wartość każdego słowa
 na podstawie której podejmowana jest dezycja czy słowo to powinno zostać wykorzystane.
@@ -69,7 +69,7 @@ usuwane są słowa o najmniejszej wartości. Podejście to ma na celu zmaksymali
 wykrycie niespójności.
 
 Następnie dla każdej reguły oraz słowa dodaje nową literę lokalną do automatów $H_l$ oraz $H_r$,
-po czym sprawdzana jest ich równoważność. Jeżeli istnieje słowo $w$, które należy do dokładniej jednego
+po czym sprawdzana jest ich równoważność. Jeżeli istnieje słowo $w$, które należy do dokładnie jednego
 z języków generowanych przez automaty $H_l$ oraz $H_r$ to oznacza, że została wykryta niespójność
 z systemem SRS. Należy wtedy skonstruować słowa $w_l$ oraz $w_r$ poprzez podstawienie za wszystkie dodatkowe
 litery lokalne odpowiednio lewej oraz prawej strony reguły SRS odpowiadającej danej literze.

@@ -1,13 +1,15 @@
 \chapter{Wyniki eksperymentów}
 
-Rozdział ten przedstawia wybrane wyniki eksperymentów, skupia się na podstawowych metrykach opisujących wydajność algorytmu aktywnego uczenia,
-czyli liczbię poszczególnych zapytań kierowanych do nauczyciela. Przedstawia w jaki sposób struktura automatu może wpływać na liczbę potrzebnych zapytań
+Rozdział ten przedstawia wybrane wyniki eksperymentów. Analiza skupia się na podstawowych metrykach opisujących
+wydajność algorytmu aktywnego uczenia, czyli liczbie poszczególnych zapytań kierowanych do nauczyciela.
+Przedstawiono również, w jaki sposób struktura automatu wpływa na liczbę potrzebnych zapytań
 oraz jak wykorzystanie systemu SRS wpływa na proces uczenia.
 
 \section{Podstawowe metryki}
 
 Przedstawione poniżej wykresy zostały wygenerowane na podstawie danych ze scenariuszy benchmarkowych, z użyciem losowego generatora.
-Mają na celu wizualizację liczby potrzebnych zapytań dla losowych automatów różniących się ilością stanów, rozmiarem alfaberu, jak i alfabetu stosowego.
+Mają na celu wizualizację liczby potrzebnych zapytań dla losowych automatów różniących się liczbą stanów,
+rozmiarem alfabetu, jak i alfabetu stosowego.
 
 Poniżej przedstawiona jest początkowa konfiguracja losowego generatora dla wszystkich scenariuszy w tej sekcji:
 \begin{verbatim}
@@ -21,7 +23,7 @@ acceptingStatesDensity = 0.3
 \end{verbatim}
 
 Każdy ze scenariuszy modyfikował początkową konfigurację generatora poprzez zwiększanie liczby stanów oraz
-liczby symboli wybranego typu. Dla każdej kofiguracji zostało wygenerowane 200 automatów,
+liczby symboli wybranego typu. Dla każdej konfiguracji zostało wygenerowane 200 automatów,
 dla których poszczególne wyniki zostały zebrane i uśrednione w celu pokazania trendów.
 
 \input{plots/baseMetrics}
@@ -32,9 +34,9 @@ z symbolami typu local.
 
 \section{Wpływ SRS}
 
-Wartością, którą wnosi wykorzystanie systemu SRS jest potencjalne zredukowanie liczby zapytań,
-skrócenie czasu procesu uczenia oraz poprawienie dokładności uczenia w przypadku wykorzystania
-heurystycznych podejść do przetwarzania zapytania equivalence query. Dlatego sekcja ta została
+Korzyścią z wykorzystania systemu SRS jest potencjalne zredukowanie liczby zapytań,
+skrócenie czasu procesu uczenia oraz poprawa dokładności uczenia w przypadku wykorzystania
+heurystycznych podejść do przetwarzania zapytania o równoważność. Dlatego sekcja ta została
 podzielona na dwie podsekcje. Pierwsza przedstawia wpływ systemu SRS na wydajność uczenia,
 z wykorzystaniem dokładnego algorytmu nauczyciela. Druga wykorzystuje heurystyczne podejście
 oraz przedstawia jak system SRS wpływa na dokładność uczenia.
@@ -45,10 +47,10 @@ identycznych automatów.
 
 \subsection{Podstawowe metryki}
 
-Sekcje ta przedstawia jak poszczególne typy systemów SRS wpłyneły na proces uczenia pod względem ilość zapytań
+Sekcja ta przedstawia jak poszczególne typy systemów SRS wpłynęły na proces uczenia pod względem liczby zapytań
 equivalence query skierowanych do nauczyciela, oraz czasu działania algorytmu.
 
-Poniżej przedstawiona jest cześć wspólna początkowej konfiguracji wszystkich
+Poniżej przedstawiona jest część wspólna początkowej konfiguracji wszystkich
 generatorów, które zostały wykorzystane w tej sekcji:
 \begin{verbatim}
 NumOfCalls = 3
@@ -60,128 +62,86 @@ acceptingStatesDensity = 0.3
 \end{verbatim}
 
 Każdy ze scenariuszy modyfikował początkową konfigurację generatora poprzez zwiększanie liczby stanów automatu.
-Dla każdej kofiguracji zostało wygenerowane 10 (TODO) automatów,
-dla których poszczególne wyniki zostały zebrane i uśrednione.
+Dla każdej konfiguracji zostało wygenerowane 100 automatów, dla których poszczególne wyniki zostały zebrane i uśrednione.
 
 \paragraph{Cancellation}
-
-Z każdym wygenerowanym automatem była związania następująca reguła SRS $cXr \rightarrow \epsilon$.
-Jednak na podstawie obserwacji i przeprowadzonych testów okazuje się, że dla wygenerowanych automatów
-równie skuteczna jest reguła $cr \rightarrow \epsilon$. Może oznaczać to, że w przypadku reguł w tej postaci
-wykorzystanie parametru nie wnosi żadnej dodatkowej wartości.
 
 \input{plots/cancellationSrs}
 
+Z każdym wygenerowanym automatem była związana następująca reguła SRS $cXr \rightarrow \epsilon$.
+Jednak na podstawie obserwacji i przeprowadzonych testów okazuje się, że dla wygenerowanych automatów
+równie skuteczna jest reguła $cr \rightarrow \epsilon$. Obserwacja ta jednak nie przełożyła się na skuteczność
+uczenia opisaną w następnej sekcji.
 
 \paragraph{Commutation}
-
-TODO:
 
 \input{plots/commutationSrs}
 
-\paragraph{Idempotency}
+Wyniki dla tej reguły nie są zadowalające, bazując na analogicznych wynikach dla automatów DFA~\cite{srs}
+spodziewana była znacznie większa redukcja liczby zapytań, co również przełożyłoby się na czas uczenia.
+Możliwe jest, że sposób generowania automatów dla tej reguły nie pozwolił ukazać jej całkowitego potencjału.
 
-Odpowiadające tej regule reguła dla automatów DFA w postaci $uu \rightarrow u$ w pracy~\cite{srs}
-została przedstawiona, jako przynosząca najmniejsze korzyści. Jednak nie było oczywiste, że obserwacja
-ta powtórzy się dla automatów DVPA z powodu zastosowania reguł z parametrem z powodu braku lokalności
-reguł z parametrami. Jednakże, otrzymane wyniki potwierdzają tą obserwację również dla automatów DVPA.
+\paragraph{Idempotency}
 
 \input{plots/idempotencySrs}
 
+Odpowiadająca tej regule reguła dla automatów DFA w postaci $uu \rightarrow u$ w pracy~\cite{srs}
+została przedstawiona, jako przynosząca najmniejsze korzyści. Jednak nie było oczywiste, że obserwacja
+ta powtórzy się dla automatów DVPA z powodu zastosowania reguł z parametrem.
+Jednakże, otrzymane wyniki potwierdzają tę obserwację również dla automatów DVPA.
 
-\paragraph{}
+\paragraph{Podsumowanie}
+W przeprowadzonych eksperymentach wykorzystanie systemu SRS prowadziło do redukcji liczby zapytań o równoważność.
+W przypadku reguł typu cancellation redukcja ta wyniosła około $50\%$, natomiast w przypadku commutation i
+idempotency około $20\%$.
+
+Czas uczenia w większości przypadków zwiększył się, jednak widoczna jest tendencja zmniejszania narzutu czasowego dla większych automatów.
+Może to sugerować, że dla większych instancji wykorzystanie systemu SRS będzie bardziej opłacalne czasowo.
+
 
 \subsection{Wpływ SRS na dokładność uczenia}
 
-W celu heurystycznego sprawdzenia równoważności dwóch automatów dla każdego sprawdzenia zostało wygenerowane
-$N$ losowych słów o losowej długości ograniczonej do 100 liter. Sprawdzanie równoważności dwóch automatów,
-które odbywa się podczas sprawdzania reguł SRS również wykorzystywało tę samą heurystykę.
+W celu heurystycznego sprawdzenia równoważności dwóch automatów dla każdego zapytania wygenerowano
+$N$ losowych słów o losowej długości ograniczonej do 100 liter. Ta sama heurystyka była wykorzystywana podczas
+sprawdzania spójności hipotezy z systemem SRS. Ostateczna ocena, czy zwrócony przez algorytm automat jest
+zgodny z automatem docelowym odbywała się poprzez dokładne sprawdzenie wykorzystywane w algorytmie nauczyciela.
 
-Ostateczne sprawdzanie zgodności hipotezy z automatem docelowym polegało na orginalnym algorytmie sprawdzającym równoważność.
-Testy przeprowadzono z $N = 10^5$ oraz $N = 10^6$.
+Ponieważ wykorzystanie systemu SRS powodowało, że w trakcie uczenia wykonywane były dodatkowe heurystyczne
+sprawdzenia równoważności, wariant bez systemu SRS został przetestowany dla $N = 10^5$ oraz $N = 2 \cdot 10^5$.
+Pozwala to porównać wpływ systemu SRS z prostym zwiększeniem liczby losowo generowanych słów.
+Dla każdej reguły wygenerowano $10^4$ losowych automatów, które zawierały od $10$ do $25$ stanów.
 
-Do generowania losowych słów wykorzystywanych przy sprawdzaniu równoważności użyto
-oddzielnego generatora liczb losowych, aby zapewnić identyczność generowanych automatów
-dla algorytmu wykorzystującego system SRS, jak i bez niego.
-
-\paragraph{Cancellation}
-
-Konfiguracja generatora automatów:
-\begin{verbatim}
-minNumOfStates = 10
-maxNumOfStates = 24
-minNumOfCalls = 3
-maxNumOfCalls = 6
-minNumOfLocals = 2
-maxNumOfLocals = 5
-minNumOfReturns = 3
-maxNumOfReturns = 6
-minNumOfStackSymbols = 3
-maxNumOfStackSymbols = 6
-density = 0.8,
-acceptingStatesDensity = 0.3
-\end{verbatim}
-
-\begin{table}[h]
+\begin{table}[H]
 \centering
-\begin{tabular}{c|cc|cc}
+\begin{tabular}{cc|ccc}
 \hline
- & \multicolumn{2}{c|}{Bez SRS} & \multicolumn{2}{c}{Z SRS} \\
-N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
+Reguła SRS & Metryka
+& $N = 10^5$
+& $N = 2\cdot10^5$
+& $N = 10^5$ z SRS \\
 \hline
-$10^5$ & 6971 & 69.71\% & 4281 & 42.81\% \\
-$10^6$ & 3593 & 35.93\% & 0 & 0\% \\
+\multirow{2}{*}{Cancellation}
+& Odsetek sukcesów & 30.29\% & 40.1\% & 57.19\% \\
+& Średni czas [s] & 0.69 & 1.28 & 2.6 \\
+\hline
+\multirow{2}{*}{Commutativity}
+& Odsetek sukcesów & 73.93\% & 78.59\% & 74.11\% \\
+& Średni czas [s] & 0.69 & 0.89 & 2.0 \\
+\hline
+\multirow{2}{*}{Idempotency}
+& Odsetek sukcesów & 91.0\% & 93.24\% & 91.69\% \\
+& Średni czas [s] & 0.38 & 0.78 & 0.92 \\
 \hline
 \end{tabular}
-\caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
+\caption{Porównanie skuteczności oraz średniego czasu uczenia}
 \end{table}
 
-\paragraph{Commutation}
+Zwiększony czas wykonania wynika głównie z zastosowanej heurystyki do wyboru słów dobrze zbalansowanych.
+Jednak całkowity czas uczenia z wykorzystaniem tego podejścia jest znacząco mniejszy niż w przypadku
+dokładnego sprawdzenia, gdzie narzut wykorzystanej heurystyki jest pomijalnie mały. Oznacza to, że pomimo zwiększonego
+średniego czasu uczenia jednego automatu narzut ten nie powinien stanowić problemu w praktycznym wykorzystaniu.
 
-Konfiguracja generatora automatów:
-\begin{verbatim}
-minNumOfStates = 12
-maxNumOfStates = 24
-minNumOfCalls = 3
-maxNumOfCalls = 6
-minNumOfLocals = 2
-maxNumOfLocals = 5
-minNumOfReturns = 3
-maxNumOfReturns = 6
-minNumOfStackSymbols = 9
-maxNumOfStackSymbols = 9
-density = 0.8,
-acceptingStatesDensity = 0.3
-\end{verbatim}
-
-\begin{table}[h]
-\centering
-\begin{tabular}{c|cc|cc}
-\hline
- & \multicolumn{2}{c|}{Bez SRS} & \multicolumn{2}{c}{Z SRS} \\
-N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
-\hline
-$10^5$ & 2607 & 26.07\% & 2589 & 25.89\% \\
-$10^6$ & 0 & 0\% & 0 & 0\% \\
-\hline
-\end{tabular}
-\caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
-\end{table}
-
-\paragraph{Idempotency}
-
-\begin{table}[h]
-\centering
-\begin{tabular}{c|cc|cc}
-\hline
- & \multicolumn{2}{c|}{Bez SRS} & \multicolumn{2}{c}{Z SRS} \\
-N & Liczba błędów & \% błędów & Liczba błędów & \% błędów \\
-\hline
-$10^5$ & 900 & 9.00\% & 831 & 8.31\% \\
-$10^6$ & 0 & 0\% & 0 & 0\% \\
-\hline
-\end{tabular}
-\caption{Porównanie liczby i procentu błędnie wygenerowanych automatów}
-\end{table}
-
-
+Zwiększenie skuteczności podejścia heurystycznego jest szczególnie widoczne w przypadku reguły Cancellation,
+wyniki dla dwóch pozostałych reguł nie wskazują znaczącej poprawy. Jednakże wykorzystanie tej funkcjonalności może
+poprawiać skuteczność, co czyni je wartościową funkcjonalnością w przypadku użycia heurystycznego sprawdzania
+równoważności.

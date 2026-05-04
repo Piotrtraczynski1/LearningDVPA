@@ -1,6 +1,8 @@
 \chapter{Podręcznik użytkownika}
 
-W tym rozdziale opisano sposób kompilacji programu, obsługiwane argumenty programu oraz konfigurację parametrów dotyczących automatów oraz generatorów.
+W tym rozdziale opisano sposób kompilacji programu, obsługiwane argumenty programu oraz konfigurację
+parametrów dotyczących automatów oraz generatorów. Kod źródłowy implementacji jest dostępny w repozytorium:
+\url{https://github.com/Piotrtraczynski1/LearningDVPA}
 
 \section{Uruchomienie programu}
 
@@ -58,8 +60,8 @@ Program zawiera dwa istotne pliki konfiguracyjne:
 \begin{enumerate}
     \item \texttt{utils/Constants.hpp} zawiera m.in. definicje parametrów: \texttt{MaxNumOf\-Automa\-ton\-States}, \texttt{MaxNumOfLetters}
     oraz \texttt{MaxNumOfStackSymbols}, które określają maksymalny rozmiar automatów przyjmowanych przez algorytm. 
-    Zawiera również parametry \texttt{MaxNumOfWellMatchedWordsForSrsCheck} oraz \texttt{MaxNumOf\-Rev\-ealed\-Well\-MatchedWordsForSrsCheck} określające maksymalną ilość dobrze zbalansowancyh słów do sprawdzania
-    zgodności z SRS oraz maksymalną ilość rozważanych słów, które potencjalnie mogą zostać wybrane do sprawdzenia zgodności.
+    Zawiera również parametry \texttt{MaxNumOfWellMatchedWordsForSrsCheck} oraz \texttt{MaxNumOf\-Rev\-ealed\-Well\-MatchedWordsForSrsCheck} określające maksymalną liczbę dobrze zbalansowanych słów do sprawdzania
+    zgodności z SRS oraz maksymalną liczbę rozważanych słów, które potencjalnie mogą zostać wybrane do sprawdzenia zgodności.
 
     \item \texttt{TesterParameters.hpp} zawiera definicję struktury \texttt{TesterParameters} służącej do parametryzowania testu oraz obiekty:
     \texttt{<nazwa\_generatora>Test\-Param\-eters}, które są wykorzystywane podczas wykonywania programu dla odpowiedniego generatora.

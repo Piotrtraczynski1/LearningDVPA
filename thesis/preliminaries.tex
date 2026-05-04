@@ -25,7 +25,7 @@ a funkcja $\delta : Q\times\Sigma\times\Gamma\to Q\times\Gamma^*$ definiuje prze
 Analogicznie do DFA definiujemy domknięcie funkcji $\delta$, jako $\widehat{\delta}: Q\times\Sigma^*\times\Gamma^* \to Q\times\Gamma^*$.
 $$\widehat{\delta}(q, \epsilon, s) = (q, s) \text{,\ gdzie\ } s \in \Gamma^*$$
 $$\widehat{\delta}(q, aw, sB) = \widehat{\delta}(q', w, ss') \text{,\ gdzie\ } \delta(q, a, B) = (q', s') \text{,\ gdzie\ } B\in \Gamma \text{\ i\ } s, s' \in \Gamma^*$$
-Język $L(A)$ generowany przez automat DPDA, to zbiór wszystkich słów $w \in \Sigma^*$, dla których $\widehat{\delta}(q_0, w, \bot) \in F$.
+Język $L(A)$ generowany przez automat DPDA, to zbiór wszystkich słów $w \in \Sigma^*$, dla których istnieją $q'\in F$ oraz $s \in \Gamma^*$ takie, że $\widehat{\delta}(q_0, w, \bot) = (q', s)$.
 Należy zwrócić uwagę, że stos po przeczytaniu słowa $w$ nie musi być pusty, żeby słowo zostało zaakceptowane.
 
 
@@ -53,7 +53,7 @@ przy jednoczesnym umożliwieniu modelowania struktur o zagnieżdżonej naturze.
 zbalansowanym, jeśli w słowie $w$ liczba liter z $\Sigma_{call}$ jest równa liczbie liter z $\Sigma_{return}$ oraz w każdym prefiksie słowa $w$
 liczba liter z $\Sigma_{call}$ jest nie mniejsza niż liczba liter z $\Sigma_{return}$.
 
-\textbf{Relacja prawostronnej kongruencji $\sim$.} To relacja, która spełnia warunek $\forall_{v_1, v_2 \in \Sigma^*} \forall_{a \in \Sigma}(v_1 \sim v_2 \Leftrightarrow v_1a \sim v_2a)$
+\textbf{Relacja prawostronnej kongruencji.} Relacja $\sim$, jest prawostronną kongruencją, gdy spełnia warunek $\forall_{v_1, v_2 \in \Sigma^*} \forall_{a \in \Sigma}(v_1 \sim v_2 \Rightarrow v_1a \sim v_2a)$
 
 \textbf{Twierdzenie Myhilla-Nerode'a \cite{Myhill-Nerode}} podaje konieczne i dostateczne warunki aby język był regularny.
 Definiuje ono relację równoważności $\sim_L \subseteq\Sigma^*\times\Sigma^*$, jako $u \sim_L v \Leftrightarrow \forall_{w \in\Sigma^*}(uw \in L \Leftrightarrow vw \in L)$.

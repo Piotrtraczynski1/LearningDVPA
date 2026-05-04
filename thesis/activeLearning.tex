@@ -50,7 +50,7 @@ W tym podejściu model zakłada naukę nieznanego uczniowi automatu DVPA $T$, zw
 zamiast języka rozpoznawanego poprzez pewien automat z tej klasy. Ponieważ problem minimalizacji DVPA jest NP-trudny \cite{minimalization}
 nie istnieje wielomianowy algorytm w stylu $L^*$ konstruujący minimalny automat. Dlatego to podejście nie gwarantuje minimalizacji automatu.
 Autorzy wykazują również, że sama obserwacja stosu nie wystarczy do stworzenia algorytmu działającego w czasie wielomianowym
-\cite[3.1 Difficulty of adapting $L^*$ to visibly pushdown languages]{main} dlatego algorytm modyfikuję stos automatu w trakcie wczytywania słowa.
+\cite[3.1 Difficulty of adapting $L^*$ to visibly pushdown languages]{main} dlatego algorytm modyfikuje stos automatu w trakcie wczytywania słowa.
 
 W celu umożliwienia manipulacji zawartością stosu autorzy wprowadzają dodatkowe pojęcia związane z kontrolą stosu:
 \begin{description}
@@ -86,7 +86,7 @@ Zapytania zostają również dostosowane do modelu zawierającego litery kontrol
     lub słowem kontrolnym.
 \end{itemize}
 
-Kluczowym jest również wprowadzenie odpowiednika relacji równoważności, która będzie udoskonalana w trakcie działania algorytmu.
+Kluczowe jest również wprowadzenie odpowiednika relacji równoważności, która będzie udoskonalana w trakcie działania algorytmu.
 Dla języków rozpoznawanych przez DVPA Twierdzenie Myhilla-Nerode'a nie może być zastosowane wprost. W szczególności minimalny automat DVPA
 rozpoznający dany język nie jest jednoznaczny, a kanoniczna konstrukcja automatu \cite{canonical} może być wykładniczo większa niż minimalny DVPA.
 
@@ -95,4 +95,4 @@ jest kontrolną prawostronną kongruencją, jeśli:
 $$\text{dla wszystkich słów }w_1, w_2 \in (\Sigma \cup \underline{\Gamma})^* \text{ i } \alpha \in \underline{\Gamma} \cdot \Sigma \text{ } (w_1 \simeq w_2 \Rightarrow w_1\alpha \simeq w_2\alpha)$$
 
 Relacje tego typu stanowią podstawę konstrukcji automatu uczonego przez algorytm. 
-W następnym rozdziale przedstawię konkretną relacje zaproponowaną przez autorów, która została zaimplementowana.
+W następnym rozdziale przedstawiono konkretną relacje zaproponowaną przez autorów, która została zaimplementowana.

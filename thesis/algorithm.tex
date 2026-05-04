@@ -27,7 +27,7 @@ Uczeń jako parametry wejściowe otrzymuje alfabet $\Sigma$ i zbiór symboli sto
 Algorytm utrzymuje dwa zbiory $S \subseteq \Sigma^*$ oraz $C \subseteq Init_1$, gdzie $S$ jest zbiorem selektorów,
 które reprezentują stany w konstruowanym automacie. Zbiór $C$ nazywany zbiorem słów testowych, udoskonala relację $\equiv^{C}_T$ poprzez
 wykluczanie przejść w hipotezie, które nie są poprawne. Algorytm zaczyna działanie z $S = \{\epsilon\}$ oraz $C = \{ \underline{\bot}\epsilon\}$.
-Następnie generuje hipotezę bazując tylko na aktualnym stanie zbiorów $S$ oraz $C$. Wygenerowaną hipotezę przesysyła do nauczyciela przy pomocy
+Następnie generuje hipotezę bazując tylko na aktualnym stanie zbiorów $S$ oraz $C$. Wygenerowaną hipotezę przesyła do nauczyciela przy pomocy
 zapytania $EQ$, jeśli nauczyciel zwróci kontrprzykład algorytm rozszerza $S$ oraz $C$, w sposób, który sprawia, że następna wygenerowania
 hipoteza będzie bardziej zbliżona automatu docelowego. Procedura ta jest powtarzana, aż do skonstruowania poprawnego automatu. 
 
@@ -93,15 +93,15 @@ na równoważne słowo z pojedynczym resetem w następujący sposób:
 
 Na końcu nieokreślone przejścia są kierowane do stanu $\epsilon$ lub stanu, który został oznaczony jako poprawny następnik dla tej konfiguracji
 podczas obsługi kontrprzykładu, co zostanie opisane w następnej sekcji. Skonstruowany w ten sposób automat zachowuje własność rozdzielności, ze względu na restrykcyjność w rozszerzaniu
-zbioru $S$. Własność domkniętności nie musi być zachowana z powodu nieokreślonych przejść, jednakże przekierowanie ich od odpowiedniego stanu
-pozwala nam skonstruować pełny automat określany jako $A^c$.
+zbioru $S$. Własność domkniętości nie musi być zachowana z powodu nieokreślonych przejść, jednakże przekierowanie ich od odpowiedniego stanu
+pozwala skonstruować pełny automat określany jako $A^c$.
 
 \subsection{Obsługa kontrprzykładu}
 Algorytm otrzymując kontrprzykład $w$ powinien rozszerzyć przynajmniej jeden ze zbiorów $S$ oraz $C$ w sposób, który zapewni progres algorytmu
 poprzez dodanie nowego selektora, bądź wykluczenie przejścia, które nie jest poprawne. Odbywa się to poprzez znalezienie podziału $w$ na $vaw'$,
 gdzie $v, w' \in \Sigma^*$ i $a \in \Sigma$, takiego że:
 $$SC_T(v) = SC_{A^c}(v) = u \text{ i } \underline{\bot u}aw' \in \underline{L}(T) \Leftrightarrow s\underline{\bot u}aw' \in \underline{L}(T) \text{, ale}$$
-$$SCT_T(va) \neq SC_{A^c}(va) \text{, albo }$$
+$$SC_T(va) \neq SC_{A^c}(va) \text{, albo }$$
 $$SC_{T}(va) = SC_{A^c}(va) = u' \text{, ale } va\underline{\bot u'}w' \in \underline{L}(T) \neq s' \underline{\bot u'}w' \in \underline{L}(T)$$
 
 Jest to pierwsze miejsce, w którym hipoteza nie zgadza się z automatem docelowym na słowie $w$. W zależności czy niespójność w hipotezie z automatem
@@ -134,13 +134,14 @@ ponieważ dwa słowa, które nie są rozróżniale ze względu na aktualny zbió
 dodaniem do danej listy selektorów słowa, które świadczy o osiągalności z pewnym symbolem na szycie stosu, który nie jest osiągalny w automacie docelowym.
 W konsekwencji prowadziło to do generowania redundantnych stanów w hipotezie.
 
-Następnym rozważanym pomysłem, było utrzymywanie struktury wykluczonych przejść, dla symobli return oraz odwoływanie się do niej,
+Następnym rozważanym pomysłem, było utrzymywanie struktury wykluczonych przejść, dla symboli return oraz odwoływanie się do niej,
 podczas domykania nieokreślonych przejść w automacie.
 
 Finalnie zastosowane zostało podejście, w którym zamiast utrzymywać wykluczone przejścia, utrzymujemy jedno wymuszone przejście do selektora
 równoważnego słowu $va$, selektor taki musi istnieć, ponieważ w przeciwnym przypadku dodalibyśmy nowy selektor w trakcie rozważania tego
-kontrprzykładu. Nie udało się udowonić poprawności tego rozwiązania, jednak nie zostały wykryte żadne przypadki testowe świadczące
-o niepoprawności tego rozwiązania.
+kontrprzykładu. Zastosowana modyfikacja wpływa na sposób generowania kolejnych hipotez i w przeprowadzonych testach
+pozwalała unikać obserwowanych zapętleń algorytmu. Nie udało się jednak formalnie udowodnić,
+że modyfikacja ta w każdym przypadku gwarantuje progres algorytmu.
 
 \section{Nauczyciel}
 
@@ -207,7 +208,7 @@ $$O(|Q|^2|\Gamma|(|\Sigma_{call}| \cdot |Q| + |\Sigma_{return}| + |\Sigma_{local
 Gdzie $Q$ jest zbiorem stanów automatu $P'$ oraz $\Gamma$ jest alfabetem stosowym automatu $P'$,
 a oba te zbiory są kwadratowo większe niż odpowiadające im zbiory w automacie docelowym.
 
-Ilość produkcji udało się zredukować w przybliżeniu o jedną trzecią poprzez wykonanie przeszukiwania wszerz po nieterminalach zaczynając
+Liczbę produkcji udało się zredukować w przybliżeniu o jedną trzecią poprzez wykonanie przeszukiwania wszerz po nieterminalach zaczynając
 od nieterminala początkowego i dodając do gramatyki, jak i kolejki przeszukiwania wszystkie nieterminale, które mogły być utworzone na podstawie
 aktualnie rozważanego. Rozwiązanie to wciąż nie było wystarczające z powodu na pamięć wykorzystywaną do reprezentowania gramatyki.
 
