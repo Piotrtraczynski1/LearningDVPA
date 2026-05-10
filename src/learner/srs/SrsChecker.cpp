@@ -284,6 +284,7 @@ common::Word SrsChecker::checkEquivalence(
 common::Word SrsChecker::prepareCounterexample(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis, const common::Word &word)
 {
+    TIME_MARKER("[SrsChecker]: counterexample found");
     std::cout << "[SrsChecker]: counterexample found: " << word << std::endl;
 
     common::Word firstCandidate{};

@@ -6,34 +6,34 @@ czy formalna specyfikacja protokołu TCP~\cite[6.2 The specification of the TCP 
 wnioskowanie o własnościach przy użyciu narzędzi teorii języków formalnych.
 
 \textbf{Aktywne uczenie się automatów} umożliwia stworzenie takiego modelu na podstawie obserwacji badanego systemu. Podejście to zakłada
-dostęp do systemu w postaci czarnej skrzynki oraz wnioskowanie na podstawie jego odpowiedzi.
+dostęp do systemu w~postaci czarnej skrzynki oraz wnioskowanie na podstawie jego odpowiedzi.
 
-\textbf{Algorytm $L^*$ \cite{Angluin}}, opublikowany w roku 1987 przez Danę Angluin był jednym z pierwszych sukcesów w tej dziedzinie,
+\textbf{Algorytm $L^*$~\cite{Angluin}}, opublikowany w roku 1987 przez Danę Angluin był jednym z~pierwszych sukcesów w tej dziedzinie,
 który przedstawił w jaki sposób można odtworzyć strukturę automatu na podstawie obserwacji. Zakładając możliwość odpowiadania na dwa rodzaje zapytań:
-"Czy słowo $w$ jest akceptowane przez automat?" i "Czy dla zadanego automatu $H$, istnieje słowo, które odróżnia go od uczonego systemu?",
+"Czy słowo $w$ jest akceptowane przez automat?" oraz "Czy dla zadanego automatu $H$, istnieje słowo, które odróżnia go od uczonego systemu?",
 można skonstruować minimalny deterministyczny automat skończony równoważny systemowi na podstawie którego odpowiadamy na zapytania.
 
 \textbf{Automaty ze stosem} stanowią rozszerzenie automatów skończonych o dodatkową pamięć w postaci stosu. Umożliwiają reprezentowanie bardziej
 skomplikowanych systemów, rozwiązujących szerszą gamę problemów, w szczególności te składające się z zagnieżdżonych struktur.
 Jednakże ogólność tych automatów wiąże się z istotnymi ograniczeniami, jak nierozstrzygalność, lub koszt obliczeniowy wielu problemów decyzyjnych.
 
-\textbf{Automaty Visibly Pushdown} stanowią klasę automatów zdefiniowaną w roku 2004 przez Rajeeva Alura i P. Madhusudana \cite{vpl}.
+\textbf{Automaty Visibly Pushdown} stanowią klasę automatów zdefiniowaną w~roku 2004 przez Rajeeva Alura i P. Madhusudana~\cite{vpl}.
 Jej obiekty podobnie jak automaty ze stosem, posiadają nieskończoną pamięć. Ich struktura jednakże jest bardziej przewidywalna,
-co umożliwia wykonywanie m.in. takich operacji jak suma, różnica, czy przekrój dwóch automatów w czasie wielomianowym \cite{vpl}[2.3 Decision problems].
+co umożliwia wykonywanie m.in. takich operacji jak suma, różnica, czy przekrój dwóch automatów w czasie wielomianowym~\cite[2.3 Decision problems]{vpl}.
 
-Automaty visibly pushdown znajdują zastosowanie w wielu systemach komputerowych. Przykładowo mogą służyć do przetwarzania dokumentów XML \cite{xml},
-walidacji plików JSON \cite{json}, czy monitorowania programów w języku C \cite{Cmonitor}. Czyni je to wartościowymi obiektami badań.
+Automaty visibly pushdown znajdują zastosowanie w wielu systemach komputerowych. Przykładowo mogą służyć do przetwarzania dokumentów XML~\cite{xml},
+walidacji plików JSON~\cite{json}, czy monitorowania programów w języku C~\cite{Cmonitor}. Czyni je to wartościowymi obiektami badań.
 
-\textbf{Aktywne uczenie się z dostępem do stosu.} W 2025 roku Jan Otop i Jakub Michaliszyn przedstawili algorytm do aktywnego uczenia się automatów DVPA.
+\textbf{Aktywne uczenie się z dostępem do stosu.} W 2022 roku Jan Otop i Jakub Michaliszyn przedstawili algorytm do aktywnego uczenia się automatów DVPA.
 Algorytm umożliwia poznanie dokładnej struktury automatu DVPA na podstawie obserwacji w wielomianowym czasie. Algorytm wymaga w porównaniu
 do algorytmu $L^*$ dodatkowego zapytania o aktualny stan stosu, jak i możliwości modyfikacji stosu podczas wczytywania słowa przez automat.
 
 Praca przedstawia implementację tego algorytmu oraz analizę jego wydajności pod względem liczby wymaganych zapytań dla różnych klas automatów DVPA.
-Badany jest również wpływ zastosowania wskazówki w postaci reguł przepisywania termów na podstawie pracy \textit{Active Automata Learning with Advice} \cite{srs},
+Badany jest również wpływ zastosowania podpowiedzi w postaci reguł przepisywania słów na podstawie pracy \textit{Active Automata Learning with Advice}~\cite{srs},
 której idea została dostosowana do automatów DVPA.
 
-Pomimo szczegółowego opisu algorytmów w pracy \cite{main}, ich implementacja wymagała dogłębnego zrozumienia idei
+Pomimo szczegółowego opisu algorytmów w pracy~\cite{main}, ich implementacja wymagała dogłębnego zrozumienia idei
 aktywnego uczenia automatów, semantyki automatów visibly pushdown oraz opracowania rozbudowanych mechanizmów
 weryfikacji poprawności. Wynikało to z konieczności zaprojektowania efektywnych struktur danych,
-uzupełnienia brakujących szczegółów implementacyjnych oraz trudności w znajdywaniu powstałych błędów, wynikających z faktu,
+uzupełnienia brakujących szczegółów implementacyjnych oraz trudności w~znajdywaniu powstałych błędów, wynikających z faktu,
 że przewidywanie dokładnego zachowania algorytmu staje się skomplikowane nawet dla niewielkich automatów.

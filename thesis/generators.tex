@@ -1,24 +1,25 @@
 \chapter{Generatory}
 \label{chap:generators}
 
-Ten rozdział zawiera opis generatorów, których celem jest wytworzenie kontrolowanych klas automatów DVPA, które różnią się strukturą stosu oraz
-organizacją przejść, w celu zbadania wpływu tych własności na wydajność aktywnego uczenia.
+W tym rozdziale opisano generatory, których celem jest wytworzenie kontrolowanych klas automatów DVPA.
+Generowane automaty różnią się strukturą stosu oraz organizacją przejść, co umożliwia zbadanie wpływu tych własności
+na wydajność aktywnego uczenia.
 
-Głównie wykorzystywanym generatorem jest generator losowy. Generuje automaty, które należą do klasy DVPA, ale nie nakłada,
-żadnych dodatkowych ograniczeń, dlatego jego struktura nie wymaga dalszego opisu.
+Podstawowym generatorem wykorzystywanym w testach jest generator losowy. Generuje on automaty należące do klasy DVPA,
+nie nakładając na nie żadnych dodatkowych ograniczeń. Z tego powodu jego struktura nie wymaga dalszego opisu.
 
 \section{Generatory sterowane call}
 \label{chap:CDA}
 
-Sekcja ta zawiera opisy cztery rodzai automatów, które były generowane podczas testowania algorytmu. Bazują one na zmodyfikowanych definicjach
-z pracy \textit{Minimizing variants of visibly pushdownautomata} \cite{variants}. Definicje z tej pracy zakładają, że zbiór symboli
-stosowych $\Gamma$ jest równy $Q\times\Sigma_{call}$, daje to pełną swobodę w wyborze symboli stosowych, gdyż jest to maksymalny sensowny
+Sekcja ta zawiera opisy czterech rodzajów automatów, które były generowane podczas testowania algorytmu. Bazują one na zmodyfikowanych definicjach
+z pracy \textit{Minimizing variants of visibly pushdown automata}~\cite{variants}. Definicje z tej pracy zakładają, że zbiór symboli
+stosowych $\Gamma$ jest równy $Q\times\Sigma_{call}$, co daje pełną swobodę w~wyborze symboli stosowych, gdyż jest to maksymalny sensowny
 zbiór symboli stosowych. W tej pracy zakładamy, że $\Gamma$ jest równa $M\times\Sigma_{call}$, gdzie $M$ oznacza zbiór modułów.
 
-Intuicyjnie automaty te przypominają stos wywołań programu, gdzie symbolami call możemy dostać się do innego modułu. Symbole lokalne
-pozostają w tym samym module, a symbole return wracają do modułu z którego został zawołany call.
+Intuicyjnie automaty te przypominają stos wywołań programu, w którym symbole call odpowiadają przejściom do innych modułów.
+Symbole lokalne pozostają w tym samym module, a symbole return powodują powrót do modułu, z którego wykonano wywołanie.
 
-\textbf{Call Driven Automaton} jest to automat dla, którego można zdefiniować funkcję $Target: \Sigma_{call} \rightarrow Q$ i podzielić zbiór
+\textbf{Call Driven Automaton} jest to automat, dla którego można zdefiniować funkcję $Target: \Sigma_{call} \rightarrow Q$ i podzielić zbiór
 stanów $Q$ na $|M|$ parami rozłączonych zbiorów $Q_k$. Stan $q_i$ oznacza stan należący do zbioru $Q_i$. Relacja $\sameModuleRel$ jest zdefiniowana
 w następujący sposób: $v \sameModuleRel v' \Leftrightarrow \exists i (v \in Q_i \land v' \in Q_i)$. Taki automat musi spełniać następujące własności:
 
@@ -35,17 +36,17 @@ w następujący sposób: $v \sameModuleRel v' \Leftrightarrow \exists i (v \in Q
 \end{equation}
 
 
-\textbf{Single Entry Visibly Pushdown automaton} jest klasą automatów, która zawiera się w klasie Call Driven. Dodatkowo jest wymagane żeby
-funkcja $Target$ spełniała warunek: jeśli $Target(c_1) \sameModuleRel Target(c_2)$, to $Target(c_1) = Target(c_2)$.
+\textbf{Single Entry Visibly Pushdown Automaton} jest klasą automatów, która zawiera się w klasie Call Driven. Dodatkowo wymagane
+jest, aby funkcja $Target$ spełniała warunek: jeśli $Target(c_1) \sameModuleRel Target(c_2)$, to $Target(c_1) = Target(c_2)$.
 
-\textbf{Multiple Entry Visibly Pushdown automaton} jest to klasa automatów, która zawiera się w klasie Call Driven.
-Jednakże zbiór $\Gamma = M$, czyli stos przenosi informację tylko o module z którego został zawołany call.
+\textbf{Multiple Entry Visibly Pushdown Automaton} jest to klasa automatów, która zawiera się w klasie Call Driven.
+Jednakże zbiór $\Gamma = M$, czyli stos przenosi informację tylko o module z którego został wywołany call.
 Pozostałe wymagania są zdefiniowane analogicznie do automatów Call Driven.
 
-Automat $A$ w tej formie ma własność, że $lcw \in L(A) \Leftrightarrow cw \in L(A)$, umożliwia to zdefiniowanie prostych reguł SRS,
-które mogą zostać wykorzystane do usprawnienia aktywnego uczenia. Ponieważ wykorzystanie systemu SRS w tej pracy wymaga żeby słowa były
-dobrze zbalansowane ta własność nie została wykorzystana, lecz możliwym jest, że przy alternatywnym wykorzystaniu podpowiedzi, takie reguły
-mogłyby zostać wykorzystane.
+Automat $A$ w tej formie ma własność, że $lcw \in L(A) \Leftrightarrow cw \in L(A)$, gdzie $l \in \Sigma_{local}, c \in \Sigma_{call}$
+oraz $w \in \Sigma^*$. Umożliwia to zdefiniowanie reguł SRS, które mogą zostać wykorzystane do usprawnienia aktywnego uczenia.
+Ponieważ wykorzystanie systemu SRS w tej pracy wymaga, żeby słowa były dobrze zbalansowane, własność ta nie została wykorzystana.
+Jednak możliwe jest, że przy alternatywnym wykorzystaniu podpowiedzi, takie reguły mogłyby zostać wykorzystane.
 
 \textbf{Extended Call Driven Automaton} jest to klasa automatów, która zawiera się zarówno w klasie Multiple Entry, jak i Single Entry.
 Jest zdefiniowana poprzez dostosowanie funkcji $Target$. Automat $A$ należy do klasy Extended Call Driven,
@@ -54,9 +55,9 @@ wtedy i tylko wtedy, gdy $Target(c_1) \sameModuleRel Target(c_2) \Rightarrow c_1
 \section{Generatory wraz z systemem SRS}
 \label{chap:generatorsSrs}
 
-Sekcja ta zawiera opisy trzech rodzajów automatów, które były generowane w celu utworzenia automatów wraz z systemem SRS wynikającym z jego struktury, która
-może odpowiadać automatom rozwiązującym rzeczywiste problemy z naturalnie występującymi własnościami dającymi się zapisać w postaci systemu SRS.
-Z każdym generatorem jest powiązany dokładnie jeden typ reguł SRS.
+Sekcja ta zawiera opis trzech rodzajów automatów generowanych wraz z systemem SRS reprezentującym własności wynikające
+z ich struktury. Własności te mogą odpowiadać naturalnym ograniczeniom występującym w automatach modelujących rzeczywiste
+systemy. Z każdym generatorem powiązany jest dokładnie jeden typ reguł SRS.
 
 \textbf{Commutative} jest to klasa automatów będących produktem dwóch automatów DVPA $A_1 \times A_2$ nad tym samym alfabetem,
 z czego każdy ze zbiorów $\Sigma_{call}$, $\Sigma_{return}$ i $\Sigma_{local}$ jest podzielony na dwa rozłączne podzbiory:
@@ -74,22 +75,22 @@ Stany akceptujące tego automatu są zdefiniowane poprzez alternatywę wykluczaj
 Naturalną interpretacją tej klasy są automaty składające się z dwóch niezależnych komponentów.
 
 
-\textbf{Cancellation} jest to klasa automatów dla których możliwym jest dla pewnych symboli $c \in \Sigma_{call}$ oraz $r \in \Sigma_{return}$ zdefiniowanie
-reguł SRS w następującej postaci:
+\textbf{Cancellation} jest to klasa automatów, dla których możliwe jest dla pewnych symboli $c \in \Sigma_{call}$
+oraz $r \in \Sigma_{return}$ zdefiniowanie reguł SRS w następującej postaci:
 $$cXr \rightarrow \epsilon$$
-Zachowanie to można interpretować jako rozpoczęcie oraz zakończenie komentarza w kodzie. Automaty te są generowane na podstawie generatora losowego, gdzie
+Zachowanie to można interpretować jako rozpoczęcie oraz zakończenie komentarza w~kodzie. Automaty te są generowane na podstawie generatora losowego, gdzie
 alfabet losowo wygenerowanego automatu rozszerza się o dodatkowe litery $c$ i $r$ oraz zbiór symboli stosowych o dodatkowy symbol $B$. Zbiór stanów automatu również zostaje rozszerzony poprzez
-dodanie dla każdego stanu $q \in Q$ jego odpowiednika $q'$, do którego można przejść jedynie za stanu $q$ za pomocą litery $c$, która wkłada na stos symbol $B$.
+dodanie dla każdego stanu $q \in Q$ jego odpowiednika $q'$, do którego można przejść jedynie ze stanu $q$ za pomocą litery $c$, która wkłada na stos symbol $B$.
 Wszystkie przejścia w stanie $q'$ prowadzą również do stanu $q'$, dodając na stos symbol stosowy różny od $B$. Wyjątkiem jest jedynie przejście:
 $(q', r, B) = q$ interpretowane jako zakończenie komentarza.
 
 \textbf{Idempotency} jest to klasa automatów umożliwiająca zdefiniowanie reguł postaci:
 $$ccXrr \rightarrow cXr$$
-Automaty te są wygenerowane poprzez nałożenie dodatkowych obostrzeń na automaty z klasy \textbf{Single Entry Visibly Pushdown automaton}:
+Automaty te są wygenerowane poprzez nałożenie dodatkowych obostrzeń na automaty z klasy \textbf{Single Entry Visibly Pushdown Automaton}:
 \begin{enumerate}
-    \item Wymagane jest żeby wszystkie przejścia dla liter typu call były określone
-    \item Wymagane jest żeby po przeczytaniu litery typu return w konfiguracji $(q_i, (i, c))$ automat przechodzi do stanu $q_i$.
+    \item Wymagane jest, żeby wszystkie przejścia dla liter typu call były określone.
+    \item Wymagane jest, żeby po przeczytaniu litery typu return w konfiguracji $(q_i, (i, c))$ automat przechodzi do stanu $q_i$.
           Czyli wracając do modułu w którym aktualnie się znajduje, nie powinien on zmieniać stanu.
 \end{enumerate}
 Intuicyjnie odpowiada to trybowi działania, którego ponowna aktywacja nie zmienia stanu systemu,
-tak jak ponowne zastosowanie już aktywnego pogrubienia tekstu.
+podobnie jak ponowne zastosowanie już aktywnego pogrubienia tekstu.

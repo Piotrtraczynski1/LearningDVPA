@@ -8,14 +8,26 @@ nauczyciela. Omówiono również najważniejsze decyzje implementacyjne oraz mod
 projektu umożliwiające testowanie algorytmu na przygotowanych klasach automatów.
 
 Drugim istotnym elementem pracy było rozszerzenie algorytmu o wykorzystanie
-więzów opartych na systemach przepisywania termów. W pracy opisano sposób
+więzów opartych na systemach przepisywania słów. W pracy opisano sposób
 adaptacji tej idei do rozważanego modelu automatów DVPA oraz przedstawiono
 implementację mechanizmu sprawdzania zgodności hipotezy z zadanym systemem
 SRS. Przygotowane eksperymenty pozwoliły zbadać wpływ tej funkcjonalności na
-liczbę zadawanych zapytań o równoważność oraz na dokładność uczenia w przypadku
+liczbę zadawanych zapytań o równoważność oraz na skuteczność uczenia w przypadku
 heurystycznego sprawdzania równoważności.
 
-Przeprowadzone eksperymenty pokazały, że ... (TODO)
+Przeprowadzone eksperymenty pokazały, że największy wpływ na liczbę zadawanych
+zapytań ma liczba stanów automatu. Zmiany rozmiaru alfabetu wejściowego oraz
+alfabetu stosowego miały mniejsze znaczenie, przy czym spośród analizowanych
+typów symboli największy wpływ na wydajność algorytmu miała liczba symboli typu
+return. Zaobserwowano również, że średnia liczba zapytań o równoważność była w~przybliżeniu
+równa liczbie stanów uczonego automatu.
+
+Eksperymenty z systemem SRS pokazały, że wykorzystanie dodatkowych podpowiedzi
+ogranicza liczbę kosztownych zapytań o równoważność. Może również prowadzić do
+skrócenia czasu uczenia, szczególnie dla odpowiednio dużych automatów. Dodatkowo może
+wpływać na skuteczność uczenia przy zastosowaniu heurystycznych metod
+sprawdzania równoważności, przy czym uzyskana poprawa w dużej mierze zależy
+od konstrukcji zastosowanych reguł.
 
 Należy zaznaczyć, że przeprowadzona analiza miała charakter eksperymentalny i
 była ograniczona do przygotowanych klas generatorów oraz wybranych konfiguracji

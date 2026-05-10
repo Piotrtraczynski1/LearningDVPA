@@ -7,7 +7,7 @@ namespace benchmark::scenario
 {
 class BaseSrsScenario : public Scenario
 {
-    static constexpr int seed{50};
+    static constexpr int seed{52};
     static constexpr uint16_t numOfIterationsIn2Dim{2};
     const std::string dim1Name{"numOfStates"};
     const std::string dim2Name{"useSrs"};

@@ -1,7 +1,7 @@
-\chapter{String rewriting systems}
+\chapter{System przepisywania słów}
 
-\textbf{Active Automata Learning with Advice \cite{srs}} przedstawia podejście, w którym algorytm aktywnego uczenia się, 
-może dostać dodatkową wskazówkę, dzięki której możliwe jest zredukowanie liczby zapytań kierowanych do nauczyciela.
+W pracy \textit{Active Automata Learning with Advice}~\cite{srs} przedstawiono podejście, w którym algorytm aktywnego uczenia się 
+może otrzymać dodatkową podpowiedź, dzięki której możliwe jest zredukowanie liczby zapytań kierowanych do nauczyciela.
 Autorzy sugerują także w jaki sposób wykorzystać to podejście w innych algorytmach aktywnego uczenia się automatów,
 z wykorzystaniem odpowiednika Twierdzenia Myhilla-Nerode'a.
 
@@ -9,16 +9,16 @@ Podejście to nie wymaga zmian w algorytmie ucznia. Zapytania, które zadaje ucz
 tylko kierowane do systemu, który wnioskuje o nich na podstawie zadanego systemu SRS.
 Jeśli system nie jest w stanie odpowiedzieć na zapytanie, wtedy przekierowuje je do nauczyciela i zwraca jego odpowiedź.
 
-Szczególnie wartościową częścią, z punktu zaprezentowanej w tej pracy implementacji algorytmu
-\textit{Learning Deterministic Visibly Pushdown Automata under Accessible Stack} jest wnioskowanie podczas zapytań o równoważność, 
-które stanowią znaczący narzut czasowy. Zapytania o przynależność nie są kosztowne z punktu widzenia tego algorytmu,
-więc ta cześć nie została wykorzystana.
+Z punktu widzenia implementacji przedstawionej w tej pracy szczególnie istotne jest wnioskowanie
+podczas zapytań o równoważność, które stanowią znaczący narzut czasowy.
+Zapytania o przynależność nie są kosztowne w przypadku rozważanego algorytmu,
+dlatego ta część nie została wykorzystana.
 
 Jan Otop i Michał Fica wprowadzają następujące definicje: system SRS $R$ jest spójny z językiem, wtedy i tylko wtedy,
 gdy dla wszystkich słów $s, t$, jeśli $s \to^*_R t$, to $s \in L \Leftrightarrow t \in L$.
 Podpowiedzią dla algorytmu jest system SRS $R$ spójny z językiem docelowym.
 
-Następnie dowodzą, że, jeśli $R$ jest SRS nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
+Następnie dowodzą, że jeśli $R$ jest SRS nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
 to SRS $R$ jest spójny z $L(A)$ wtedy i tylko wtedy, gdy dla każdego stanu $q \in Q_A$ i każdej reguły
 $l \to r \in R$ mamy $\delta_A(q, l) = \delta_A(q, r)$.
 
@@ -38,8 +38,8 @@ skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
     Musimy ograniczyć się tylko do części osiągalnych konfiguracji.
 \end{enumerate}
 
-Z powodu trudności w zastosowaniu tego podejścia, zostały nałożone dodatkowe obostrzenia na system SRS, który może być wskazówką dla algorytmu.
-Każda reguła postaci $l \rightarrow r$ powinna składać się z słów $l$ oraz $r$, które są dobrze zbalansowane. Ponieważ nie zależą one od stosu,
+Z powodu trudności w zastosowaniu tego podejścia, zostały nałożone dodatkowe obostrzenia na system SRS, który może być podpowiedzią dla algorytmu.
+Każda reguła postaci $l \rightarrow r$ powinna składać się ze słów $l$ oraz $r$, które są dobrze zbalansowane. Ponieważ nie zależą one od stosu,
 ani nie zmieniają jego zawartości, odpowiadają one pewnemu przekształceniu stanów analogicznie jak dla automatów DFA.
 
 Umożliwia to sprawdzenie czy automat jest zgodny z daną regułą $l \rightarrow r$, poprzez sprawdzenie równoważności dwóch automatów $H_l$ oraz $H_r$, utworzonych
@@ -48,19 +48,19 @@ Automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którym znalazłby 
 trafia do stanu w którym znalazłaby się hipoteza po przeczytaniu słowa $r$. Jest to możliwe, gdyż słowa dobrze
 zbalansowane nie zależą od stosu ani go nie modyfikują.
 
-Problemem tego podejścia wydawało się sprawdzanie równoważności, gdyż w aktualnej implementacji jest wykorzystywany ten sam algorytm, który sprawdza
+Problemem tego podejścia wydawało się sprawdzanie równoważności, gdyż w~aktualnej implementacji jest wykorzystywany ten sam algorytm, który sprawdza
 równoważność hipotezy z automatem docelowym. Jednak hipoteza przez znaczący czas trwania algorytmu jest znacznie mniejsza niż automat docelowy, przez co produkt
-$H_l \times H_r$ jest znacząco mniejszy niż $H \times T$, gdzie $T$ jest automatem docelowym. Gwarantuje to, że wykorzystanie tego systemu może przyśpieszyć
-proces uczenia się automatu.
+$H_l \times H_r$ jest znacząco mniejszy niż $H \times T$, gdzie $T$ jest automatem docelowym. W praktyce sprawia to,
+że sprawdzanie zgodności z systemem SRS może być znacznie tańsze niż sprawdzanie równoważności hipotezy z automatem docelowym.
 
-\textbf{Finalne zastosowanie} rozszerza idee systemu o parametryzowane reguły postaci $l_1Xl_2 \rightarrow r_1Xr_2$, reguła ta reprezentuję tożsamość
-$wl_1Xl_2v \in L \Leftrightarrow wr_1Xr_2v \in L$, gdzie $w,v \in \Sigma^*$, $X \in \Sigma^*$ jest słowem dobrze zbalansowanym oraz słowa $l_1l_2, r_1r_2$
+\textbf{Finalne zastosowanie} rozszerza ideę systemu o parametryzowane reguły postaci $l_1Xl_2 \rightarrow r_1Xr_2$, reguła ta reprezentuje tożsamość
+$wl_1Xl_2v \in L \Leftrightarrow wr_1Xr_2v \in L$, gdzie $w,v \in \Sigma^*$, $X \in \Sigma^*$ jest słowem dobrze zbalansowanym oraz słowa $l_1l_2$ i $r_1r_2$
 są dobrze zbalansowane.
 
 Algorytm w celu sprawdzenia zgodności hipotezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia zbioru 
-słów dobrze zbalansowanych, które mogą zostać podstawione jako parametr $X$.
-Ponieważ liczba tych słów powinna być ogarniczona, obliczana jest wartość każdego słowa
-na podstawie której podejmowana jest dezycja czy słowo to powinno zostać wykorzystane.
+słów dobrze zbalansowanych, które mogą zostać podstawione za parametr $X$.
+Ponieważ liczba tych słów powinna być ograniczona, obliczana jest wartość każdego słowa
+na podstawie której podejmowana jest decyzja, czy słowo to powinno zostać wykorzystane.
 Dystansem $dist(w_1, w_2)$ pomiędzy słowami $w_1$ i $w_2$ określamy liczbę takich stanów
 $q \in Q$, że $H(q, \bot, w_1) \neq H(q, \bot, w_2)$.
 Następnie w momencie dodawania słowa do zbioru słów dobrze zbalansowanych określana jest jego wartość,
@@ -73,8 +73,8 @@ po czym sprawdzana jest ich równoważność. Jeżeli istnieje słowo $w$, któr
 z języków generowanych przez automaty $H_l$ oraz $H_r$ to oznacza, że została wykryta niespójność
 z systemem SRS. Należy wtedy skonstruować słowa $w_l$ oraz $w_r$ poprzez podstawienie za wszystkie dodatkowe
 litery lokalne odpowiednio lewej oraz prawej strony reguły SRS odpowiadającej danej literze.
-Ostatecznie jedno tych słów jest poprawnym kontrprzykładem, więc przy pomocy jednego zapytania \textbf{MQ}
-algortm podejmuje decyzje, które słowo należy zwrócić.
+Ostatecznie jedno z tych słów jest poprawnym kontrprzykładem, ponieważ system SRS jest zgodny z automatem docelowym.
+Umożliwia to podjęcie decyzji, które słowo należy zwrócić, przy pomocy jednego zapytania \textbf{MQ}.
 
-Podejście to gwarantuję to, że w przypadku wykrycia niespójności $H$ nie jest zgodne z systemem SRS.
-Jednakże nie daje to gwarancji, że każda niezgodność $H$ z systemem SRS zostanie wykryta.
+Podejście to gwarantuje, że w przypadku wykrycia niespójności hipoteza $H$ nie jest zgodna z systemem SRS.
+Nie gwarantuje jednak wykrycia każdej możliwej niezgodności hipotezy z tym systemem.
