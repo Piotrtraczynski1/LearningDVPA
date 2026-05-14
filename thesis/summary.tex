@@ -3,8 +3,8 @@
 Celem pracy była implementacja oraz analiza wydajności algorytmu aktywnego
 uczenia się deterministycznych automatów visibly pushdown. W ramach pracy
 przedstawiono podstawy teoretyczne dotyczące automatów DVPA oraz aktywnego
-uczenia automatów, a następnie opisano zaimplementowany algorytm ucznia i
-nauczyciela. Omówiono również najważniejsze decyzje implementacyjne oraz moduły
+uczenia automatów, a następnie opisano zaimplementowane algorytmy.
+Omówiono również najważniejsze decyzje implementacyjne oraz moduły
 projektu umożliwiające testowanie algorytmu na przygotowanych klasach automatów.
 
 Drugim istotnym elementem pracy było rozszerzenie algorytmu o wykorzystanie
@@ -21,6 +21,13 @@ alfabetu stosowego miały mniejsze znaczenie, przy czym spośród analizowanych
 typów symboli największy wpływ na wydajność algorytmu miała liczba symboli typu
 return. Zaobserwowano również, że średnia liczba zapytań o równoważność była w~przybliżeniu
 równa liczbie stanów uczonego automatu.
+
+Dodatkowa analiza czasu działania pokazała, że sama liczba zapytań o równoważność
+nie wyjaśnia w pełni całkowitego czasu uczenia. Istotne znaczenie ma również struktura
+przejść automatu docelowego, która może oddziaływać zarówno na koszt poszczególnych
+procedur, jak i na liczbę wymaganych zapytań.
+W szczególności automaty o bardziej rozbudowanej strukturze przejść mogą wymagać
+mniejszej liczby zapytań o równoważność, a jednocześnie dłuższego całkowitego czasu uczenia.
 
 Eksperymenty z systemem SRS pokazały, że wykorzystanie dodatkowych podpowiedzi
 ogranicza liczbę kosztownych zapytań o równoważność. Może również prowadzić do

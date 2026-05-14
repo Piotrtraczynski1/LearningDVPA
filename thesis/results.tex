@@ -28,14 +28,20 @@ dla których poszczególne wyniki zostały zebrane i uśrednione w celu pokazani
 
 \input{plots/baseMetrics}
 
-Na podstawie powyższych wykresów można wnioskować, że dominującym czynnikiem wpływającym na liczbę zadawanych zapytań
-jest liczba stanów automatu. Zmiany alfabetu miały znacznie mniejszy wpływ na liczbę zadawanych zapytań.
-Średnia liczba zapytań $EQ$ jest w przybliżeniu równa liczbie stanów automatu.
-Można także zaobserwować podobieństwo w liczbie zadanych zapytań $MQ$ oraz $SC$. Ponadto zaskakującą obserwacją
-jest podobieństwo wyników przy rosnącej liczbie symboli typu call oraz local. Oczekiwano, że wzrost liczby
-symboli typu call znacząco zwiększy liczbę zapytań w porównaniu z symbolami typu local.
-Można wnioskować, że liczba symboli typu return w porównaniu do call oraz local ma największy wpływ
-na wydajność algorytmu.
+Na podstawie przedstawionych wykresów można wnioskować, że w badanych konfiguracjach dominującym czynnikiem
+wpływającym na liczbę zadawanych zapytań była liczba stanów automatu. Zmiany rozmiaru alfabetu miały
+znacznie mniejszy wpływ na liczbę zapytań.
+Szczególnie niewielki wpływ obserwowano przy zwiększaniu liczby symboli stosowych.
+
+Średnia liczba zapytań typu $EQ$ była w przybliżeniu równa liczbie stanów automatu.
+Liczby zapytań typu $MQ$ oraz $SC$ były do siebie bardzo zbliżone i o około cztery
+rzędy wielkości większe niż liczba zapytań typu $EQ$.
+
+Zaskakującą obserwacją jest podobieństwo wyników dla rosnącej liczby symboli typu
+call oraz local. Oczekiwano, że wzrost liczby symboli typu call znacząco zwiększy
+liczbę zapytań w porównaniu ze wzrostem liczby symboli typu local.
+Wyniki sugerują jednak, że spośród rozważanych zmian alfabetu największy wpływ
+na liczbę koniecznych zapytań miały symbole typu return.
 
 \section{Wpływ SRS}
 
@@ -51,6 +57,7 @@ Przed drugą iteracją ziarno generatora liczb losowych jest ponownie ustawiane 
 identycznych automatów.
 
 \subsection{Podstawowe metryki}
+\label{chap:baseMetrics}
 
 Sekcja ta przedstawia jak poszczególne typy systemów SRS wpłynęły na proces uczenia pod względem liczby zapytań
 equivalence query skierowanych do nauczyciela, oraz czasu działania algorytmu.
@@ -61,7 +68,6 @@ generatorów, które zostały wykorzystane w tej sekcji:
 NumOfCalls = 3
 NumOfLocals = 3
 NumOfReturns = 3
-NumOfStackSymbols = 5
 density = 0.8
 acceptingStatesDensity = 0.3
 \end{verbatim}
@@ -150,3 +156,104 @@ Zwiększenie skuteczności podejścia heurystycznego jest szczególnie widoczne 
 wyniki dla dwóch pozostałych reguł nie wskazują znaczącej poprawy. Jednakże wykorzystanie tej funkcjonalności może
 poprawiać skuteczność, co czyni je wartościową funkcjonalnością w przypadku użycia heurystycznego sprawdzania
 równoważności.
+
+\section{Wpływ struktury automatu}
+
+Analiza w tej sekcji bazuje głównie na tych samych uruchomieniach, które zostały wykorzystane do analizy podstawowych metryk
+dla klas automatów powiązanych z regułami SRS w sekcji~\ref{chap:baseMetrics}. Rozważany jest jedynie wariant,
+który nie wykorzystywał systemu SRS.
+
+W tej sekcji określenie \emph{gęstość przejść} oznacza,
+że przejścia z poszczególnych stanów prowadzą do większej liczby różnych następników,
+zamiast skupiać się wokół niewielkiego zbioru stanów. Nie jest to
+formalna definicja, lecz pomocnicze określenie.
+
+Klasy automatów wygenerowanych w celu przetestowania systemu SRS można uporządkować ze względu na tak
+rozumianą gęstość struktury przejść. Automaty wygenerowane dla reguły commutation cechują się
+najbardziej rozbudowaną siecią połączeń między stanami. Automaty powiązane z regułą idempotency,
+ze względu na przynależność do klasy SEVPA, mają mniej gęstą strukturę przejść.
+Najmniej gęste są automaty związane z regułą cancellation, ponieważ z połowy stanów
+każdego automatu tej klasy można przejść jedynie do dwóch różnych następników,
+z których jednym jest specjalny stan \texttt{sink}.
+
+Należy jednak zaznaczyć, że porównywane klasy automatów różniły się również
+rozmiarem alfabetu stosowego. Wynikało to z dostosowania generatorów do wymagań
+poszczególnych klas. Automaty związane z regułami commutation oraz idempotency
+miały po 16 symboli stosowych, natomiast automaty związane z regułą cancellation
+miały ich 6. Różnice czasowe obserwowane dla reguły cancellation mogą więc wynikać
+zarówno ze struktury przejść, jak i z mniejszego rozmiaru alfabetu stosowego.
+
+Na podstawie wykresów przedstawionych w sekcji~\ref{chap:baseMetrics} można zaobserwować interesującą zależność.
+Czas uczenia był największy dla automatów związanych z~regułą commutation, mimo że wymagały one najmniejszej liczby
+zapytań o równoważność. Z kolei automaty związane z regułą cancellation wymagały największej liczby zapytań
+o równoważność, ale ich średni czas uczenia był najmniejszy lub porównywalny z automatami związanymi z regułą idempotency.
+
+Gęstsza struktura przejść nie musi zwiększać liczby możliwych produkcji w klasycznej konstrukcji gramatyki,
+ponieważ ta zależy głównie od rozmiarów automatu i alfabetów. Może jednak zwiększać liczbę zależności
+faktycznie rozważanych przez zoptymalizowaną procedurę sprawdzania równoważności.
+
+Poniżej przedstawiono średni czas spędzony w kluczowych częściach algorytmu.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|ccc}
+        \hline
+        Liczba stanów & Cancellation & Idempotency & Commutation \\
+        \hline
+        6 & 1.42 [s] & 0.37 [s] & 1.25 [s] \\
+        12 & 2.73 [s] & 1.02 [s] & 5.99 [s] \\
+        18 & 4.37 [s] & 4.26 [s] & 34.46 [s] \\
+        24 & 8.18 [s] & 11.15 [s] & - [s] \\
+        30 & 16.88 [s] & 38.78 [s] & 249.66 [s] \\
+        \hline
+    \end{tabular}
+    \caption{Średni czas spędzony na sprawdzaniu równoważności podczas uczenia się jednego automatu dla różnych klas automatów.}
+\end{table}
+
+\FloatBarrier
+
+Można zaobserwować, że struktura przejść automatu miała istotny wpływ na czas potrzebny do sprawdzania równoważności.
+Różnice te są szczególnie widoczne dla automatów związanych z regułą commutation, dla których czas spędzony na sprawdzaniu
+równoważności rośnie znacznie szybciej niż dla pozostałych klas.
+
+Gęstsza struktura przejść nie musi zwiększać liczby możliwych produkcji w klasycznej konstrukcji gramatyki,
+ponieważ ta zależy przede wszystkim od liczby stanów, alfabetu stosowego oraz alfabetu wejściowego.
+Może jednak zwiększać liczbę zależności faktycznie rozważanych przez zoptymalizowaną procedurę sprawdzania równoważności.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|ccc}
+        \hline
+        Liczba stanów & Cancellation & Idempotency & Commutation \\
+        \hline
+        6 & 5.91 [ms] & 0.91 [ms] & 5.44 [ms] \\
+        12 & 37.36 [ms] & 8.26 [ms] & 24.42 [ms] \\
+        18 & 95.61 [ms] & 40.37 [ms] & 87.64 [ms] \\
+        24 & 218.56 [ms] & 66.56 [ms] & - [ms] \\
+        30 & 343.94 [ms] & 199.76 [ms] & 278.18 [ms] \\
+        \hline
+    \end{tabular}
+    \caption{Średni czas spędzony na generowaniu hipotez podczas uczenia się jednego automatu dla różnych klas automatów.}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|ccc}
+        \hline
+        Liczba stanów & Cancellation & Idempotency & Commutation \\
+        \hline
+        6 & 0.94 [ms] & 0.62 [ms] & 1.48 [ms] \\
+        12 & 3.26 [ms] & 3.14 [ms] & 4.49 [ms] \\
+        18 & 6.39 [ms] & 9.09 [ms] & 11.35 [ms] \\
+        24 & 12.10 [ms] & 12.35 [ms] & - [ms] \\
+        30 & 16.77 [ms] & 25.68 [ms] & 26.37 [ms] \\
+        \hline
+    \end{tabular}
+    \caption{Średni czas spędzony na pojedynczym generowaniu hipotezy dla różnych klas automatów.}
+\end{table}
+
+\FloatBarrier
+
+Z powyższych tabel wynika, że struktura przejść automatu może również wpływać na czas generowania hipotezy.
+Dla automatów charakteryzujących się większą gęstością pojedyncze wykonanie procedury generowania automatu
+jest zwykle droższe czasowo. W tym przypadku istotniejszy wydaje się jednak wpływ rozmiaru alfabetu stosowego.
