@@ -11,7 +11,7 @@ Jeśli system nie jest w stanie odpowiedzieć na zapytanie, wtedy przekierowuje 
 
 Z punktu widzenia implementacji przedstawionej w tej pracy szczególnie istotne jest wnioskowanie
 podczas zapytań o równoważność, które stanowią znaczący narzut czasowy.
-Zapytania o przynależność nie są kosztowne w przypadku rozważanego algorytmu,
+Zapytania o należenie nie są kosztowne w przypadku rozważanego algorytmu,
 dlatego ta część nie została wykorzystana.
 
 Jan Otop i Michał Fica wprowadzają następujące definicje: system SRS $R$ jest spójny z językiem, wtedy i tylko wtedy,
@@ -29,9 +29,11 @@ skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
 \textbf{Problemy z adaptacją tego podejścia.}
 
 \begin{enumerate}
-    \item Zastosowany odpowiednik Twierdzenia Myhilla-Nerode'a dla automatów visibly pushdown nie jest prawo-kongruencją. 
-    Oznacza to, że dwie różne konfiguracje hipotezy $H$ mogą generować dokładnie te same prawostronne języki.
-    Dlatego znalezienie reguły $r \to l \in R$ i konfiguracji $(q, s)$, takich że konfiguracje $H(q, l, s)$ i $H(q, r, s)$
+    \item Zastosowany odpowiednik Twierdzenia Myhilla-Nerode'a dla automatów visibly pushdown nie jest prawą kongruencją.
+    Oznacza to, że dwie różne konfiguracje hipotezy $H$ mogą być nierozróżnialne na podstawie dalszego zachowania automatu.
+    Innymi słowy, rozpoczynając działanie z jednej z tych konfiguracji, hipoteza może rozpoznawać ten sam język,
+    co przy rozpoczęciu działania z drugiej konfiguracji.
+    Dlatego znalezienie reguły $r \to l \in R$ oraz konfiguracji $(q, s)$, takich że konfiguracje $H(q, l, s)$ i $H(q, r, s)$
     się różnią nie gwarantuje nam, że automat nie jest zgodny z systemem SRS $R$.
     
     \item Nie jest możliwe sprawdzenie wszystkich osiągalnych konfiguracji dla hipotezy, bo w ogólności jest ich nieskończenie wiele.

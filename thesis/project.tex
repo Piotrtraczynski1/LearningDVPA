@@ -229,28 +229,33 @@ Przekształcenie automatu $A$ do automatu akceptującego poprzez pusty stos odby
 Po wyznaczeniu stanów akceptujących możemy zdefiniować dla nich dodatkowe przejścia umożliwiające opróżnienie stosu.
 
 \paragraph{Sprawdzanie pustości automatu $A'$}
+Poniżej przedstawiono ideę konwersji automatu $A'$ do gramatyki bezkontekstowej, na której opiera się algorytm
+sprawdzania pustości. W implementacji gramatyka nie jest jednak konstruowana jawnie. Zamiast tego wykorzystano
+tę samą ideę do bezpośredniego wyznaczania generujących nieterminali na podstawie struktury automatu.
+
 Idea konwersji automatu DVPA $A' = (\Sigma', Q, q_0, F, \Gamma, \delta')$ do gramatyki bezkontekstowej $G = (T, N, P, S)$ polega na zdefiniowaniu
 gramatyki w następujący sposób:
 \begin{description}
     \item[$T$] -- Jest to dokładnie zbiór $\Sigma'$
-    \item[$N$] -- Jest to zbiór elementów postaci $[s, B, s']$, gdzie $s, s' \in Q$ oraz $B \in \Gamma$. Rozumiane jako przejście automatem $A'$
-                z konfiguracji $(s, B)$ do stanu $s'$
+    \item[$N$] -- Jest to zbiór elementów postaci $[s, B, s']$, gdzie $s, s' \in Q$ oraz $B \in \Gamma$. Rozumianych jako możliwość przejścia
+                    automatu $A'$ z konfiguracji $(s, B)$ do stanu $s'$
     \item[$P$] -- Dla poszczególnych przejść w automacie $A'$ definiujemy następujące produkcje:
             \begin{itemize}
-                \item Dla $\delta(s, l) = q$ dodajemy produkcje $[s, B, s'] \rightarrow l[q, B, s']$,
+                \item Dla $\delta'(s, l) = q$, gdzie $l \in \Sigma_{local}$ dodajemy produkcje $[s, B, s'] \rightarrow l[q, B, s']$,
                         dla każdego $B \in \Gamma$ oraz każdego $s' \in Q$.
-                \item Dla $\delta(s, B, r) = q$, gdzie $B \in \Gamma$ oraz $B \neq \bot$ dodajemy produkcje $[s, B, q] \rightarrow r$
-                \item Dla $\delta(s, \bot, r) = q$ dodajemy produkcje $[s, \bot, s'] \rightarrow r[q, \bot, s']$.
-                \item Dla $\delta(s, c) = (q, B')$ dodajemy produkcje $[s, B, s'] \rightarrow c[q, B', m][m, B, s']$,
+                \item Dla $\delta'(s, r, B) = q$, gdzie $r \in \Sigma_{return}$, $B \in \Gamma$ oraz $B \neq \bot$ dodajemy produkcję $[s, B, q] \rightarrow r$.
+                \item Dla $\delta'(s, r, \bot) = q$, gdzie $r \in \Sigma_{return}$ dodajemy produkcje $[s, \bot, s'] \rightarrow r[q, \bot, s']$, dla każdego $s' \in Q$.
+                \item Dla $\delta'(s, c) = (q, B')$, gdzie $c \in \Sigma_{call}$ dodajemy produkcje $[s, B, s'] \rightarrow c[q, B', m][m, B, s']$,
                         dla każdego $B \in \Gamma$, każdego $s' \in Q$ oraz każdego $m \in Q$.
-                \item Dla każdego $s \in F$ dodajemy produkcję $[s, \bot, s] \rightarrow \epsilon$
+                \item Dla każdego $s \in F$ dodajemy produkcję $[s, \bot, s] \rightarrow \epsilon$.
             \end{itemize}
     \item[$S$] -- Wyróżniony element, którego produkcje prowadzą do nieterminali $[q_0, \bot, s]$, gdzie $s \in F$.
 \end{description}
 
-Sprawdzenie pustości gramatyki polega na algorytmie w stylu BFS, zaczynającym działanie od oznaczenia nieterminali mających po prawej stronie
-dowolnej produkcji tylko symbole terminalne i oznaczeniu ich jako generujące. Następnie algorytm kontynuuje działanie oznaczając jako generujące
-te nieterminale, które mają po prawej stronie dowolnej produkcji tylko nieterminale generujące.
+Sprawdzenie pustości gramatyki odbywa się za pomocą algorytmu w stylu BFS, który zaczyna działanie od oznaczenia
+jako generujące nieterminali mających po prawej stronie pewnej produkcji tylko symbole terminalne.
+Następnie algorytm kontynuuje działanie oznaczając jako generujące te nieterminale,
+które mają po prawej stronie pewnej produkcji tylko symbole terminalne oraz nieterminale oznaczone jako generujące.
 
 Klasa \texttt{EmptinessChecker} łączy te dwie idee w jedną procedurę bez jawnego konstruowania gramatyki.
 Nieterminale kodowane są jako liczby gęsto rozmieszczone w przedziale $[0, |Q| \cdot |\Gamma| \cdot |Q|]$,
@@ -328,7 +333,7 @@ rozdziale~\ref{chap:generators}.
     \item liczba stanów automatu: \texttt{numOfStates}
     \item liczba poszczególnych symboli alfabetu wejściowego: \texttt{numOfCalls}, \texttt{numOfLocals}, \texttt{numOfReturns}
     \item liczba poszczególnych symboli alfabetu stosowego: \texttt{numOfStackSymbols}
-    \item gęstość przejść w automacie: \texttt{density}
+    \item gęstość przejść w automacie: \texttt{density}, czyli prawdopodobieństwo, że przejście dla danego symbolu w danej konfiguracji zostanie skierowane do stanu innego niż \texttt{sink}
     \item gęstość stanów akceptujących: \texttt{acceptingStatesDensity}
     \item liczba modułów: \texttt{numOfModules}, stosowana tylko dla automatów sterowanych symbolami call (rozdz.~\ref{chap:CDA})
     \item liczba stanów drugiego automatu: \texttt{secondDvpaNumOfStates}, stosowana tylko dla \texttt{CommutativeGenerator} 
@@ -350,7 +355,8 @@ Zbiór stanów akceptujących jest wyznaczany poprzez rozpatrzenie każdego moż
 z prawdopodobieństwem określonym przez parametr \texttt{acceptingStatesDensity}.
 
 Do wygenerowania przejść w automacie dla każdego stanu, bądź konfiguracji w~przypadku symbolu return losujemy czy dane przejście
-będzie zdefiniowane zgodnie z parametrem \texttt{density}. Następnie spośród możliwych następników, wynikających ze specyfiki danego generatora,
+będzie zdefiniowane zgodnie z parametrem \texttt{density}. Jeżeli przejście nie zostanie zdefiniowane, pozostaje ono przejściem
+do specjalnego stanu \texttt{sink}. Następnie spośród możliwych następników wynikających ze specyfiki danego generatora,
 losowo wybierany jest stan docelowy. W przypadku symboli typu call losowany jest również symbol stosowy z uwzględnieniem specyfiki danego generatora.
 
 System SRS jest generowany tylko dla wybranych generatorów, gdy wynika to bezpośrednio z definicji generowanej klasy automatów DVPA.

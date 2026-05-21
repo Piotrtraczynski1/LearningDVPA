@@ -151,6 +151,10 @@ Zwiększony czas wykonania wynika głównie z zastosowanej heurystyki do wyboru 
 Jednak całkowity czas uczenia z wykorzystaniem tego podejścia jest znacząco mniejszy niż w przypadku
 dokładnego sprawdzenia, gdzie narzut wykorzystanej heurystyki jest pomijalnie mały. Oznacza to, że pomimo zwiększonego
 średniego czasu uczenia jednego automatu narzut ten nie powinien stanowić problemu w praktycznym wykorzystaniu.
+Ponadto w przypadku, gdyby nauczyciel był zrealizowany jako zewnętrzny system,
+koszt zapytań do nauczyciela mógłby być znacząco większy. W takiej sytuacji
+wykorzystanie systemu SRS mogłoby przynieść większą korzyść, ponieważ sprawdzanie
+zgodności z regułami nadal opierałoby się na lokalnie skonstruowanym automacie.
 
 Zwiększenie skuteczności podejścia heurystycznego jest szczególnie widoczne w przypadku reguły Cancellation,
 wyniki dla dwóch pozostałych reguł nie wskazują znaczącej poprawy. Jednakże wykorzystanie tej funkcjonalności może

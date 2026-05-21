@@ -5,7 +5,7 @@ języka docelowego $L$. Algorytm konstruujący automat $H$, nazywany hipotezą, 
 
 W klasycznym modelu Angluin~\cite{Angluin} nauczyciel odpowiada na dwa typy zapytań:
 \begin{itemize}
-  \item \textbf{zapytanie o przynależność (ang. membership query) $MQ(w)$} -- zapytanie o to, czy dane słowo $w$ należy do języka $L$.
+  \item \textbf{zapytanie o należenie (ang. membership query) $MQ(w)$} -- zapytanie o to, czy dane słowo $w$ należy do języka $L$.
   \item \textbf{zapytanie o równoważność (ang. equivalence query) $EQ(H)$} --  zapytanie o to, czy skonstruowana hipoteza $H$ generuje język $L$.
 \end{itemize}
 W odpowiedzi na zapytanie o równoważność nauczyciel może ją potwierdzić, co kończy działanie algorytmu, albo zwrócić kontrprzykład,
@@ -41,7 +41,7 @@ Algorytm zaczyna działanie z $S = \{\epsilon\}$ i $C = \emptyset$, które speł
 \end{enumerate}
 
 Jeśli docelowy automat ma $n$ stanów, a najdłuższy zwrócony przez nauczyciela kontrprzykład $m$ liter to algorytm zadaje
-$O(n)$ zapytań o równoważność i $O(mn^2)$ zapytań o przynależność do języka~\cite{Angluin}.
+$O(n)$ zapytań o równoważność i $O(mn^2)$ zapytań o należenie do języka~\cite{Angluin}.
 
 
 \textbf{Aktywne Uczenie z Resetami} jest rozszerzeniem modelu aktywnego uczenia zaproponowanym przez Jana Otopa i Jakuba Michaliszyna
@@ -80,7 +80,7 @@ Zapytania zostają również dostosowane do modelu zawierającego litery kontrol
     \item \textbf{zapytanie o równoważność $EQ(H)$}. Nauczyciel powinien zwrócić słowo standardowe, rozróżniające język $L(H)$ od języka $L(T)$,
     gdy takie istnieje.
 
-    \item \textbf{zapytanie o przynależność $MQ(w)$}. Nauczyciel powinien odpowiedzieć czy słowo $w$ będące słowem standardowym,
+    \item \textbf{zapytanie o należenie $MQ(w)$}. Nauczyciel powinien odpowiedzieć czy słowo $w$ będące słowem standardowym,
     lub słowem kontrolnym należy do języka $\underline{L}(T)$.
 
     \item \textbf{zapytanie o stos $SC(w)$}. Nauczyciel powinien zwrócić zawartość stosu po przeczytaniu słowa $w$ będącego słowem standardowym,
