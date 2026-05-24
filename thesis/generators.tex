@@ -19,7 +19,7 @@ zbiór symboli stosowych. W tej pracy zakładamy, że $\Gamma$ jest równa $M\ti
 Intuicyjnie automaty te przypominają stos wywołań programu, w którym symbole call odpowiadają przejściom do innych modułów.
 Symbole lokalne pozostają w tym samym module, a symbole return powodują powrót do modułu, z którego wykonano wywołanie.
 
-\textbf{Call Driven Automaton} jest to automat, dla którego można zdefiniować funkcję $Target: \Sigma_{call} \rightarrow Q$ i podzielić zbiór
+\textbf{Call Driven Automaton} jest to automat, dla którego można zdefiniować funkcję $\operatorname{Target}: \Sigma_{call} \rightarrow Q$ i podzielić zbiór
 stanów $Q$ na $|M|$ parami rozłączonych zbiorów $Q_k$. Stan $q_i$ oznacza stan należący do zbioru $Q_i$. Relacja $\sameModuleRel$ jest zdefiniowana
 w następujący sposób: $v \sameModuleRel v' \Leftrightarrow \exists i (v \in Q_i \land v' \in Q_i)$. Taki automat musi spełniać następujące własności:
 
@@ -27,7 +27,7 @@ w następujący sposób: $v \sameModuleRel v' \Leftrightarrow \exists i (v \in Q
 \begin{equation}
 \begin{aligned}
     \delta(q_i, c) &= (q_j, s),
-    && \text{gdzie } c \in \Sigma_{call},\ q_j = Target(c),\ s = (i, c) \\
+    && \text{gdzie } c \in \Sigma_{call},\ q_j = \operatorname{Target}(c),\ s = (i, c) \\
     \delta(q_i^{1}, l) &= (q_i^{2}),
     && \text{gdzie } l \in \Sigma_{local} \\
     \delta(q_i, (j, c), r) &= (q_j),
@@ -37,7 +37,7 @@ w następujący sposób: $v \sameModuleRel v' \Leftrightarrow \exists i (v \in Q
 
 
 \textbf{Single Entry Visibly Pushdown Automaton} jest klasą automatów, która zawiera się w klasie Call Driven. Dodatkowo wymagane
-jest, aby funkcja $Target$ spełniała warunek: jeśli $Target(c_1) \sameModuleRel Target(c_2)$, to $Target(c_1) = Target(c_2)$.
+jest, aby funkcja $\operatorname{Target}$ spełniała warunek: jeśli $\operatorname{Target}(c_1) \sameModuleRel \operatorname{Target}(c_2)$, to $\operatorname{Target}(c_1) = \operatorname{Target}(c_2)$.
 
 \textbf{Multiple Entry Visibly Pushdown Automaton} jest to klasa automatów, która zawiera się w klasie Call Driven.
 Jednakże zbiór $\Gamma = M$, czyli stos przenosi informację tylko o module z którego został wywołany call.
@@ -49,8 +49,8 @@ Ponieważ wykorzystanie systemu SRS w tej pracy wymaga, żeby słowa były dobrz
 Jednak możliwe jest, że przy alternatywnym wykorzystaniu podpowiedzi, takie reguły mogłyby zostać wykorzystane.
 
 \textbf{Extended Call Driven Automaton} jest to klasa automatów, która zawiera się zarówno w klasie Multiple Entry, jak i Single Entry.
-Jest zdefiniowana poprzez dostosowanie funkcji $Target$. Automat $A$ należy do klasy Extended Call Driven,
-wtedy i tylko wtedy, gdy $Target(c_1) \sameModuleRel Target(c_2) \Rightarrow c_1 = c_2$.
+Jest zdefiniowana poprzez dostosowanie funkcji $\operatorname{Target}$. Automat $A$ należy do klasy Extended Call Driven
+wtedy i tylko wtedy, gdy $\operatorname{Target}(c_1) \sameModuleRel \operatorname{Target}(c_2) \Rightarrow c_1 = c_2$.
 
 \section{Generatory wraz z systemem SRS}
 \label{chap:generatorsSrs}

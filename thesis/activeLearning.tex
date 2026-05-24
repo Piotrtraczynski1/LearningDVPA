@@ -1,12 +1,20 @@
 \chapter{Aktywne uczenie automatów}
 
+Rozdział ten ma na celu przedstawienie ogólnego kontekstu aktywnego uczenia automatów, na którym opiera się dalsza
+część pracy. Najpierw omówiony zostanie klasyczny model aktywnego uczenia automatów DFA oraz jego rozszerzenie
+o dodatkową podpowiedź w postaci systemu SRS. Następnie przedstawione zostaną najważniejsze modyfikacje
+konieczne przy przejściu od automatów DFA do automatów DVPA. Na końcu rozdziału krótko opisano rozwiązania heurystyczne
+wykorzystane w implementacji przedstawionej w tej pracy.
+
+\section{Uczenie się automatów DFA z poradą}
+
 \textbf{Model aktywnego uczenia} zakłada istnienie nauczyciela, który potrafi odpowiadać na określony zestaw zapytań dotyczących nieznanego
 języka docelowego $L$. Algorytm konstruujący automat $H$, nazywany hipotezą, który docelowo powinien rozpoznawać język $L$, nazywany jest uczniem. 
 
 W klasycznym modelu Angluin~\cite{Angluin} nauczyciel odpowiada na dwa typy zapytań:
 \begin{itemize}
-  \item \textbf{zapytanie o należenie (ang. membership query) $MQ(w)$} -- zapytanie o to, czy dane słowo $w$ należy do języka $L$.
-  \item \textbf{zapytanie o równoważność (ang. equivalence query) $EQ(H)$} --  zapytanie o to, czy skonstruowana hipoteza $H$ generuje język $L$.
+  \item \textbf{zapytanie o należenie (ang. membership query) $MQ(w)$} -- zapytanie o~to, czy dane słowo $w$ należy do języka $L$.
+  \item \textbf{zapytanie o równoważność (ang. equivalence query) $EQ(H)$} --  zapytanie o to, czy skonstruowana hipoteza $H$ rozpoznaje język $L$.
 \end{itemize}
 W odpowiedzi na zapytanie o równoważność nauczyciel może ją potwierdzić, co kończy działanie algorytmu, albo zwrócić kontrprzykład,
 czyli słowo, które należy do dokładnie jednego z języków $L$ oraz $L(H)$.
@@ -43,15 +51,40 @@ Algorytm zaczyna działanie z $S = \{\epsilon\}$ i $C = \emptyset$, które speł
 Jeśli docelowy automat ma $n$ stanów, a najdłuższy zwrócony przez nauczyciela kontrprzykład $m$ liter to algorytm zadaje
 $O(n)$ zapytań o równoważność i $O(mn^2)$ zapytań o należenie do języka~\cite{Angluin}.
 
+\textbf{Uczenie się DFA z poradą.} W pracy \textit{Active Automata Learning with Advice}~\cite{srs} przedstawiono podejście,
+w którym algorytm aktywnego uczenia się może otrzymać dodatkową podpowiedź, dzięki której możliwe jest zredukowanie
+liczby zapytań kierowanych do nauczyciela.
 
-\textbf{Aktywne Uczenie z Resetami} jest rozszerzeniem modelu aktywnego uczenia zaproponowanym przez Jana Otopa i Jakuba Michaliszyna
-\cite[5. Learning with resets, 6. Learning with a single reset]{main}.
+Podejście to nie wymaga zmian w algorytmie ucznia. Zapytania które zadaje uczeń, nie są wprost przekazywane do nauczyciela,
+tylko kierowane do systemu, który wnioskuje o nich na podstawie zadanego systemu SRS spójnego z językiem $L$.
+Jeśli system nie jest w stanie odpowiedzieć na zapytanie, wtedy przekierowuje je do nauczyciela i zwraca jego odpowiedź.
+
+Autorzy dowodzą, że jeśli $R$ jest SRS nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
+to SRS $R$ jest spójny z $L(A)$ wtedy i tylko wtedy, gdy dla każdego stanu $q \in Q_A$ i każdej reguły
+$l \to r \in R$ mamy $\delta_A(q, l) = \delta_A(q, r)$.
+
+Ta obserwacja umożliwia przeiterowanie się po konfiguracjach hipotezy $H$ i~regułach systemu SRS $R$ w celu wykrycia
+niespójności hipotezy z systemem. Jeżeli dla stanu $q \in Q_H$ oraz reguły $l \to r \in R$ zachodzi
+$H(q,l) \neq H(q,r)$, to można obliczyć najkrótsze słowa $u, v \in \Sigma^*$, takie że $\delta_H(q_0, u) = q$ oraz $v$
+rozróżnia stany $\delta_H(q, l)$ i $\delta_H(q, r)$. Wtedy jedno ze słów $ulv$ i $urv$ jest poprawnym kontrprzykładem,
+do wybrania odpowiedniego słowa wystarczy jedno zapytanie $MQ$.
+
+\section{Aktywne uczenie się automatów DVPA}
+
+\textbf{Aktywne uczenie z resetami} jest rozszerzeniem modelu aktywnego uczenia zaproponowanym przez
+Jana Otopa i Jakuba Michaliszyna \cite[5. Learning with resets, 6. Learning with a single reset]{main}.
+Przejście z aktywnego uczenia DFA do aktywnego uczenia DVPA wymaga kilku istotnych zmian.
 
 W tym podejściu model zakłada naukę nieznanego uczniowi automatu DVPA $T$, zwanego automatem docelowym,
-zamiast języka rozpoznawanego poprzez pewien automat z tej klasy. Ponieważ problem minimalizacji DVPA jest NP-trudny~\cite{minimization}
-nie istnieje wielomianowy algorytm w stylu $L^*$ konstruujący minimalny automat. Dlatego to podejście nie gwarantuje minimalizacji automatu.
-Autorzy wykazują również, że sama obserwacja stosu nie wystarczy do stworzenia algorytmu działającego w czasie wielomianowym
-\cite[3.1 Difficulty of adapting $L^*$ to visibly pushdown languages]{main} dlatego algorytm modyfikuje stos automatu w trakcie wczytywania słowa.
+zamiast języka rozpoznawanego poprzez pewien automat z tej klasy.
+
+Ponieważ problem minimalizacji DVPA jest NP-trudny~\cite{minimization}, przy założeniu $P \neq NP$
+nie istnieje wielomianowy algorytm w stylu $L^*$ konstruujący minimalny automat.
+Dlatego podejście to nie gwarantuje minimalizacji automatu.
+
+Autorzy wykazują również, że sama obserwacja stosu nie wystarczy do stworzenia algorytmu działającego
+w czasie wielomianowym \cite[3.1 Difficulty of adapting $L^*$ to visibly pushdown languages]{main}.
+Dlatego algorytm modyfikuje stos automatu w~trakcie wczytywania słowa.
 
 W celu umożliwienia manipulacji zawartością stosu autorzy wprowadzają dodatkowe pojęcia związane z kontrolą stosu:
 \begin{description}
@@ -62,7 +95,7 @@ W celu umożliwienia manipulacji zawartością stosu autorzy wprowadzają dodatk
 
     \item[Słowo standardowe] jest to słowo nad alfabetem $\Sigma$, nie zawiera ono liter kontrolnych.
 
-    \item[Słowo kontrolne] jest to słowo składające się zarówno z liter z alfabetu $\Sigma$, jak również liter kontrolnych
+    \item[Słowo kontrolne] jest to słowo składające się zarówno z liter z alfabetu $\Sigma$, jak również liter kontrolnych.
 
     \item[Słowo z pojedynczym resetem] jest to słowo zawierające dokładnie jedną literę kontrolną. Zbiór wszystkich słów z pojedynczym
       resetem nad alfabetem $\Sigma$ i $\Gamma$ oznaczamy jako $Reset_1^{\Sigma, \Gamma}$.
@@ -70,7 +103,7 @@ W celu umożliwienia manipulacji zawartością stosu autorzy wprowadzają dodatk
     \item[Słowo z pojedynczym resetem inicjalizującym] jest to słowo z pojedynczym resetem, którego pierwszą literą jest litera kontrolna.
       Zbiór tych słów oznaczamy jako $Init_1^{\Sigma,\Gamma}$. Dla uproszczenia notacji, indeks górny będzie pomijany.
 \end{description}
-Poprzez $\underline{L}(A)$ oznaczamy język generowany przez automat nad alfabetem zawierającym litery kontrolne.
+Poprzez $\underline{L}(A)$ oznaczamy język rozpoznawany przez automat nad alfabetem zawierającym litery kontrolne.
 
 Zbiór zapytań na jakie powinien odpowiadać nauczyciel w tym modelu zostaje rozszerzony o dodatkowe zapytanie: zapytanie o stos $SC(w)$,
 w odpowiedzi na to zapytanie nauczyciel powinien zwrócić zawartość stosu automatu docelowego po przeczytaniu słowa $w$.
@@ -97,3 +130,54 @@ $$\text{dla wszystkich słów }w_1, w_2 \in (\Sigma \cup \underline{\Gamma})^* \
 
 Relacje tego typu stanowią podstawę konstrukcji automatu uczonego przez algorytm. 
 W następnym rozdziale przedstawiono konkretną relację zaproponowaną przez autorów, która została zaimplementowana.
+
+\textbf{Uczenie się DVPA z poradą.}
+Podejście aktywnego uczenia z poradą można przenieść również na języki visibly pushdown.
+W pracy \textit{Learning Visibly Pushdown Languages under Rewriting Rules}~\cite{SrsDvpa} zaproponowano
+wykorzystanie systemów SRS dla automatów DVPA.
+
+W przypadku języków visibly pushdown istotne jest jednak to, że słowa mają dodatkową strukturę wynikającą z dopasowania
+symboli typu call i return. Dlatego nie każda reguła przepisywania jest naturalna z punktu widzenia języków visibly pushdown.
+Reguły powinny zachowywać strukturę dopasowań poza przepisywanym fragmentem słowa. Dlatego rozważane są systemy
+SRS zachowujące dopasowanie. W tej pracy implementacyjnie ograniczamy się do dobrze zbalansowanych systemów SRS,
+które stanowią szczególny przypadek systemów zachowujących dopasowanie.
+
+Autorzy wskazują również~\cite[Example 4]{SrsDvpa}, że niektóre naturalne własności języków visibly pushdown
+nie mogą być wyrażone za pomocą skończonego systemu zwykłych reguł SRS. Z tego powodu wprowadzane
+są reguły ze zmiennymi, w których za zmienne podstawiane są słowa dobrze zbalansowane. Taka reguła reprezentuje
+zbiór wszystkich zwykłych reguł otrzymanych przez podstawienie za zmienną dowolnego słowa dobrze zbalansowanego.
+
+Opis sposobu sprawdzania spójności hipotezy z systemem SRS oraz zastosowane uproszczenia implementacyjne
+przedstawiono w rozdziale~\ref{chap:srs}
+
+\section{Heurystyki wykorzystane w implementacji}
+
+W implementacji zastosowano kilka rozwiązań o charakterze heurystycznym. Nie zmieniają one ogólnego modelu aktywnego uczenia,
+ale wpływają na praktyczne działanie programu oraz interpretację wyników eksperymentalnych. Szczegóły tych
+rozwiązań opisano w kolejnych rozdziałach przy omawianiu odpowiednich elementów implementacji.
+
+\textbf{Algorytm ucznia.}
+Pierwszym rozwiązaniem heurystycznym jest dodanie wymuszonych przejść.
+Procedura ta została opisana w podrozdziale~\ref{chap:counterexample} W trakcie implementacji zaobserwowano,
+że w~rzadkich przypadkach algorytm może zapętlać się podczas obsługi kontrprzykładów
+związanych z przejściami typu return. Całkowite wyeliminowanie tego problemu wymagałoby
+istotnych zmian w sposobie generowania hipotezy, które mogłyby znacząco zwiększyć koszt działania algorytmu.
+
+Z tego powodu zastosowano heurystyczny mechanizm wymuszonych przejść. Rozwiązanie to pozwala niemal
+całkowicie uniknąć zapętleń w praktycznych przypadkach testowych, wprowadzając niezauważalny narzut czasowy.
+
+\textbf{Sprawdzanie spójności z systemem SRS.}
+Drugim rozwiązaniem heurystycznym jest uproszczenie sprawdzania spójności hipotezy z systemem SRS.
+Oryginalne podejście wymaga symbolicznego uwzględnienia wszystkich możliwych podstawień słów dobrze
+zbalansowanych za zmienne. W implementacji zamiast tego konstruowany jest ograniczony zbiór słów
+dobrze zbalansowanych. Słowa do tego zbioru wybierane są heurystycznie, tak aby premiować słowa prowadzące
+w hipotezie do możliwie różnych zachowań.
+
+Takie podejście zachowuje poprawność wykrytych niespójności. Oznacza to, że jeśli algorytm wykryje
+niespójność, to hipoteza rzeczywiście nie jest zgodna z systemem SRS. Nie gwarantuje jednak wykrycia
+każdej możliwej niespójności, ponieważ rozważany jest tylko ograniczony zbiór podstawień za zmienną.
+
+\textbf{Heurystyczne sprawdzanie równoważności.}
+W części eksperymentów wykorzystano również przybliżone sprawdzanie równoważności przez testowanie
+losowo generowanych słów. Takie podejście może znacząco skrócić czas uczenia, ale nie gwarantuje, że
+znaleziony automat jest równoważny docelowemu.

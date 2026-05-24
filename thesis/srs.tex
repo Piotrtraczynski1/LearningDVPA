@@ -1,82 +1,67 @@
 \chapter{System przepisywania słów}
+\label{chap:srs}
 
-W pracy \textit{Active Automata Learning with Advice}~\cite{srs} przedstawiono podejście, w którym algorytm aktywnego uczenia się 
-może otrzymać dodatkową podpowiedź, dzięki której możliwe jest zredukowanie liczby zapytań kierowanych do nauczyciela.
-Autorzy sugerują także w jaki sposób wykorzystać to podejście w innych algorytmach aktywnego uczenia się automatów,
-z wykorzystaniem odpowiednika Twierdzenia Myhilla-Nerode'a.
+W tym rozdziale opisano sposób wykorzystania systemu SRS jako dodatkowej podpowiedzi w procesie aktywnego uczenia automatów DVPA.
+W implementacji rozważane są dobrze zbalansowane systemy SRS z co najwyżej jedną zmienną, które stanowią szczególny
+przypadek systemów zachowujących dopasowanie ze zmiennymi. Wymagane jest, żeby system SRS $R$ był spójny z językiem
+rozpoznawanym przez automat docelowy $T$. Celem wykorzystania systemu SRS jest wykrywanie błędnych hipotez przed wykonaniem
+kosztownego zapytania o równoważność do nauczyciela.
 
-Podejście to nie wymaga zmian w algorytmie ucznia. Zapytania, które zadaje uczeń nie są wprost przekazywane do nauczyciela,
-tylko kierowane do systemu, który wnioskuje o nich na podstawie zadanego systemu SRS.
-Jeśli system nie jest w stanie odpowiedzieć na zapytanie, wtedy przekierowuje je do nauczyciela i zwraca jego odpowiedź.
+\section{Sprawdzanie spójności hipotezy z systemem SRS}
 
-Z punktu widzenia implementacji przedstawionej w tej pracy szczególnie istotne jest wnioskowanie
-podczas zapytań o równoważność, które stanowią znaczący narzut czasowy.
-Zapytania o należenie nie są kosztowne w przypadku rozważanego algorytmu,
-dlatego ta część nie została wykorzystana.
+Algorytm zaczyna od skonstruowania dwóch automatów $H_{\alpha}$ oraz $H_{\beta}$, które początkowo są kopiami hipotezy $H$.
+Następnie dla każdej reguły $l_1Xl_2 \to r_1Xr_2 \in R$ (odpowiednio $l_1Xl_2 \to r \in R$, gdy zmienna nie występuje po prawej stronie)
+oraz dla każdego rozważanego słowa dobrze zbalansowanego $w$ dodaje nową literę lokalną $l'$ do automatów $H_{\alpha}$ oraz $H_{\beta}$.
 
-Jan Otop i Michał Fica wprowadzają następujące definicje: system SRS $R$ jest spójny z językiem, wtedy i tylko wtedy,
-gdy dla wszystkich słów $s, t$, jeśli $s \to^*_R t$, to $s \in L \Leftrightarrow t \in L$.
-Podpowiedzią dla algorytmu jest system SRS $R$ spójny z językiem docelowym.
+Automat $H_{\alpha}$ po przeczytaniu litery $l'$ trafia do stanu, w którym znalazłby się automat $H$ po
+przeczytaniu słowa $l_1wl_2$. Analogicznie, automat $H_{\beta}$ po przeczytaniu litery $l'$ trafia do stanu,
+w którym znalazłby się automat $H$ po przeczytaniu słowa $r_1wr_2$ (odpowiednio $r$).
+Jest to możliwe, ponieważ słowa $l_1wl_2$ oraz $r_1wr_2$ (odpowiednio $r$) są dobrze zbalansowane.
+Przeczytanie takiego słowa nie zmienia początkowej zawartości stosu, a jego wpływ na automat można traktować
+jak przejście po literze lokalnej. Algorytm przechowuje również informację, z którą regułą oraz z którym słowem
+dobrze zbalansowanym powiązana jest dodana litera $l'$.
 
-Następnie dowodzą, że jeśli $R$ jest SRS nad $\Sigma$ i $A$ jest minimalnym DFA również nad $\Sigma$,
-to SRS $R$ jest spójny z $L(A)$ wtedy i tylko wtedy, gdy dla każdego stanu $q \in Q_A$ i każdej reguły
-$l \to r \in R$ mamy $\delta_A(q, l) = \delta_A(q, r)$.
+Po rozszerzeniu alfabetu obu automatów o litery odpowiadające wszystkim rozważanym instancjom reguł sprawdzana
+jest równoważność automatów $H_{\alpha}$ oraz $H_{\beta}$. Jeżeli istnieje słowo $u$, które należy do dokładnie jednego
+z języków rozpoznawanych przez te automaty, oznacza to wykrycie niespójności hipotezy z systemem SRS.
 
-Ta obserwacja umożliwia przeiterowanie się po konfiguracjach automatu DFA i regułach systemu SRS $R$ w celu wykrycia niespójności hipotezy z systemem.
-Następnie pokazują jak znając stan $q \in Q_A$ i $l \to r \in R$, takie że tylko jeden ze stanów $H(q, l)$ i $H(q, r)$ należy do $F_H$
-skonstruować kontrprzykład przy użyciu dokładnie jednego zapytania $MQ$.
+Następnie konstruowane są słowa $u_{\alpha}$ oraz $u_{\beta}$ nad oryginalnym alfabetem. Powstają one przez zastąpienie
+każdej dodatkowej litery lokalnej odpowiednio lewą lub prawą stroną reguły SRS, po podstawieniu za zmienną słowa
+dobrze zbalansowanego powiązanego z tą literą.
+Ponieważ system SRS jest spójny z językiem automatu docelowego, słowa $u_{\alpha}$ oraz $u_{\beta}$ powinny albo oba należeć do języka $L(T)$,
+albo oba do niego nie należeć. Ponieważ dokładnie jedno z nich należy do $L(H)$, to jedno z tych słów jest
+poprawnym kontrprzykładem. Wybór właściwego słowa należy ustalić za pomocą jednego zapytania $MQ$.
 
-\textbf{Problemy z adaptacją tego podejścia.}
+\section{Obliczanie zbioru słów dobrze zbalansowanych}
 
-\begin{enumerate}
-    \item Zastosowany odpowiednik Twierdzenia Myhilla-Nerode'a dla automatów visibly pushdown nie jest prawą kongruencją.
-    Oznacza to, że dwie różne konfiguracje hipotezy $H$ mogą być nierozróżnialne na podstawie dalszego zachowania automatu.
-    Innymi słowy, rozpoczynając działanie z jednej z tych konfiguracji, hipoteza może rozpoznawać ten sam język,
-    co przy rozpoczęciu działania z drugiej konfiguracji.
-    Dlatego znalezienie reguły $r \to l \in R$ oraz konfiguracji $(q, s)$, takich że konfiguracje $H(q, l, s)$ i $H(q, r, s)$
-    się różnią nie gwarantuje nam, że automat nie jest zgodny z systemem SRS $R$.
-    
-    \item Nie jest możliwe sprawdzenie wszystkich osiągalnych konfiguracji dla hipotezy, bo w ogólności jest ich nieskończenie wiele.
-    Musimy ograniczyć się tylko do części osiągalnych konfiguracji.
-\end{enumerate}
+Oryginalny algorytm~\cite{SrsDvpa} nie konstruuje jawnie ograniczonego zbioru słów dobrze zbalansowanych podstawianych
+za zmienną $X \in \mathcal{X}$. Zamiast tego, dla każdej reguły $\alpha \to \beta$ ze zmiennymi wyznaczana
+jest relacja $\DeltaRule \in Q^3$.
 
-Z powodu trudności w zastosowaniu tego podejścia, zostały nałożone dodatkowe obostrzenia na system SRS, który może być podpowiedzią dla algorytmu.
-Każda reguła postaci $l \rightarrow r$ powinna składać się ze słów $l$ oraz $r$, które są dobrze zbalansowane. Ponieważ nie zależą one od stosu,
-ani nie zmieniają jego zawartości, odpowiadają one pewnemu przekształceniu stanów analogicznie jak dla automatów DFA.
+Intuicyjnie, trójka $(q, s_1, s_2)$ należy do $\DeltaRule$, jeśli istnieje podstawienie słów dobrze zbalansowanych
+za zmienne takie, że lewa strona reguły prowadzi automat ze stanu $q$ do stanu $s_1$, a prawa strona reguły prowadzi
+automat ze stanu $q$ do stanu $s_2$. Relacja ta pozwala więc opisać efekt wszystkich możliwych podstawień za zmienne
+bez jawnego konstruowania tych słów. Obliczenie tej relacji jest jednak kosztowne, dlatego w implementacji zastosowano
+uproszczone podejście, w którym rozważany jest jedynie ograniczony zbiór słów dobrze zbalansowanych.
 
-Umożliwia to sprawdzenie czy automat jest zgodny z daną regułą $l \rightarrow r$, poprzez sprawdzenie równoważności dwóch automatów $H_l$ oraz $H_r$, utworzonych
-na podstawie hipotezy $H$, z alfabetem rozszerzonym o dodatkową literę $l'$ typu local.
-Automat $H_l$ po przeczytaniu litery $l'$ trafia do stanu, w którym znalazłby się automat $H$ po przeczytaniu słowa $l$, a $H_r$ po przeczytaniu $l'$
-trafia do stanu w którym znalazłaby się hipoteza po przeczytaniu słowa $r$. Jest to możliwe, gdyż słowa dobrze
-zbalansowane nie zależą od stosu ani go nie modyfikują.
+Algorytm konstruuje zbiór słów dobrze zbalansowanych $\mathcal{B}$, które mogą zostać podstawione za zmienną w regułach z $R$.
+Implementacja dopuszcza tylko ograniczony, konfigurowalny rozmiar zbioru $\mathcal{B}$. Dlatego obliczana
+jest wartość każdego słowa, na podstawie której podejmowana jest decyzja, czy słowo to powinno zostać wykorzystane.
 
-Problemem tego podejścia wydawało się sprawdzanie równoważności, gdyż w~aktualnej implementacji jest wykorzystywany ten sam algorytm, który sprawdza
-równoważność hipotezy z automatem docelowym. Jednak hipoteza przez znaczący czas trwania algorytmu jest znacznie mniejsza niż automat docelowy, przez co produkt
-$H_l \times H_r$ jest znacząco mniejszy niż $H \times T$, gdzie $T$ jest automatem docelowym. W praktyce sprawia to,
-że sprawdzanie zgodności z systemem SRS może być znacznie tańsze niż sprawdzanie równoważności hipotezy z automatem docelowym.
-
-\textbf{Finalne zastosowanie} rozszerza ideę systemu o parametryzowane reguły postaci $l_1Xl_2 \rightarrow r_1Xr_2$, reguła ta reprezentuje tożsamość
-$wl_1Xl_2v \in L \Leftrightarrow wr_1Xr_2v \in L$, gdzie $w,v \in \Sigma^*$, $X \in \Sigma^*$ jest słowem dobrze zbalansowanym oraz słowa $l_1l_2$ i $r_1r_2$
-są dobrze zbalansowane.
-
-Algorytm w celu sprawdzenia zgodności hipotezy $H$ z systemem SRS $R$ rozpoczyna od wyznaczenia zbioru 
-słów dobrze zbalansowanych, które mogą zostać podstawione za parametr $X$.
-Ponieważ liczba tych słów powinna być ograniczona, obliczana jest wartość każdego słowa
-na podstawie której podejmowana jest decyzja, czy słowo to powinno zostać wykorzystane.
 Dystansem $dist(w_1, w_2)$ pomiędzy słowami $w_1$ i $w_2$ określamy liczbę takich stanów
-$q \in Q$, że $H(q, \bot, w_1) \neq H(q, \bot, w_2)$.
+$q \in Q_H$, że $H(q, \bot, w_1) \neq H(q, \bot, w_2)$.
+Intuicyjnie dystans określa, w ilu stanach hipotezy słowa $w_1$ oraz $w_2$ powodują różne zachowanie automatu.
 Następnie w momencie dodawania słowa do zbioru słów dobrze zbalansowanych określana jest jego wartość,
-jako minimalny dystans od już zawartych w tym zbiorze słów. Jeśli zbiór ten zawiera zbyt wiele elementów
-usuwane są słowa o najmniejszej wartości. Podejście to ma na celu zmaksymalizować szanse algorytmu na
-wykrycie niespójności.
+jako minimalny dystans od już zawartych w tym zbiorze słów. Jeśli zbiór ten zawiera zbyt wiele elementów,
+usuwane są słowa o najmniejszej wartości. Celem tej heurystyki jest zwiększenie szansy wykrycia niespójności
+hipotezy z systemem SRS.
 
-Następnie dla każdej reguły oraz słowa dodaje nową literę lokalną do automatów $H_l$ oraz $H_r$,
-po czym sprawdzana jest ich równoważność. Jeżeli istnieje słowo $w$, które należy do dokładnie jednego
-z języków generowanych przez automaty $H_l$ oraz $H_r$ to oznacza, że została wykryta niespójność
-z systemem SRS. Należy wtedy skonstruować słowa $w_l$ oraz $w_r$ poprzez podstawienie za wszystkie dodatkowe
-litery lokalne odpowiednio lewej oraz prawej strony reguły SRS odpowiadającej danej literze.
-Ostatecznie jedno z tych słów jest poprawnym kontrprzykładem, ponieważ system SRS jest zgodny z automatem docelowym.
-Umożliwia to podjęcie decyzji, które słowo należy zwrócić, przy pomocy jednego zapytania \textbf{MQ}.
+\clearpage
+\section{Koszt czasowy}
 
-Podejście to gwarantuje, że w przypadku wykrycia niespójności hipoteza $H$ nie jest zgodna z systemem SRS.
-Nie gwarantuje jednak wykrycia każdej możliwej niezgodności hipotezy z tym systemem.
+Potencjalnym problemem tego podejścia jest koszt sprawdzania równoważności, ponieważ w implementacji
+wykorzystywany jest ten sam algorytm, który służy do sprawdzania równoważności hipotezy z automatem docelowym.
+W praktyce porównywane automaty są jednak zwykle mniejsze. Przez znaczną część działania algorytmu hipoteza $H$
+jest mniejsza niż automat docelowy $T$. W konsekwencji produkt $H_{\alpha} \times H_{\beta}$ jest zwykle mniejszy niż
+produkt $H \times T$. Może to skrócić całkowity czas uczenia, jeśli odpowiednio wiele kontrprzykładów
+zostanie znalezionych dzięki wykorzystaniu systemu SRS.

@@ -26,11 +26,12 @@ relacji $\equiv^{C}_T$ poprzez rozszerzanie zbioru $C$ w celu aktywnego uczenia 
 Uczeń jako parametry wejściowe otrzymuje alfabet $\Sigma$ i zbiór symboli stosowych $\Gamma$, które obsługuje automat docelowy.
 
 Algorytm utrzymuje dwa zbiory $S \subseteq \Sigma^*$ oraz $C \subseteq Init_1$, gdzie $S$ jest zbiorem selektorów,
-które reprezentują stany w konstruowanym automacie. Zbiór $C$ nazywany zbiorem słów testowych, udoskonala relację $\equiv^{C}_T$ poprzez
+które reprezentują stany w konstruowanym automacie. Zbiór $C$, nazywany zbiorem słów testowych, udoskonala relację $\equiv^{C}_T$ poprzez
 wykluczanie przejść w hipotezie, które nie są poprawne. Algorytm zaczyna działanie z $S = \{\epsilon\}$ oraz $C = \{ \underline{\bot}\epsilon\}$.
 Następnie generuje hipotezę bazując tylko na aktualnym stanie zbiorów $S$ oraz $C$. Wygenerowaną hipotezę przesyła do nauczyciela przy pomocy
-zapytania $EQ$, jeśli nauczyciel zwróci kontrprzykład algorytm rozszerza $S$ oraz $C$, w sposób, który sprawia, że następna wygenerowana
-hipoteza będzie bardziej zbliżona do automatu docelowego. Procedura ta jest powtarzana, aż do skonstruowania poprawnego automatu. 
+zapytania $EQ$. Jeśli nauczyciel zwróci kontrprzykład, algorytm rozszerza przynajmniej jeden ze zbiorów $S$ oraz $C$
+w sposób, który sprawia, że następna wygenerowana hipoteza będzie bardziej zbliżona do automatu docelowego.
+Procedura ta jest powtarzana, aż do skonstruowania poprawnego automatu.
 
 W trakcie trwania algorytmu utrzymywany jest odpowiednik rozdzielności, który gwarantuje ograniczenie liczby stanów hipotezy.
 Utrzymywany jest także w pewnym stopniu ograniczony odpowiednik domkniętości. Ponieważ nie wszystkie rozważane konfiguracje muszą być osiągalne
@@ -49,7 +50,7 @@ W algorytmie procedury domykania $S$ i $C$ oraz generowania automatu w przeciwie
 
 Stan początkowy określony jest jako $\epsilon$, a stany akceptujące to te selektory $s \in S$ dla których $MQ(s)$ zwraca \texttt{true}.
 Żeby skonstruować hipotezę należy jeszcze zdefiniować funkcje przejścia $\delta$, w tym celu rozważa się każdą możliwą literę $a \in \Sigma$
-oraz każdą możliwą konfigurację $(s, B)$, gdzie $s \in S$ i $B \in \Gamma$. Żeby określić $\delta(s, a, B)$, należy znaleźć selektor $s'$,
+oraz każdą możliwą konfigurację $(s, B)$, gdzie $s \in S$ i $B \in \Gamma \cup \{\bot\}$. Żeby określić $\delta(s, a, B)$, należy znaleźć selektor $s'$,
 taki że $s' \equiv^C_T s\underline{\bot B}a$. Ponieważ relacja $\equiv^C_T$ jest zdefiniowana nad słowami standardowymi,
 nie można wprost skorzystać z definicji równoważności.
 Dlatego podczas sprawdzania równoważności należy zamienić słowo $s\underline{\bot B}ac$
@@ -58,9 +59,9 @@ na równoważne słowo z pojedynczym resetem w następujący sposób:
 \clearpage
 \begin{description}
     \item[Jeśli $a$ jest literą local albo call:] \hfill \\
-        Ponieważ litery te nie zależą one od symbolu stosowego, oraz po przeczytaniu litery $a$ stos zostanie zresetowany przez pierwszą
-        literę słowa testowego można pominąć wkładanie symbolu stosowego $B$ na stos. Jeśli istnieje równoważny selektor to jest on dobrym następnikiem,
-        jeśli nie to należy dodać nowy selektor $sa$. Ponadto w przypadku symbolu call trzeba określić jaki symbol powinien zostać włożony na stos,
+        Ponieważ litery te nie zależą od symbolu stosowego oraz po przeczytaniu litery $a$ stos zostanie zresetowany przez pierwszą
+        literę słowa testowego, można pominąć wkładanie symbolu stosowego $B$ na stos. Jeśli istnieje równoważny selektor, to jest on dobrym następnikiem,
+        jeśli nie, to należy dodać nowy selektor $sa$. Ponadto w przypadku symbolu call trzeba określić jaki symbol powinien zostać włożony na stos,
         przy pomocy zapytania $SC(sa)$.
 
     \item[Jeśli $a$ jest literą return] \hfill \\
@@ -93,12 +94,14 @@ na równoważne słowo z pojedynczym resetem w następujący sposób:
 
 \end{description}
 
-Na końcu nieokreślone przejścia są kierowane do stanu $\epsilon$ lub stanu, który został oznaczony jako poprawny następnik dla tej konfiguracji
+Na końcu nieokreślone przejścia są kierowane do stanu $\epsilon$ lub stanu, który został oznaczony jako wymuszony następnik dla tej konfiguracji
 podczas obsługi kontrprzykładu, co zostanie opisane w następnej sekcji. Skonstruowany w ten sposób automat zachowuje własność rozdzielności, ze względu na restrykcyjność w rozszerzaniu
 zbioru $S$. Własność domkniętości nie musi być zachowana z powodu nieokreślonych przejść, jednakże przekierowanie ich do odpowiedniego stanu
 pozwala skonstruować pełny automat określany jako $A^c$.
 
 \subsection{Obsługa kontrprzykładu}
+\label{chap:counterexample}
+
 Algorytm otrzymując kontrprzykład $w$ powinien rozszerzyć przynajmniej jeden ze zbiorów $S$ lub $C$ w sposób, który zapewni progres algorytmu
 poprzez dodanie nowego selektora, bądź wykluczenie przejścia, które nie jest poprawne. Odbywa się to poprzez znalezienie podziału $w$ na $vaw'$,
 gdzie $v, w' \in \Sigma^*$ i $a \in \Sigma$, takiego że:
@@ -124,7 +127,7 @@ Jeśli rozszerzyliśmy zbiór $S$ to gwarantuje to dalszy progres. W innym przyp
 że w~dowolnym automacie wygenerowanym na podstawie zbioru $S$ oraz nowego zbioru $C$ nie będzie istnieć przejście z $s$ do $s'$ za pomocą
 litery $a$ i symbolu stosowego $B$.
 
-Jednak podczas testowania algorytmu zaobserwowano, że lemat ten nie jest całkowicie poprawny. Jeśli $s' = \epsilon$ oraz algorytm nie znajdzie
+Jednak podczas testowania algorytmu zaobserwowano, że lemat w tej postaci nie jest całkowicie poprawny. Jeśli $s' = \epsilon$ oraz algorytm nie znajdzie
 świadka dla konfiguracji $(s, B)$, to wtedy przejście $(s, B, a) = \epsilon$ będzie zawarte w hipotezie wygenerowanej na podstawie nowych
 zbiorów $S$ oraz $C$. Własność ta potrafiła doprowadzić do zapętlenia się algorytmu, gdyż kontrprzykład $w$
 może nadal pozostać poprawnym kontrprzykładem oraz nie wykluczać żadnego innego przejścia.
@@ -134,7 +137,7 @@ ten sam stan ale świadczył o jego osiągalności z innym symbolem stosowym. Po
 który prowadzi do stanu $s$ zostawiając symbol $B$ na szczycie stosu. Jednak nie jest to poprawne rozwiązanie,
 ponieważ dwa słowa, które nie są rozróżnialne ze względu na aktualny zbiór $C$ mogą prowadzić do różnych stanów w automacie docelowym. Może to skutkować
 dodaniem do danej listy selektorów słowa, które świadczy o osiągalności z pewnym symbolem na szczycie stosu, który nie jest osiągalny w automacie docelowym.
-W konsekwencji prowadziło to do generowania redundantnych stanów w hipotezie.
+W~konsekwencji prowadziło to do generowania redundantnych stanów w hipotezie.
 
 Następną rozważaną modyfikacją było utrzymywanie struktury wykluczonych przejść dla liter typu return.
 W tym podejściu kontrprzykład, który wskazuje na niepoprawność przejścia w konfiguracji $(q, B, r)$,
@@ -148,7 +151,7 @@ utrzymujemy jedno wymuszone przejście do selektora równoważnego słowu $va$. 
 istnieć po zakończeniu obsługi kontrprzykładu. Jeżeli wcześniej nie istniał selektor równoważny $va$,
 to słowo $va$ zostałoby dodane do zbioru selektorów.
 
-W przeprowadzonych testach pozwoliła ona unikać obserwowanych zapętleń algorytmu bez zwiększania jego złożoności.
+W przeprowadzonych testach modyfikacja ta pozwoliła unikać obserwowanych zapętleń algorytmu bez zwiększania jego złożoności.
 Nie przedstawiono jednak formalnego dowodu poprawności tej modyfikacji, dlatego należy ją traktować jako rozwiązanie
 heurystyczne zastosowane w implementacji.
 
@@ -164,7 +167,7 @@ procesu uczenia, dlatego też implementacja tego fragmentu przechodziła wiele u
     \item Skonstruuj automat $P = T \triangle H$, czyli taki, który generuje język $L(T) \triangle L(H) = (L(T) \setminus L(H)) \cup (L(H) \setminus L(T))$.
 
     \item Przekształć automat $P$ na automat $P'$ nad alfabetem $\Sigma_P \cup {r'}$, gdzie $r' \in \Sigma_{return}^{P'}$,
-        który akceptuje poprzez pusty stos oraz $L(P') = \{w : \ w = vv' \text{, gdzie } v \in L(P), v' \in {r'}^* \}$.
+        który akceptuje poprzez stan akceptujący i pusty stos oraz $L(P') = \{w : \ w = vv' \text{, gdzie } v \in L(P), v' \in {r'}^* \}$.
 
     \item Zamień automat $P'$ na równoważną gramatykę bezkontekstową.
 
@@ -192,8 +195,8 @@ i~$H = (\Sigma, Q_H, q_0^H, F_H, \Gamma, \delta_H)$, to $P = (\Sigma, Q_p, q_0^P
 \cite[2.2 Equivalence with context-free grammars]{Sipser} operują na automatach, dla których akceptacja jest powiązana z opróżnieniem stosu,
 zostały one wykorzystane i poprzedzone prostą konwersją.
 
-Do konwersji zastosowano uproszczone podejście inspirowane klasycznym algorytmem konstrukcji
-przekształcania akceptacji poprzez stan do akceptacji poprzez pusty stos~\cite[6.2.4 From Final State to Empty Stack]{DPDAtoCFG}.
+Do konwersji zastosowano uproszczone podejście inspirowane klasycznym algorytmem przekształcania
+akceptacji poprzez stan do akceptacji poprzez pusty stos~\cite[6.2.4 From Final State to Empty Stack]{DPDAtoCFG}.
 Automat $P'$ akceptuje poprzez stan akceptujący oraz pusty stos. Język $L(P')$ różni się od $L(P)$
 oraz jest zdefiniowany nad innym alfabetem, ale znając słowo akceptowane przez ten automat,
 można w prosty sposób odtworzyć słowo akceptowane przez $P$.
@@ -207,7 +210,7 @@ Formalnie automat $P' = (\Sigma_{P'}, Q_{P'}, q_0^P, F_{P'}, \Gamma_P, \delta_{P
 \end{description}
 
 Stan $q'$ służy do opróżniania stosu. Po osiągnięciu stanu akceptującego automatu $P$ automat $P'$ może przejść do $q'$ za pomocą
-dodatkowego symbolu $r'$, a następnie kolejne wystąpienia $r'$ zdejmują symbole ze stosu, pozostając w stanie $q'$.
+dodatkowego symbolu $r'$, a~następnie kolejne wystąpienia $r'$ zdejmują symbole ze stosu, pozostając w stanie $q'$.
 Dzięki temu słowo akceptowane przez $P$ można rozszerzyć sufiksem złożonym z symboli $r'$,
 uzyskując słowo akceptowane przez $P'$ po osiągnięciu stanu akceptującego i opróżnieniu stosu.
 

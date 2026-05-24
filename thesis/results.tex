@@ -164,7 +164,7 @@ równoważności.
 \section{Wpływ struktury automatu}
 
 Analiza w tej sekcji bazuje głównie na tych samych uruchomieniach, które zostały wykorzystane do analizy podstawowych metryk
-dla klas automatów powiązanych z regułami SRS w sekcji~\ref{chap:baseMetrics}. Rozważany jest jedynie wariant,
+dla klas automatów powiązanych z regułami SRS w sekcji~\ref{chap:baseMetrics} Rozważany jest jedynie wariant,
 który nie wykorzystywał systemu SRS.
 
 W tej sekcji określenie \emph{gęstość przejść} oznacza,
@@ -191,10 +191,6 @@ Na podstawie wykresów przedstawionych w sekcji~\ref{chap:baseMetrics} można za
 Czas uczenia był największy dla automatów związanych z~regułą commutation, mimo że wymagały one najmniejszej liczby
 zapytań o równoważność. Z kolei automaty związane z regułą cancellation wymagały największej liczby zapytań
 o równoważność, ale ich średni czas uczenia był najmniejszy lub porównywalny z automatami związanymi z regułą idempotency.
-
-Gęstsza struktura przejść nie musi zwiększać liczby możliwych produkcji w klasycznej konstrukcji gramatyki,
-ponieważ ta zależy głównie od rozmiarów automatu i alfabetów. Może jednak zwiększać liczbę zależności
-faktycznie rozważanych przez zoptymalizowaną procedurę sprawdzania równoważności.
 
 Poniżej przedstawiono średni czas spędzony w kluczowych częściach algorytmu.
 

@@ -12,14 +12,15 @@ a pusty stos poprzez $\bot$.
     \item[$Q$] -- zbiór stanów automatu
     \item[$q_0$] -- stan początkowy
     \item[$F$] -- zbiór stanów akceptujących
-    \item[$\delta : Q \times \Sigma \to Q$] -- funkcja przejścia.
+    \item[$\delta : Q \times \Sigma \to Q$] -- funkcja przejścia
 \end{description}
 
 Domknięciem funkcji $\delta$ nazywamy $\widehat{\delta}: Q \times \Sigma^* \to Q$, zdefiniowaną w następujący sposób:
 $$\widehat{\delta}(q, \epsilon) = q$$
 $$\widehat{\delta}(q, aw) = \widehat{\delta}(\delta(q, a), w) \text{,\ gdzie\ } a \in \Sigma, w \in \Sigma^*$$
 Język $L(A)$ generowany przez automat DFA, to zbiór wszystkich słów $w \in \Sigma^*$, dla których $\widehat{\delta}(q_0, w) \in F$.
-Taki język nazywamy językiem regularnym.
+Taki język nazywamy językiem regularnym. W dalszej części pracy, gdy z kontekstu będzie jasne, że funkcja przejścia
+stosowana jest do słowa, będziemy pisać $\delta$ zamiast $\widehat{\delta}$.
 
 \textbf{Relacja prawostronnej kongruencji.} Relacja $\sim$ jest prawostronną kongruencją, gdy spełnia warunek $\forall_{v_1, v_2 \in \Sigma^*} \forall_{a \in \Sigma}(v_1 \sim v_2 \Rightarrow v_1a \sim v_2a)$
 
@@ -82,6 +83,34 @@ ciąg produkcji z $P$. Zbiór wszystkich słów generowanych przez gramatykę $G
 
 \section{Systemy przepisywania słów}
 
-\textbf{System Przepisywania Słów (ang. String Rewriting System)} $R$ dalej SRS $R$ nazywamy zbiór reguł typu $l \rightarrow r$,
-gdzie $l$ oraz $r$ są słowami nad pewnym alfabetem $\Sigma$. W tej pracy reguły SRS będą interpretowane jako więzy względem języka $L$:
-reguła $l \to r$ oznacza, że dla wszystkich $w,v \in \Sigma^*$ zachodzi $wlv \in L \Leftrightarrow wrv \in L$.
+\textbf{System Przepisywania Słów (ang. String Rewriting System)} $R$ dalej SRS $R$ nazywamy zbiór reguł typu $l \to r$,
+gdzie $l$ oraz $r$ są słowami nad pewnym alfabetem $\Sigma$. Jeden krok przepisywania względem systemu $R$ oznaczamy przez $\to_R$.
+Dla reguły $l \to r \in R$ oraz słów $x,y \in \Sigma^*$ zachodzi $xly \to_R xry$.
+Przez $\to_R^*$ oznaczamy zwrotno-przechodnie domknięcie relacji $\to_R$.
+W tej pracy systemy SRS będą wykorzystywane jako więzy opisujące zależności między słowami względem rozważanego języka.
+
+\textbf{Spójność systemu SRS z językiem.} System SRS $R$ jest spójny z językiem $L$ wtedy i tylko wtedy, gdy dla wszystkich słów $s, t \in \Sigma^*$,
+jeśli $s \to^*_R t$, to $s \in L \Leftrightarrow t \in L$.
+
+\textbf{Reguły ze zmiennymi.} Niech $\mathcal{X}$ będzie skończonym zbiorem zmiennych. Regułą przepisywania słów ze zmiennymi
+nazywamy regułę $\alpha \to \beta$, gdzie $\alpha, \beta \in (\Sigma \cup \mathcal{X})^*$ oraz:
+\begin{enumerate}
+    \item Każda zmienna $X \in \mathcal{X}$ występuje co najwyżej raz w~$\alpha$ oraz co najwyżej raz w~$\beta$.
+    \item Każda zmienna $X \in \mathcal{X}$, która występuje w $\beta$, występuje również w $\alpha$.
+\end{enumerate}
+Dla każdej zmiennej we wszystkich jej wystąpieniach podstawiane jest to samo słowo. System SRS zawierający reguły ze zmiennymi
+nazywamy systemem SRS ze zmiennymi.
+
+\textbf{Instancją reguły ze zmiennymi} nazywamy zwykłą regułę SRS otrzymaną przez podstawienie słów dobrze zbalansowanych za zmienne
+w regule ze zmiennymi.
+
+\textbf{Reguły zachowujące dopasowanie.} W przypadku języków visibly pushdown regułę ze zmiennymi $\alpha \to \beta$ nazywamy
+zachowującą dopasowanie, jeśli każda jej instancja jest regułą zachowującą dopasowanie.
+Dla zwykłej reguły $l \to r$ oznacza to, że dla wszystkich słów $w,w' \in \Sigma^*$ takich, że $w=xly$ oraz $w'=xry$,
+relacja dopasowania pomiędzy symbolami typu call występującymi w $x$ oraz symbolami typu return występującymi w $y$ jest
+taka sama dla słów $w$ oraz $w'$. System SRS nazywamy zachowującym dopasowanie, jeśli wszystkie należące do niego reguły
+zachowują dopasowanie.
+
+\textbf{Reguły dobrze zbalansowane.} Szczególnym przypadkiem reguł zachowujących dopasowanie są reguły dobrze
+zbalansowane. Regułę $\alpha \to \beta$ nazywamy dobrze zbalansowaną, jeśli zarówno słowo $\alpha$, jak i słowo $\beta$ po usunięciu
+zmiennych są dobrze zbalansowane. System SRS składający się wyłącznie z reguł dobrze zbalansowanych nazywamy dobrze zbalansowanym.
