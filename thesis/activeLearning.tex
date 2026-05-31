@@ -1,22 +1,22 @@
 \chapter{Aktywne uczenie automatów}
 
 Rozdział ten ma na celu przedstawienie ogólnego kontekstu aktywnego uczenia automatów, na którym opiera się dalsza
-część pracy. Najpierw omówiony zostanie klasyczny model aktywnego uczenia automatów DFA oraz jego rozszerzenie
+część pracy. W pierwszej kolejności omówiony zostanie klasyczny model aktywnego uczenia automatów DFA oraz jego rozszerzenie
 o dodatkową podpowiedź w postaci systemu SRS. Następnie przedstawione zostaną najważniejsze modyfikacje
 konieczne przy przejściu od automatów DFA do automatów DVPA. Na końcu rozdziału krótko opisano rozwiązania heurystyczne
 wykorzystane w implementacji przedstawionej w tej pracy.
 
 \section{Uczenie się automatów DFA z poradą}
 
-\textbf{Model aktywnego uczenia} zakłada istnienie nauczyciela, który potrafi odpowiadać na określony zestaw zapytań dotyczących nieznanego
-języka docelowego $L$. Algorytm konstruujący automat $H$, nazywany hipotezą, który docelowo powinien rozpoznawać język $L$, nazywany jest uczniem. 
+\textbf{Model aktywnego uczenia} zakłada istnienie \emph{nauczyciela}, który potrafi odpowiadać na określony zestaw zapytań dotyczących nieznanego
+języka docelowego $L$. Algorytm konstruujący automat $H$, nazywany \emph{hipotezą}, który docelowo powinien rozpoznawać język $L$, nazywany jest \emph{uczniem}.
 
 W klasycznym modelu Angluin~\cite{Angluin} nauczyciel odpowiada na dwa typy zapytań:
 \begin{itemize}
   \item \textbf{zapytanie o należenie (ang. membership query) $MQ(w)$} -- zapytanie o~to, czy dane słowo $w$ należy do języka $L$.
   \item \textbf{zapytanie o równoważność (ang. equivalence query) $EQ(H)$} --  zapytanie o to, czy skonstruowana hipoteza $H$ rozpoznaje język $L$.
 \end{itemize}
-W odpowiedzi na zapytanie o równoważność nauczyciel może ją potwierdzić, co kończy działanie algorytmu, albo zwrócić kontrprzykład,
+W odpowiedzi na zapytanie o równoważność nauczyciel może ją potwierdzić, co kończy działanie algorytmu, albo zwrócić \emph{kontrprzykład},
 czyli słowo, które należy do dokładnie jednego z języków $L$ oraz $L(H)$.
 
 \textbf{Algorytm L$^*$}, zaproponowany przez Angluin~\cite{Angluin}, stanowi realizację powyższego modelu dla języków regularnych.
@@ -124,7 +124,7 @@ Kluczowe jest również wprowadzenie odpowiednika relacji równoważności, któ
 Dla języków rozpoznawanych przez DVPA Twierdzenie Myhilla-Nerode'a nie może być zastosowane wprost. W szczególności minimalny automat DVPA
 rozpoznający dany język nie jest jednoznaczny, a kanoniczna konstrukcja automatu~\cite{canonical} może być wykładniczo większa niż minimalny DVPA.
 
-Autorzy wprowadzają pojęcie kontrolnej prawostronnej kongruencji. Relacja $\simeq$ na słowach nad alfabetem $(\Sigma \cup \underline{\Gamma})$,
+Autorzy wprowadzają pojęcie \emph{kontrolnej prawostronnej kongruencji}. Relacja $\simeq$ na słowach nad alfabetem $(\Sigma \cup \underline{\Gamma})$,
 jest kontrolną prawostronną kongruencją, jeśli:
 $$\text{dla wszystkich słów }w_1, w_2 \in (\Sigma \cup \underline{\Gamma})^* \text{ i } \alpha \in \underline{\Gamma} \cdot \Sigma \text{ } (w_1 \simeq w_2 \Rightarrow w_1\alpha \simeq w_2\alpha)$$
 
@@ -134,15 +134,16 @@ W następnym rozdziale przedstawiono konkretną relację zaproponowaną przez au
 \textbf{Uczenie się DVPA z poradą.}
 Podejście aktywnego uczenia z poradą można przenieść również na języki visibly pushdown.
 W pracy \textit{Learning Visibly Pushdown Languages under Rewriting Rules}~\cite{SrsDvpa} zaproponowano
-wykorzystanie systemów SRS dla automatów DVPA.
+wykorzystanie systemów SRS dla automatów DVPA. Autor niniejszej pracy jest jej współautorem,
+a opisana w dalszych rozdziałach implementacja stanowiła podstawę przedstawionych w niej eksperymentów.
 
-W przypadku języków visibly pushdown istotne jest jednak to, że słowa mają dodatkową strukturę wynikającą z dopasowania
+W przypadku języków visibly pushdown istotne jest, że słowa mają dodatkową strukturę wynikającą z dopasowania
 symboli typu call i return. Dlatego nie każda reguła przepisywania jest naturalna z punktu widzenia języków visibly pushdown.
 Reguły powinny zachowywać strukturę dopasowań poza przepisywanym fragmentem słowa. Dlatego rozważane są systemy
 SRS zachowujące dopasowanie. W tej pracy implementacyjnie ograniczamy się do dobrze zbalansowanych systemów SRS,
 które stanowią szczególny przypadek systemów zachowujących dopasowanie.
 
-Autorzy wskazują również~\cite[Example 4]{SrsDvpa}, że niektóre naturalne własności języków visibly pushdown
+W publikacji tej wskazano również~\cite[Example 4]{SrsDvpa}, że niektóre naturalne własności języków visibly pushdown
 nie mogą być wyrażone za pomocą skończonego systemu zwykłych reguł SRS. Z tego powodu wprowadzane
 są reguły ze zmiennymi, w których za zmienne podstawiane są słowa dobrze zbalansowane. Taka reguła reprezentuje
 zbiór wszystkich zwykłych reguł otrzymanych przez podstawienie za zmienną dowolnego słowa dobrze zbalansowanego.
@@ -157,8 +158,8 @@ ale wpływają na praktyczne działanie programu oraz interpretację wyników ek
 rozwiązań opisano w kolejnych rozdziałach przy omawianiu odpowiednich elementów implementacji.
 
 \textbf{Algorytm ucznia.}
-Pierwszym rozwiązaniem heurystycznym jest dodanie wymuszonych przejść.
-Procedura ta została opisana w podrozdziale~\ref{chap:counterexample} W trakcie implementacji zaobserwowano,
+Pierwszym rozwiązaniem heurystycznym jest dodanie \emph{wymuszonych przejść}.
+Mechanizm ten opisano w podrozdziale~\ref{chap:counterexample} W trakcie implementacji zaobserwowano,
 że w~rzadkich przypadkach algorytm może zapętlać się podczas obsługi kontrprzykładów
 związanych z przejściami typu return. Całkowite wyeliminowanie tego problemu wymagałoby
 istotnych zmian w sposobie generowania hipotezy, które mogłyby znacząco zwiększyć koszt działania algorytmu.
