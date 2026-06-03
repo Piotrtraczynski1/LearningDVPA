@@ -1,0 +1,105 @@
+We thank all the reviewers for their thorough and constructive
+feedback. Our responses are organized below by review.
+
+# Review 1
+
+Thank you for pointing out confusing parts.  
+We believe the confusion can be resolved by extending the preliminaries with 
+a formally statement that DVPA behave like DFA on well-matched words, and recalling 
+reachability analysis for pushdown automata.
+
+Still, we prefer light explanations in plain English instead of
+formal constructions as this allows us to point out important details while skipping standard ones.
+However, we did explain informal notions:
+
+-  what does "A moves from q to q' (over alpha)" formally mean?
+
+This is explained in the following sentence:
+"Since alpha is well-matched, the run over alpha does not depend on
+the stack content and it does not modify the stack content, and hence
+it is equivalent to a transition over a single local letter."
+
+- "(...) Proposition 6, but somehow it does not match, e.g. product A
+x A instead A_1 x A_2"
+
+In the statement of Proposition 6 it states "a DVPA **obtained** from the
+product A × A.", which holds since A_1 x A_2 is obtained from A x A.
+This makes the statement of Proposition 6 self-contained.
+
+
+Regarding the proof of Theorem 10, there are two typos:
+
+- You are correct: "n" is the number of variables and "q_{1,n+1}"
+should be "q_{n+1,1}", where q_{n+1,1} is the last state of A_1.
+An example of a run of A_1 would be:
+
+q_{1,1} -> q^f_{1,2} -> ... -> q^f_{1,2m} -> q_{2,1} -> q^t_{2,2} -> ... -> q^t_{2,2m'} -> q_{3,1} -> ... -> q_{n+1,1}
+
+- You are correct, \neq should be \neg
+
+Example 7: Self-loops over l_1, l_2 are necessary for a VPA to be deterministic and 
+to ensure that there is no easier way to certify (in)consistency.
+
+
+# Review 2
+
+We agree that the experiments section has to be improved. Let us
+focus on questions (some rephrased):
+
+- Page 7, lines 309 and 310, should it not be "to check
+**in**consistency [...]"?
+- Page 8, lines 330 and 331, should it not be "The automaton behaves
+differently in states q_1, q_2 if the stack is **empty**"?
+
+Thank you, we agree with both.
+
+- Matching-preserving rules:
+
+We do not expect different results for matching-preserving rules than for well-matched rules. 
+We did not check it as all natural examples of rules are well-matched.
+
+- Implementation:
+
+Yes, the repository with the code and experiments is public at: https://github.com/Piotrtraczynski1/LearningDVPA. 
+It will be added to references.
+
+- Does the tradeoff always occur:
+
+We expect so, particularly in applications where a DVPA is given implicitly. There, 
+equivalence queries can be substantially more expensive than reachability checks.
+
+- The current experiments are only on randomly generated automata. Do
+you expect your results to also hold on "real-world" automata?
+
+Yes, we expect so. We prepared the random automata to mimic DVPA from real-world
+applications; we have implemented random SEVPA, MeVPA and call-driven
+automata.
+
+
+# Review 3
+
+
+We agree with most detailed remarks, but we oppose the following points:
+
+# Extending results to non-deterministic automata
+
+Our results do not extend to non-deterministic VPA. 
+There is a simple reduction of the universality problem, which is EXPTIME-complete for VPA, 
+ to checking consistency for rules without variables. In line 314, we explain that positive consistency
+ amounts to checking emptiness of L(A_1) \ L(A_2), which is EXPTIME-complete, if A_1, A_2 are non-deterministic VPA.
+
+# Lemma 8. Order of variables
+
+You are correct that the reason for coNP-completeness is different order of variables.
+We attempted to construct a polynomial-time algorithm for rules with a common variable order, but were unsuccessful.
+ We suspect it to be coNP-hard as well.
+
+
+# "489: The rule does not make much sense. In the described setting,
+already w_i -> v_i is a valid (and shorter) rule for every i."
+
+This rule uses k variables, whereas w_i -> v_i has no variables. 
+We studied the problem of minimal consistent rules with variables. 
+Note that it is "harder" for a rule with variables to be consistent
+since all its well-balanced instances have to be consistent.
+Initially, we expected the lower bound to be exponential, before showing a polynomial upper bound.
