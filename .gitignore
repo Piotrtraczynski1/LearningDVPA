@@ -10,4 +10,6 @@ out.txt
 /thesis/main.out
 /thesis/main.pdf
 /thesis/main.toc
+/thesis/main.bbl
+/thesis/main.blg
 src/benchmark/results
