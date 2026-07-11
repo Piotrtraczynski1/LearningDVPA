@@ -1,267 +1,342 @@
 #include "generator/srs/CommutativeGenerator.hpp"
-#include "teacher/AutomataCombiner.hpp"
+
+#include <algorithm>
+
 #include "utils/Constants.hpp"
 #include "utils/ExitCode.hpp"
 #include "utils/log.hpp"
 
 namespace generator::srs
 {
+CommutativeGenerator::ComponentTransitions::ComponentTransitions(
+    const uint16_t numOfStates_, const uint16_t callBegin_, const uint16_t callEnd_,
+    const uint16_t localBegin_, const uint16_t localEnd_, const uint16_t returnBegin_,
+    const uint16_t returnEnd_, const uint16_t stackBegin_, const uint16_t stackEnd_,
+    const uint16_t numOfCalls, const uint16_t numOfLocals, const uint16_t numOfReturns,
+    const uint16_t numOfStackSymbols)
+    : numOfStates{numOfStates_}, callBegin{callBegin_}, callEnd{callEnd_}, localBegin{localBegin_},
+      localEnd{localEnd_}, returnBegin{returnBegin_}, returnEnd{returnEnd_},
+      stackBegin{stackBegin_}, stackEnd{stackEnd_},
+      calls(static_cast<size_t>(numOfStates) * numOfCalls),
+      locals(static_cast<size_t>(numOfStates) * numOfLocals, State::INVALID),
+      returns(static_cast<size_t>(numOfStates) * numOfStackSymbols * numOfReturns, State::INVALID)
+{
+}
+
 void CommutativeGenerator::validateGeneratorConfig(
     uint16_t &numOfStates_, [[maybe_unused]] uint16_t &numOfCalls_,
     [[maybe_unused]] uint16_t &numOfLocals_, [[maybe_unused]] uint16_t &numOfReturns_,
     uint16_t &numOfStackSymbols_)
 {
-    uint16_t adjustedNumOfStates{
-        static_cast<uint16_t>((numOfStates + 1) * (secondDvpaNumOfStates + 1))};
+    constexpr uint16_t minNumOfStackSymbols{3};
+    if (numOfStackSymbols < minNumOfStackSymbols)
+    {
+        IMP("[CommutativeGenerator] adjusting stack symbols from %u to %u", numOfStackSymbols,
+            minNumOfStackSymbols);
+        numOfStackSymbols = minNumOfStackSymbols;
+    }
+
+    const uint16_t adjustedNumOfStates{static_cast<uint16_t>(numOfStates * secondDvpaNumOfStates)};
     if (adjustedNumOfStates > utils::MaxNumOfAutomatonStates)
     {
-        ERR("[CommutativeGenerator]: (numOfStates + 1) * (secondDvpaNumOfStates + 1) (%u) is "
-            "greater than "
-            "MaxNumOfAutomatonStates!",
-            adjustedNumOfStates);
+        ERR("[CommutativeGenerator]: numOfStates * secondDvpaNumOfStates (%u) is greater than "
+            "MaxNumOfAutomatonStates! (%u)",
+            adjustedNumOfStates, utils::MaxNumOfAutomatonStates);
+        exit(toExit(ExitCode::GENERATOR));
+    }
+    if (numOfStackSymbols > utils::MaxNumOfStackSymbols)
+    {
+        ERR("[CommutativeGenerator]: numOfStackSymbols (%u) is greater than "
+            "MaxNumOfStackSymbols! (%u)",
+            numOfStackSymbols, utils::MaxNumOfStackSymbols);
         exit(toExit(ExitCode::GENERATOR));
     }
 
     IMP("[CommutativeGenerator] adjusting numOfStates to %u", adjustedNumOfStates);
     numOfStates_ = adjustedNumOfStates;
-
-    uint16_t adjustedNumOfStackSymbols{
-        static_cast<uint16_t>((numOfStackSymbols + 1) * (numOfStackSymbols + 1))}; // TODO
-    if (adjustedNumOfStackSymbols > utils::MaxNumOfStackSymbols)
-    {
-        ERR("[CommutativeGenerator]: (numOfStackSymbols + 1) * (numOfStackSymbols + 1) (%u) is "
-            "greater than "
-            "MaxNumOfStackSymbols! (%u)",
-            adjustedNumOfStackSymbols, utils::MaxNumOfStackSymbols);
-        exit(toExit(ExitCode::GENERATOR));
-    }
-
-    IMP("[CommutativeGenerator] adjusting numOfStackSymbols to %u", adjustedNumOfStackSymbols);
-    numOfStackSymbols_ = adjustedNumOfStackSymbols;
+    numOfStackSymbols_ = numOfStackSymbols;
 }
 
 bool CommutativeGenerator::generatorSpecificCheck(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis)
 {
-    return (numOfStates + 1) * (secondDvpaNumOfStates + 1) + 1 >= hypothesis->getNumOfStates();
+    return numOfStates * secondDvpaNumOfStates + 1 >= hypothesis->getNumOfStates();
+}
+
+void CommutativeGenerator::splitAlphabet()
+{
+    callSplitPoint = numOfCalls / 2;
+    returnSplitPoint = numOfReturns / 2;
+    localSplitPoint = numOfLocals / 2;
+    stackSplitPoint = static_cast<uint16_t>(1 + (numOfStackSymbols - 1) / 2);
 }
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommutativeGenerator::run()
 {
-    splitAplhabet();
+    splitAlphabet();
 
-    auto firstVpa = generateVpa(
-        [&](const common::Symbol &symbol) { return firstVpaPredicate(symbol); }, numOfStates);
-    auto secondVpa = generateVpa(
-        [&](const common::Symbol &symbol) { return secondVpaPredicate(symbol); },
-        secondDvpaNumOfStates);
+    auto first = generateComponent(
+        numOfStates, 0, callSplitPoint, 0, localSplitPoint, 0, returnSplitPoint, 1,
+        stackSplitPoint);
+    auto second = generateComponent(
+        secondDvpaNumOfStates, callSplitPoint, numOfCalls, localSplitPoint, numOfLocals,
+        returnSplitPoint, numOfReturns, stackSplitPoint, numOfStackSymbols);
 
-    teacher::AutomataCombiner<AutomatonKind::Normal> combiner{
-        firstVpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols};
-    return combiner.combineVPA(*secondVpa);
-}
+    generateProduct(first, second);
+    selectProductAcceptingStates(first.numOfStates, second.numOfStates);
 
-void CommutativeGenerator::splitAplhabet()
-{
-    callSplitPoint = (rng() % (numOfCalls - 1)) + 1;
-    returnSplitPoint = (rng() % (numOfReturns - 1)) + 1;
-    localSplitPoint = (rng() % (numOfLocals - 1)) + 1;
-}
-
-template <typename Predicate>
-std::shared_ptr<common::VPA<AutomatonKind::Normal>> CommutativeGenerator::generateVpa(
-    const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates)
-{
-    generateTransition(isVoidSymbol, specificVpaNumOfStates);
-
-    acceptingStates.clear();
-    selectAcceptingStates(specificVpaNumOfStates);
+    const uint16_t productNumOfStates{
+        static_cast<uint16_t>(first.numOfStates * second.numOfStates)};
     return std::make_shared<common::VPA<AutomatonKind::Normal>>(
-        std::move(transition), initialState, acceptingStates, specificVpaNumOfStates);
+        std::move(transition), initialState, acceptingStates, productNumOfStates);
 }
 
-template <typename Predicate>
-void CommutativeGenerator::generateTransition(
-    const Predicate &isVoidSymbol, const uint16_t specificVpaNumOfStates)
+CommutativeGenerator::ComponentTransitions CommutativeGenerator::generateComponent(
+    const uint16_t componentNumOfStates, const uint16_t callBegin, const uint16_t callEnd,
+    const uint16_t localBegin, const uint16_t localEnd, const uint16_t returnBegin,
+    const uint16_t returnEnd, const uint16_t stackBegin, const uint16_t stackEnd)
 {
-    transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
+    ComponentTransitions component{
+        componentNumOfStates, callBegin,    callEnd,          localBegin, localEnd,
+        returnBegin,          returnEnd,    stackBegin,       stackEnd,   numOfCalls,
+        numOfLocals,          numOfReturns, numOfStackSymbols};
+    generateComponentTransitions(component);
+    return component;
+}
 
-    for (uint16_t stateId = 0; stateId < specificVpaNumOfStates; stateId++)
+void CommutativeGenerator::generateComponentTransitions(ComponentTransitions &component)
+{
+    for (uint16_t stateId = 0; stateId < component.numOfStates; stateId++)
     {
-        common::transition::State state{stateId};
-        addCalls(state, isVoidSymbol, specificVpaNumOfStates);
-        addLocals(state, isVoidSymbol, specificVpaNumOfStates);
-        addReturns(state, isVoidSymbol, specificVpaNumOfStates);
+        const State state{stateId};
+        addCalls(component, state);
+        addLocals(component, state);
+        addReturns(component, state);
     }
 }
 
-template <typename Predicate>
-void CommutativeGenerator::addCalls(
-    common::transition::State state, const Predicate &isVoidSymbol,
-    const uint16_t specificVpaNumOfStates)
+void CommutativeGenerator::addCalls(ComponentTransitions &component, const State state)
 {
-    for (uint16_t call = 0; call < numOfCalls; call++)
+    for (uint16_t call = component.callBegin; call < component.callEnd; call++)
     {
-        if (isVoidSymbol(common::Symbol{common::symbol::CallSymbol{call}}))
-        {
-            addVoidCall(state, call);
-            continue;
-        }
-
         if (skipTransition())
         {
             continue;
         }
-        common::transition::State dest{static_cast<uint16_t>(rng() % specificVpaNumOfStates)};
-        common::symbol::StackSymbol stackSymbol{
-            static_cast<uint16_t>((rng() % (numOfStackSymbols - 1)) + 1)};
 
-        transition->add(state, common::symbol::CallSymbol{call}, dest, stackSymbol);
+        component.calls[callIndex(state, call)] = {
+            State{static_cast<uint16_t>(rng() % component.numOfStates)},
+            StackSymbol{static_cast<uint16_t>(
+                component.stackBegin + rng() % (component.stackEnd - component.stackBegin))}};
     }
 }
 
-template <typename Predicate>
-void CommutativeGenerator::addLocals(
-    common::transition::State state, const Predicate &isVoidSymbol,
-    const uint16_t specificVpaNumOfStates)
+void CommutativeGenerator::addLocals(ComponentTransitions &component, const State state)
 {
-    for (uint16_t local = 0; local < numOfLocals; local++)
+    for (uint16_t local = component.localBegin; local < component.localEnd; local++)
     {
-        if (isVoidSymbol(common::Symbol{common::symbol::LocalSymbol{local}}))
-        {
-            addVoidLocal(state, local);
-            continue;
-        }
-
         if (skipTransition())
         {
             continue;
         }
-        common::transition::State dest{static_cast<uint16_t>(rng() % specificVpaNumOfStates)};
 
-        transition->add(state, common::symbol::LocalSymbol{local}, dest);
+        component.locals[localIndex(state, local)] =
+            State{static_cast<uint16_t>(rng() % component.numOfStates)};
     }
 }
 
-template <typename Predicate>
-void CommutativeGenerator::addReturns(
-    common::transition::State state, const Predicate &isVoidSymbol,
-    const uint16_t specificVpaNumOfStates)
+void CommutativeGenerator::addReturns(ComponentTransitions &component, const State state)
 {
-    for (uint16_t ret = 0; ret < numOfReturns; ret++)
+    for (uint16_t ret = component.returnBegin; ret < component.returnEnd; ret++)
     {
-        for (uint16_t stackSymbolId = 0; stackSymbolId < numOfStackSymbols; stackSymbolId++)
+        for (uint16_t stackSymbol = component.stackBegin; stackSymbol < component.stackEnd;
+             stackSymbol++)
         {
-            if (isVoidSymbol(common::Symbol{common::symbol::ReturnSymbol{ret}}))
-            {
-                addVoidReturn(state, stackSymbolId, ret);
-                continue;
-            }
-
             if (skipTransition())
             {
                 continue;
             }
-            common::transition::State dest{static_cast<uint16_t>(rng() % specificVpaNumOfStates)};
-            common::symbol::StackSymbol stackSymbol{stackSymbolId};
 
-            transition->add(state, stackSymbol, common::symbol::ReturnSymbol{ret}, dest);
+            component.returns[returnIndex(state, stackSymbol, ret)] =
+                State{static_cast<uint16_t>(rng() % component.numOfStates)};
         }
     }
 }
 
-void CommutativeGenerator::addVoidCall(const common::transition::State state, const uint16_t callId)
+void CommutativeGenerator::generateProduct(
+    const ComponentTransitions &first, const ComponentTransitions &second)
 {
-    transition->add(
-        state, common::symbol::CallSymbol{callId}, state, common::symbol::StackSymbol{1});
-}
+    transition = std::make_unique<common::transition::Transition<AutomatonKind::Normal>>();
 
-void CommutativeGenerator::addVoidReturn(
-    const common::transition::State state, const uint16_t stackSymbolId, const uint16_t returnId)
-{
-    transition->add(
-        state, common::symbol::StackSymbol{stackSymbolId}, common::symbol::ReturnSymbol{returnId},
-        state);
-}
-
-void CommutativeGenerator::addVoidLocal(
-    const common::transition::State state, const uint16_t localId)
-{
-    transition->add(state, common::symbol::LocalSymbol{localId}, state);
-}
-
-bool CommutativeGenerator::firstVpaPredicate(const common::Symbol &symbol)
-{
-    switch (symbol.index())
+    for (uint16_t secondState = 0; secondState < second.numOfStates; secondState++)
     {
-    case common::CallSymbolVariant:
-    {
-        auto callId{static_cast<uint16_t>(std::get<common::symbol::CallSymbol>(symbol))};
-        return callId < callSplitPoint;
-    }
-    case common::ReturnSymbolVariant:
-    {
-        auto returnId{static_cast<uint16_t>(std::get<common::symbol::ReturnSymbol>(symbol))};
-        return returnId < returnSplitPoint;
-    }
-    case common::LocalSymbolVariant:
-    {
-        auto localId{static_cast<uint16_t>(std::get<common::symbol::LocalSymbol>(symbol))};
-        return localId < localSplitPoint;
-    }
-    }
-    ERR("[CommutativeGenerator] invalid symbol!");
-    return false;
-}
-
-bool CommutativeGenerator::secondVpaPredicate(const common::Symbol &symbol)
-{
-    switch (symbol.index())
-    {
-    case common::CallSymbolVariant:
-    {
-        auto callId{static_cast<uint16_t>(std::get<common::symbol::CallSymbol>(symbol))};
-        return callId >= callSplitPoint;
-    }
-    case common::ReturnSymbolVariant:
-    {
-        auto returnId{static_cast<uint16_t>(std::get<common::symbol::ReturnSymbol>(symbol))};
-        return returnId >= returnSplitPoint;
-    }
-    case common::LocalSymbolVariant:
-    {
-        auto localId{static_cast<uint16_t>(std::get<common::symbol::LocalSymbol>(symbol))};
-        return localId >= localSplitPoint;
-    }
-    }
-    ERR("[CommutativeGenerator] invalid symbol!");
-    return false;
-}
-
-void CommutativeGenerator::selectAcceptingStates(const uint16_t specificVpaNumOfStates)
-{
-    for (uint16_t i = 0; i < specificVpaNumOfStates; i++)
-    {
-        if (shouldAccept())
+        for (uint16_t firstState = 0; firstState < first.numOfStates; firstState++)
         {
-            acceptingStates.push_back(i);
+            const State source{combineStates(firstState, secondState)};
+            addProductCalls(source, firstState, secondState, first, second);
+            addProductLocals(source, firstState, secondState, first, second);
+            addProductReturns(source, firstState, secondState, first, second);
         }
     }
+}
 
-    if (acceptingStates.size() == specificVpaNumOfStates)
+void CommutativeGenerator::addProductCalls(
+    const State source, const uint16_t firstState, const uint16_t secondState,
+    const ComponentTransitions &first, const ComponentTransitions &second)
+{
+    for (uint16_t call = 0; call < numOfCalls; call++)
     {
-        acceptingStates.pop_back();
+        const bool belongsToFirst{call < callSplitPoint};
+        const auto &componentTransition = belongsToFirst
+                                              ? first.calls[callIndex(firstState, call)]
+                                              : second.calls[callIndex(secondState, call)];
+        if (componentTransition.destination == State::INVALID)
+        {
+            continue;
+        }
+
+        const State destination = belongsToFirst
+                                      ? combineStates(componentTransition.destination, secondState)
+                                      : combineStates(firstState, componentTransition.destination);
+        transition->add(
+            source, common::symbol::CallSymbol{call}, destination, componentTransition.stackSymbol);
+    }
+}
+
+void CommutativeGenerator::addProductLocals(
+    const State source, const uint16_t firstState, const uint16_t secondState,
+    const ComponentTransitions &first, const ComponentTransitions &second)
+{
+    for (uint16_t local = 0; local < numOfLocals; local++)
+    {
+        const bool belongsToFirst{local < localSplitPoint};
+        const State componentDestination = belongsToFirst
+                                               ? first.locals[localIndex(firstState, local)]
+                                               : second.locals[localIndex(secondState, local)];
+        if (componentDestination == State::INVALID)
+        {
+            continue;
+        }
+
+        const State destination = belongsToFirst ? combineStates(componentDestination, secondState)
+                                                 : combineStates(firstState, componentDestination);
+        transition->add(source, common::symbol::LocalSymbol{local}, destination);
+    }
+}
+
+void CommutativeGenerator::addProductReturns(
+    const State source, const uint16_t firstState, const uint16_t secondState,
+    const ComponentTransitions &first, const ComponentTransitions &second)
+{
+    for (uint16_t ret = 0; ret < numOfReturns; ret++)
+    {
+        const bool belongsToFirst{ret < returnSplitPoint};
+        const auto &component{belongsToFirst ? first : second};
+        const uint16_t componentState{belongsToFirst ? firstState : secondState};
+
+        for (uint16_t stackSymbol = component.stackBegin; stackSymbol < component.stackEnd;
+             stackSymbol++)
+        {
+            const State componentDestination =
+                component.returns[returnIndex(componentState, stackSymbol, ret)];
+            if (componentDestination == State::INVALID)
+            {
+                continue;
+            }
+
+            const State destination = belongsToFirst
+                                          ? combineStates(componentDestination, secondState)
+                                          : combineStates(firstState, componentDestination);
+            transition->add(
+                source, StackSymbol{stackSymbol}, common::symbol::ReturnSymbol{ret}, destination);
+        }
+    }
+}
+
+void CommutativeGenerator::selectProductAcceptingStates(
+    const uint16_t firstNumOfStates, const uint16_t secondNumOfStates)
+{
+    const auto firstAccepting{selectComponentAcceptingStates(firstNumOfStates)};
+    const auto secondAccepting{selectComponentAcceptingStates(secondNumOfStates)};
+
+    acceptingStates.clear();
+    for (uint16_t secondState = 0; secondState < secondNumOfStates; secondState++)
+    {
+        for (uint16_t firstState = 0; firstState < firstNumOfStates; firstState++)
+        {
+            if (firstAccepting[firstState] or secondAccepting[secondState])
+            {
+                acceptingStates.push_back(combineStates(firstState, secondState));
+            }
+        }
+    }
+}
+
+std::vector<bool> CommutativeGenerator::selectComponentAcceptingStates(
+    const uint16_t componentNumOfStates)
+{
+    std::vector<bool> componentAccepting(componentNumOfStates);
+    for (auto &&accepting : componentAccepting)
+    {
+        accepting = shouldAccept();
     }
 
-    if (acceptingStates.size() == 0)
+    if (std::all_of(
+            componentAccepting.begin(), componentAccepting.end(), [](bool value) { return value; }))
     {
-        acceptingStates.push_back(0);
+        componentAccepting.back() = false;
     }
+    if (std::none_of(
+            componentAccepting.begin(), componentAccepting.end(), [](bool value) { return value; }))
+    {
+        componentAccepting.front() = true;
+    }
+
+    return componentAccepting;
+}
+
+size_t CommutativeGenerator::callIndex(const uint16_t state, const uint16_t call) const
+{
+    return static_cast<size_t>(state) * numOfCalls + call;
+}
+
+size_t CommutativeGenerator::localIndex(const uint16_t state, const uint16_t local) const
+{
+    return static_cast<size_t>(state) * numOfLocals + local;
+}
+
+size_t CommutativeGenerator::returnIndex(
+    const uint16_t state, const uint16_t stackSymbol, const uint16_t ret) const
+{
+    return (static_cast<size_t>(state) * numOfStackSymbols + stackSymbol) * numOfReturns + ret;
+}
+
+CommutativeGenerator::State CommutativeGenerator::combineStates(
+    const uint16_t first, const uint16_t second) const
+{
+    return State{static_cast<uint16_t>(second * numOfStates + first)};
 }
 
 learner::srs::Srs CommutativeGenerator::getSrs()
 {
     learner::srs::Srs srs{};
+
+    for (uint16_t firstLocal = 0; firstLocal < localSplitPoint; firstLocal++)
+    {
+        for (uint16_t secondLocal = localSplitPoint; secondLocal < numOfLocals; secondLocal++)
+        {
+            srs.push_back(
+                learner::srs::SrsRuleWithParams{
+                    .left =
+                        {.left = {common::Word{common::symbol::LocalSymbol{firstLocal}}},
+                         .right = {common::Word{common::symbol::LocalSymbol{secondLocal}}},
+                         .takesParams = false},
+                    .right = {
+                        .left = {common::Word{common::symbol::LocalSymbol{secondLocal}}},
+                        .right = {common::Word{common::symbol::LocalSymbol{firstLocal}}},
+                        .takesParams = false}});
+        }
+    }
 
     for (uint16_t firstCall = 0; firstCall < callSplitPoint; firstCall++)
     {

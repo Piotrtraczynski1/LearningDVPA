@@ -60,11 +60,11 @@ void Generator::validateGeneratorConfig(
 
 bool Generator::skipTransition()
 {
-    return ((static_cast<double>(rng()) / RAND_MAX) >= density);
+    return not std::bernoulli_distribution{density}(rng);
 }
 
 bool Generator::shouldAccept()
 {
-    return ((static_cast<double>(rng()) / RAND_MAX) < acceptingStatesDensity);
+    return std::bernoulli_distribution{acceptingStatesDensity}(rng);
 }
 } // namespace generator

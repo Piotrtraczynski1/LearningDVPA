@@ -7,9 +7,9 @@ namespace benchmark::scenario
 using Step = std::pair<uint16_t, uint16_t>;
 
 const std::array<Step, CommutationIncreasingNumOfStates::numOfIterationsIn1Dim>
-    CommutationIncreasingNumOfStates::dim1Steps = {Step{1, 1}, Step{1, 2}, Step{2, 2}, Step{2, 3},
-                                                   Step{2, 4}, Step{3, 3}, Step{2, 5}, Step{3, 4},
-                                                   Step{4, 4}, Step{4, 5}};
+    CommutationIncreasingNumOfStates::dim1Steps = {Step{2, 2}, Step{2, 3}, Step{2, 4}, Step{3, 3},
+                                                   Step{2, 5}, Step{3, 4}, Step{4, 4}, Step{4, 5},
+                                                   Step{5, 5}, Step{5, 6}};
 
 uint16_t CommutationIncreasingNumOfStates::getNumOfIterationsIn1Dim()
 {
