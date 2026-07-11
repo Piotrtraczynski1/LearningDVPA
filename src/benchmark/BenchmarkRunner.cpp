@@ -4,6 +4,7 @@
 
 #include "benchmark/BenchmarkRunner.hpp"
 #include "benchmark/scenario/Scenarios.hpp"
+#include "utils/Counters.hpp"
 #include "utils/TimeMarker.hpp"
 #include "utils/log.hpp"
 
@@ -17,6 +18,12 @@ const std::vector<std::string> BenchmarkRunner::markersToBeIncluded = {
     "[SrsChecker]: check consistency with SRS",
     "[SrsChecker]: counterexample found",
     "[AutomataGenerator]: generateAutomaton"
+};
+
+const std::vector<std::string> BenchmarkRunner::countersToBeIncluded = {
+    "membershipQuery",
+    "stackContentQuery",
+    "equivalenceQuery"
 };
 
 const std::vector<std::string> BenchmarkRunner::heatmapMarkers = {
@@ -69,6 +76,7 @@ void BenchmarkRunner::run()
                     scenario->runSingleIteration();
                     saveResults(numOfTestsInSingleIteration);
                     MeasurementDataBase::reset();
+                    Counters::reset();
                     scenario->prepareNextIterationDim1();
                 }
                 scenario->resetDim1();
@@ -85,9 +93,20 @@ void BenchmarkRunner::run()
 void BenchmarkRunner::createDirectory()
 {
     std::filesystem::create_directories(getDirectoryName());
+
     std::ofstream out(getOutputFileName(), std::ios::trunc);
-    out << "dim4Name;dim4Details;dim3Name;dim3Details;dim2Name;dim2Details;dim1Name;dim1Details;"
+    out << "dim4Name;dim4Details;"
+           "dim3Name;dim3Details;"
+           "dim2Name;dim2Details;"
+           "dim1Name;dim1Details;"
            "marker;time;executions;avg_time_per_execution\n";
+
+    std::ofstream out2(getCountersFileName(), std::ios::trunc);
+    out2 << "dim4Name;dim4Details;"
+            "dim3Name;dim3Details;"
+            "dim2Name;dim2Details;"
+            "dim1Name;dim1Details;"
+            "counter;value\n";
 
     for (const auto &marker : heatmapMarkers)
     {
@@ -115,6 +134,11 @@ std::string BenchmarkRunner::getOutputFileName()
     return (std::filesystem::path(getDirectoryName()) / "output.csv").string();
 }
 
+std::string BenchmarkRunner::getCountersFileName()
+{
+    return (std::filesystem::path(getDirectoryName()) / "counters.csv").string();
+}
+
 std::string BenchmarkRunner::getHeatmapFileName(const std::string &marker)
 {
     std::string filename = "heatmap" + marker + ".txt";
@@ -134,6 +158,8 @@ void BenchmarkRunner::saveResults(const uint16_t numOfTestsInSingleIteration)
     {
         saveMarker(out, marker, numOfTestsInSingleIteration);
     }
+
+    saveCounters(numOfTestsInSingleIteration);
 
     for (const auto &marker : heatmapMarkers)
     {
@@ -164,6 +190,22 @@ void BenchmarkRunner::saveMarker(
             << (markerInfo.time / numOfTestsInSingleIteration) << ";"
             << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration) << ";"
             << (markerInfo.time / markerInfo.executions) << "\n";
+    }
+}
+
+void BenchmarkRunner::saveCounters(const uint16_t numOfTestsInSingleIteration)
+{
+    std::ofstream out(getCountersFileName(), std::ios::app);
+
+    for (const auto &counter : countersToBeIncluded)
+    {
+        const auto value = Counters::getCounter(counter);
+
+        out << scenario->getDim4Name() << ";" << scenario->getDim4Details() << ";"
+            << scenario->getDim3Name() << ";" << scenario->getDim3Details() << ";"
+            << scenario->getDim2Name() << ";" << scenario->getDim2Details() << ";"
+            << scenario->getDim1Name() << ";" << scenario->getDim1Details() << ";" << counter << ";"
+            << (static_cast<float>(value) / numOfTestsInSingleIteration) << "\n";
     }
 }
 

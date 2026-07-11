@@ -3,6 +3,7 @@
 #include "common/VPA.hpp"
 #include "teacher/EquivalenceCheck.hpp"
 #include "teacher/Teacher.hpp"
+#include "utils/Counters.hpp"
 #include "utils/ExitCode.hpp"
 #include "utils/TimeMarker.hpp"
 
@@ -22,6 +23,7 @@ Teacher::Teacher(
 bool Teacher::membershipQuery(const common::Word &word) const
 {
     TIME_MARKER("[Teacher]: membershipQuery");
+    Counters::update("membershipQuery", word.size());
 
     return vpa->checkWord(word);
 }
@@ -29,6 +31,7 @@ bool Teacher::membershipQuery(const common::Word &word) const
 common::Stack Teacher::stackContentQuery(const common::Word &word) const
 {
     TIME_MARKER("[Teacher]: stackContentQuery");
+    Counters::update("stackContentQuery", word.size());
 
     vpa->checkWord(word);
     return vpa->stack;
@@ -38,6 +41,7 @@ std::shared_ptr<common::Word> Teacher::equivalenceQuery(
     const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis) const
 {
     TIME_MARKER("[Teacher]: equivalenceQuery");
+    Counters::update("equivalenceQuery", hypothesis->getNumOfStates());
     LOG("[Teacher]: equivalenceQuery hypothesis numOfStates: %u", hypothesis->getNumOfStates());
 
     auto output = equivalenceCheck(automataCombiner, emptinessChecker, hypothesis);

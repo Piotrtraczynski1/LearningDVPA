@@ -59,12 +59,12 @@ constexpr TesterParameters RandomTestParameters{
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
 constexpr TesterParameters CommutativeTestParameters{
-    .minNumOfStates = 5,
-    .maxNumOfStates = 2,
+    .minNumOfStates = 2,
+    .maxNumOfStates = 5,
     .minNumOfCalls = 8,
     .maxNumOfCalls = 8,
-    .minNumOfLocals = 2,
-    .maxNumOfLocals = 2,
+    .minNumOfLocals = 8,
+    .maxNumOfLocals = 8,
     .minNumOfReturns = 8,
     .maxNumOfReturns = 8,
     .minNumOfStackSymbols = 2,
