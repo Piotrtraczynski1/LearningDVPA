@@ -17,6 +17,33 @@
 
 struct RunResult;
 
+enum class TestStatus
+{
+    Passed,
+    ValidationFailed,
+    GeneratorCheckFailed,
+    Timeout,
+    ChildError,
+    StackContentError
+};
+
+const char *toString(TestStatus status);
+
+struct SingleTestResult
+{
+    uint32_t seed;
+    uint16_t numOfStates;
+    uint16_t numOfCalls;
+    uint16_t numOfLocals;
+    uint16_t numOfReturns;
+    uint16_t numOfStackSymbols;
+    uint16_t targetNumOfStates;
+    uint16_t targetAcceptingStates;
+    uint16_t hypothesisNumOfStates;
+    uint16_t hypothesisAcceptingStates;
+    TestStatus status;
+};
+
 class Tester
 {
     const TesterParameters &params;
@@ -30,6 +57,7 @@ public:
         const TesterParameters &testerParameters, uint32_t seed);
 
     uint16_t run();
+    SingleTestResult runSingle();
 
 private:
     std::string directoryPath;
@@ -44,9 +72,10 @@ private:
         const std::string &name);
     void printUt();
 
+    SingleTestResult runNextTest();
     void prepareTest();
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> runLearner();
-    void runSupervisedTest();
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> runSupervisedTest();
     RunResult runTestWithTimeout();
 
     std::shared_ptr<common::Word> generateRandomWord(uint16_t length);
@@ -80,6 +109,8 @@ private:
     std::shared_ptr<learner::Learner> learner;
 
     std::mt19937 rng;
+    uint32_t seed;
+    TestStatus currentTestStatus{TestStatus::Passed};
 };
 
 struct RunResult

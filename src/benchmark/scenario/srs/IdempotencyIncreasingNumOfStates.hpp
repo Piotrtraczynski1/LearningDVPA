@@ -11,7 +11,8 @@ class IdempotencyIncreasingNumOfStates : public BaseSrsScenario
 public:
     uint16_t getNumOfIterationsIn1Dim() override;
     uint16_t getDim1Details() override;
-    void runSingleIteration() override;
+    std::string getGeneratorName() const override;
+    SingleTestResult runSingle(uint32_t seed) override;
 
     void prepareNextIterationDim1() override;
 };

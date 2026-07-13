@@ -14,13 +14,15 @@ uint16_t IdempotencyIncreasingNumOfStates::getDim1Details()
     return parameters.minNumOfStates;
 }
 
-void IdempotencyIncreasingNumOfStates::runSingleIteration()
+std::string IdempotencyIncreasingNumOfStates::getGeneratorName() const
 {
-    Tester{
-        numOfTestsInSingleIteration,
-        std::unique_ptr<generator::Generator>(new generator::srs::IdempotencyGenerator()),
-        parameters, static_cast<uint16_t>(rand())}
-        .run();
+    return "idempotency";
+}
+
+SingleTestResult IdempotencyIncreasingNumOfStates::runSingle(uint32_t seed)
+{
+    return Tester{1, std::make_unique<generator::srs::IdempotencyGenerator>(), parameters, seed}
+        .runSingle();
 }
 
 void IdempotencyIncreasingNumOfStates::prepareNextIterationDim1()

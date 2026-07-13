@@ -42,6 +42,7 @@ public:
     uint16_t getNumOfTestsInSingleIteration() override;
     std::string getDim2Name() override;
     uint16_t getDim2Details() override;
+    const TesterParameters &getParameters() const override;
     void prepareNextIterationDim2();
     void resetDim2();
 

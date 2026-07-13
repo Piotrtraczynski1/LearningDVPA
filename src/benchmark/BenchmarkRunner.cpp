@@ -1,6 +1,5 @@
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 
 #include "benchmark/BenchmarkRunner.hpp"
 #include "benchmark/scenario/Scenarios.hpp"
@@ -10,37 +9,17 @@
 
 namespace benchmark
 {
-// clang-format off
-const std::vector<std::string> BenchmarkRunner::markersToBeIncluded = {
-    "[Teacher]: membershipQuery",
-    "[Teacher]: stackContentQuery",
-    "[Teacher]: equivalenceQuery",
-    "[SrsChecker]: check consistency with SRS",
-    "[SrsChecker]: counterexample found",
-    "[AutomataGenerator]: generateAutomaton"
-};
-
-const std::vector<std::string> BenchmarkRunner::countersToBeIncluded = {
-    "membershipQuery",
-    "stackContentQuery",
-    "equivalenceQuery"
-};
-
-const std::vector<std::string> BenchmarkRunner::heatmapMarkers = {
-    "[Teacher]: membershipQuery",
-    "[Teacher]: stackContentQuery",
-    "[Teacher]: equivalenceQuery"
-};
-
-const std::vector<std::string> BenchmarkRunner::plotExecutionMarkers = {
-    "[Teacher]: equivalenceQuery",
-    "[SrsChecker]: counterexample found"
-};
-
-const std::vector<std::string> BenchmarkRunner::plotTimeMarkers = {
-    "[Learner]: Learner::run"
-};
-// clang-format on
+namespace
+{
+constexpr const char *membershipQueryMarker{"[Teacher]: membershipQuery"};
+constexpr const char *stackContentQueryMarker{"[Teacher]: stackContentQuery"};
+constexpr const char *equivalenceQueryMarker{"[Teacher]: equivalenceQuery"};
+constexpr const char *srsCheckMarker{"[SrsChecker]: check consistency with SRS"};
+constexpr const char *srsCounterexampleMarker{"[SrsChecker]: counterexample found"};
+constexpr const char *automataGenerationMarker{"[AutomataGenerator]: generateAutomaton"};
+constexpr const char *learnerMarker{"[Learner]: Learner::run"};
+constexpr const char *outputValidationMarker{"[Tester]: testOutput"};
+} // namespace
 
 BenchmarkRunner::BenchmarkRunner(const std::string &scenarioNameArg) : scenarioName{scenarioNameArg}
 {
@@ -48,19 +27,24 @@ BenchmarkRunner::BenchmarkRunner(const std::string &scenarioNameArg) : scenarioN
 
 void BenchmarkRunner::run()
 {
-    auto it = benchmark::scenariosRegistry.find(scenarioName);
+    auto it = scenariosRegistry.find(scenarioName);
     if (it == scenariosRegistry.end())
     {
         ERR("Unknown scenario: %s", scenarioName.c_str());
         return;
     }
 
+    scenario = it->second();
     createDirectory();
 
-    scenario = it->second();
+    std::ofstream out(getRunsFileName(), std::ios::trunc);
+    if (not out)
+    {
+        ERR("Could not create benchmark results file: %s", getRunsFileName().c_str());
+        return;
+    }
+    writeHeader(out);
 
-    std::srand(scenario->getSeed());
-    const auto numOfTestsInSingleIteration{scenario->getNumOfTestsInSingleIteration()};
     for (uint16_t iteration4Dim = 0; iteration4Dim < scenario->getNumOfIterationsIn4Dim();
          iteration4Dim++)
     {
@@ -73,10 +57,14 @@ void BenchmarkRunner::run()
                 for (uint16_t iteration1Dim = 0;
                      iteration1Dim < scenario->getNumOfIterationsIn1Dim(); iteration1Dim++)
                 {
-                    scenario->runSingleIteration();
-                    saveResults(numOfTestsInSingleIteration);
-                    MeasurementDataBase::reset();
-                    Counters::reset();
+                    for (uint16_t runIndex = 0;
+                         runIndex < scenario->getNumOfTestsInSingleIteration(); runIndex++)
+                    {
+                        MeasurementDataBase::reset();
+                        Counters::reset();
+                        const uint32_t seed = static_cast<uint32_t>(scenario->getSeed()) + runIndex;
+                        saveResult(out, runIndex, scenario->runSingle(seed));
+                    }
                     scenario->prepareNextIterationDim1();
                 }
                 scenario->resetDim1();
@@ -93,162 +81,59 @@ void BenchmarkRunner::run()
 void BenchmarkRunner::createDirectory()
 {
     std::filesystem::create_directories(getDirectoryName());
-
-    std::ofstream out(getOutputFileName(), std::ios::trunc);
-    out << "dim4Name;dim4Details;"
-           "dim3Name;dim3Details;"
-           "dim2Name;dim2Details;"
-           "dim1Name;dim1Details;"
-           "marker;time;executions;avg_time_per_execution\n";
-
-    std::ofstream out2(getCountersFileName(), std::ios::trunc);
-    out2 << "dim4Name;dim4Details;"
-            "dim3Name;dim3Details;"
-            "dim2Name;dim2Details;"
-            "dim1Name;dim1Details;"
-            "counter;value\n";
-
-    for (const auto &marker : heatmapMarkers)
-    {
-        std::ofstream out(getHeatmapFileName(marker), std::ios::trunc);
-    }
-
-    for (const auto &marker : plotExecutionMarkers)
-    {
-        std::ofstream out(getPlotFileName(marker), std::ios::trunc);
-    }
-
-    for (const auto &marker : plotTimeMarkers)
-    {
-        std::ofstream out(getPlotFileName(marker), std::ios::trunc);
-    }
 }
 
-std::string BenchmarkRunner::getDirectoryName()
+std::string BenchmarkRunner::getDirectoryName() const
 {
     return (std::filesystem::path(__FILE__).parent_path() / "results" / scenarioName).string();
 }
 
-std::string BenchmarkRunner::getOutputFileName()
+std::string BenchmarkRunner::getRunsFileName() const
 {
-    return (std::filesystem::path(getDirectoryName()) / "output.csv").string();
+    return (std::filesystem::path(getDirectoryName()) / "runs.csv").string();
 }
 
-std::string BenchmarkRunner::getCountersFileName()
+void BenchmarkRunner::writeHeader(std::ofstream &out) const
 {
-    return (std::filesystem::path(getDirectoryName()) / "counters.csv").string();
+    out << "scenario,runIndex,seed,generator,numOfStates,numOfCalls,numOfLocals,numOfReturns,"
+           "numOfStackSymbols,density,acceptingStatesDensity,numOfModules,secondDvpaNumOfStates,"
+           "useSrs,useEquivalenceCheckToValidateOutput,equivalenceQueryCount,"
+           "equivalenceQueryHypothesisStatesTotal,equivalenceQueryTimeUs,membershipQueryCount,"
+           "membershipQuerySymbolsTotal,membershipQueryTimeUs,stackContentQueryCount,"
+           "stackContentQuerySymbolsTotal,stackContentQueryTimeUs,srsCheckCount,srsCheckTimeUs,"
+           "srsCounterexampleCount,automataGeneratedCount,automataGenerationTimeUs,learnerTimeUs,"
+           "outputValidationTimeUs,status,targetNumOfStates,targetAcceptingStates,"
+           "hypothesisNumOfStates,hypothesisAcceptingStates\n";
 }
 
-std::string BenchmarkRunner::getHeatmapFileName(const std::string &marker)
+void BenchmarkRunner::saveResult(
+    std::ofstream &out, uint16_t runIndex, const SingleTestResult &result) const
 {
-    std::string filename = "heatmap" + marker + ".txt";
-    return (std::filesystem::path(getDirectoryName()) / filename).string();
-}
+    const auto &parameters = scenario->getParameters();
+    const auto membershipQuery = MeasurementDataBase::getMarkerInfo(membershipQueryMarker);
+    const auto stackContentQuery = MeasurementDataBase::getMarkerInfo(stackContentQueryMarker);
+    const auto equivalenceQuery = MeasurementDataBase::getMarkerInfo(equivalenceQueryMarker);
+    const auto srsCheck = MeasurementDataBase::getMarkerInfo(srsCheckMarker);
+    const auto srsCounterexample = MeasurementDataBase::getMarkerInfo(srsCounterexampleMarker);
+    const auto automataGeneration = MeasurementDataBase::getMarkerInfo(automataGenerationMarker);
+    const auto learner = MeasurementDataBase::getMarkerInfo(learnerMarker);
+    const auto outputValidation = MeasurementDataBase::getMarkerInfo(outputValidationMarker);
 
-std::string BenchmarkRunner::getPlotFileName(const std::string &marker)
-{
-    std::string filename = "plot" + marker + ".txt";
-    return (std::filesystem::path(getDirectoryName()) / filename).string();
-}
-
-void BenchmarkRunner::saveResults(const uint16_t numOfTestsInSingleIteration)
-{
-    std::ofstream out(getOutputFileName(), std::ios::app);
-    for (const auto &marker : markersToBeIncluded)
-    {
-        saveMarker(out, marker, numOfTestsInSingleIteration);
-    }
-
-    saveCounters(numOfTestsInSingleIteration);
-
-    for (const auto &marker : heatmapMarkers)
-    {
-        saveHeatmap(marker, numOfTestsInSingleIteration);
-    }
-
-    for (const auto &marker : plotExecutionMarkers)
-    {
-        savePlotExecutions(marker, numOfTestsInSingleIteration);
-    }
-
-    for (const auto &marker : plotTimeMarkers)
-    {
-        savePlotTime(marker, numOfTestsInSingleIteration);
-    }
-}
-
-void BenchmarkRunner::saveMarker(
-    std::ofstream &out, const std::string &marker, const uint16_t numOfTestsInSingleIteration)
-{
-    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
-    if (markerInfo.executions > 0)
-    {
-        out << scenario->getDim4Name() << ";" << scenario->getDim4Details() << ";"
-            << scenario->getDim3Name() << ";" << scenario->getDim3Details() << ";"
-            << scenario->getDim2Name() << ";" << scenario->getDim2Details() << ";"
-            << scenario->getDim1Name() << ";" << scenario->getDim1Details() << ";" << marker << ";"
-            << (markerInfo.time / numOfTestsInSingleIteration) << ";"
-            << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration) << ";"
-            << (markerInfo.time / markerInfo.executions) << "\n";
-    }
-}
-
-void BenchmarkRunner::saveCounters(const uint16_t numOfTestsInSingleIteration)
-{
-    std::ofstream out(getCountersFileName(), std::ios::app);
-
-    for (const auto &counter : countersToBeIncluded)
-    {
-        const auto value = Counters::getCounter(counter);
-
-        out << scenario->getDim4Name() << ";" << scenario->getDim4Details() << ";"
-            << scenario->getDim3Name() << ";" << scenario->getDim3Details() << ";"
-            << scenario->getDim2Name() << ";" << scenario->getDim2Details() << ";"
-            << scenario->getDim1Name() << ";" << scenario->getDim1Details() << ";" << counter << ";"
-            << (static_cast<float>(value) / numOfTestsInSingleIteration) << "\n";
-    }
-}
-
-void BenchmarkRunner::saveHeatmap(
-    const std::string &marker, const uint16_t numOfTestsInSingleIteration)
-{
-    std::ofstream out(getHeatmapFileName(marker), std::ios::app);
-    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
-    if (markerInfo.executions > 0)
-    {
-        out << marker << " (" << scenario->getDim2Details() << ", " << scenario->getDim1Details()
-            << ") [" << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration)
-            << "]\n";
-    }
-}
-
-void BenchmarkRunner::savePlotExecutions(
-    const std::string &marker, const uint16_t numOfTestsInSingleIteration)
-{
-    std::ofstream out(getPlotFileName(marker), std::ios::app);
-    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
-    if (markerInfo.executions > 0)
-    {
-        out << marker << ", dim2Details: " << scenario->getDim2Details() << ", ("
-            << scenario->getDim1Details() << ", "
-            << (static_cast<float>(markerInfo.executions) / numOfTestsInSingleIteration) << ")\n";
-    }
-}
-
-void BenchmarkRunner::savePlotTime(
-    const std::string &marker, const uint16_t numOfTestsInSingleIteration)
-{
-    constexpr double microsecondsToSeconds{1e-6};
-
-    std::ofstream out(getPlotFileName(marker), std::ios::app);
-    const auto markerInfo{MeasurementDataBase::getMarkerInfo(marker)};
-    if (markerInfo.executions > 0)
-    {
-        out << marker << ", dim2Details: " << scenario->getDim2Details() << ", ("
-            << scenario->getDim1Details() << ", "
-            << (static_cast<float>(markerInfo.time) / numOfTestsInSingleIteration) *
-                   microsecondsToSeconds
-            << ")\n";
-    }
+    out << scenarioName << "," << runIndex << "," << result.seed << ","
+        << scenario->getGeneratorName() << "," << result.numOfStates << "," << result.numOfCalls
+        << "," << result.numOfLocals << "," << result.numOfReturns << ","
+        << result.numOfStackSymbols << "," << parameters.density << ","
+        << parameters.acceptingStatesDensity << "," << parameters.numOfModules << ","
+        << parameters.secondDvpaNumOfStates << "," << parameters.useSrs << ","
+        << parameters.useEquivalenceCheckToValidateOutput << "," << equivalenceQuery.executions
+        << "," << Counters::getCounter("equivalenceQuery") << "," << equivalenceQuery.time << ","
+        << membershipQuery.executions << "," << Counters::getCounter("membershipQuery") << ","
+        << membershipQuery.time << "," << stackContentQuery.executions << ","
+        << Counters::getCounter("stackContentQuery") << "," << stackContentQuery.time << ","
+        << srsCheck.executions << "," << srsCheck.time << "," << srsCounterexample.executions << ","
+        << automataGeneration.executions << "," << automataGeneration.time << "," << learner.time
+        << "," << outputValidation.time << "," << toString(result.status) << ","
+        << result.targetNumOfStates << "," << result.targetAcceptingStates << ","
+        << result.hypothesisNumOfStates << "," << result.hypothesisAcceptingStates << "\n";
 }
 } // namespace benchmark

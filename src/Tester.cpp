@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <cstdlib>
 #include <memory>
 #include <signal.h>
@@ -15,7 +16,7 @@
 Tester::Tester(
     const uint64_t numOfTests, std::unique_ptr<generator::Generator> gen,
     const TesterParameters &testerParameters, uint32_t seed)
-    : numOfTests{numOfTests}, generator{std::move(gen)}, params{testerParameters}
+    : params{testerParameters}, generator{std::move(gen)}, numOfTests{numOfTests}, seed{seed}
 {
     generator->setSeed(seed + 1);
     rng = std::mt19937{seed};
@@ -33,24 +34,94 @@ uint16_t Tester::run()
 {
     while (numOfExecutedTests < numOfTests)
     {
-        prepareTest();
-        printTestDetails();
-
-        if (params.supervisedMode)
-        {
-            runSupervisedTest();
-        }
-        else
-        {
-
-            testOutput(runLearner());
-        }
-
-        numOfExecutedTests++;
-        printTestStats();
+        runNextTest();
     }
 
     return numOfFailedTests;
+}
+
+const char *toString(TestStatus status)
+{
+    switch (status)
+    {
+    case TestStatus::Passed:
+        return "passed";
+    case TestStatus::ValidationFailed:
+        return "validation_failed";
+    case TestStatus::GeneratorCheckFailed:
+        return "generator_check_failed";
+    case TestStatus::Timeout:
+        return "timeout";
+    case TestStatus::ChildError:
+        return "child_error";
+    case TestStatus::StackContentError:
+        return "stack_content_error";
+    }
+
+    return "child_error";
+}
+
+namespace
+{
+uint16_t countAcceptingStates(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &automaton)
+{
+    if (not automaton)
+    {
+        return 0;
+    }
+
+    uint16_t count{0};
+    for (bool accepting : automaton->acceptingStates)
+    {
+        count += accepting;
+    }
+    return count;
+}
+} // namespace
+
+SingleTestResult Tester::runSingle()
+{
+    if (numOfTests != 1 or numOfExecutedTests != 0)
+    {
+        ERR("[Tester]: runSingle requires a fresh Tester configured for one test");
+        exit(toExit(ExitCode::UNDEFINED));
+    }
+
+    return runNextTest();
+}
+
+SingleTestResult Tester::runNextTest()
+{
+    prepareTest();
+    printTestDetails();
+    currentTestStatus = TestStatus::Passed;
+
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
+    if (params.supervisedMode)
+    {
+        hypothesis = runSupervisedTest();
+    }
+    else
+    {
+        hypothesis = runLearner();
+        testOutput(hypothesis);
+    }
+
+    numOfExecutedTests++;
+    printTestStats();
+
+    return SingleTestResult{
+        .seed = seed,
+        .numOfStates = numOfStates,
+        .numOfCalls = numOfCalls,
+        .numOfLocals = numOfLocals,
+        .numOfReturns = numOfReturns,
+        .numOfStackSymbols = numOfStackSymbols,
+        .targetNumOfStates = vpa->getNumOfStates(),
+        .targetAcceptingStates = countAcceptingStates(vpa),
+        .hypothesisNumOfStates = hypothesis ? hypothesis->getNumOfStates() : uint16_t{0},
+        .hypothesisAcceptingStates = countAcceptingStates(hypothesis),
+        .status = currentTestStatus};
 }
 
 std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
@@ -64,31 +135,36 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
     return learner->run();
 }
 
-void Tester::runSupervisedTest()
+std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runSupervisedTest()
 {
     auto res = runTestWithTimeout();
     switch (res.exitCode)
     {
     case ExitCode::OK:
         testOutput(res.hyp);
-        break;
+        return res.hyp;
     case ExitCode::TIMEOUT:
         ERR("[Tester]: TIMEOUT after %ld ms", res.elapsed.count());
         numOfHangouts++;
+        currentTestStatus = TestStatus::Timeout;
         saveFailedTestData("HANGOUT DETECTED!");
-        break;
+        return nullptr;
     case ExitCode::STACKCONTENTDIVERGE:
         ERR("[Tester]: ERROR in StackContentDiverages, after %ld ms", res.elapsed.count());
         numOfErrInHandleStackContent++;
+        currentTestStatus = TestStatus::StackContentError;
         saveFailedTestData("StackContentDiverages ERROR!");
-        break;
+        return nullptr;
     default:
         ERR("[Tester]: Child exited early, after %ld ms with error: %s", res.elapsed.count(),
             toString(res.exitCode));
         numOfChildErrors++;
+        currentTestStatus = TestStatus::ChildError;
         saveFailedTestData("CHILD ERROR: " + std::string(toString(res.exitCode)));
-        break;
+        return nullptr;
     }
+
+    return nullptr;
 }
 
 void Tester::prepareTest()
@@ -139,14 +215,18 @@ RunResult Tester::runTestWithTimeout()
         {
             auto elapsed =
                 std::chrono::duration_cast<std::chrono::milliseconds>(clock::now() - startTime);
-            if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+            if (WIFEXITED(status))
             {
-                return {ExitCode::OK, runLearner(), elapsed};
+                const auto exitCode = ExitCode{static_cast<uint8_t>(WEXITSTATUS(status))};
+                if (exitCode == ExitCode::OK)
+                {
+                    return {ExitCode::OK, runLearner(), elapsed};
+                }
+
+                return {exitCode, nullptr, elapsed};
             }
-            else
-            {
-                return {ExitCode{WEXITSTATUS(status)}, nullptr, elapsed};
-            }
+
+            return {ExitCode::UNDEFINED, nullptr, elapsed};
         }
 
         if (clock::now() >= deadline)
@@ -214,6 +294,7 @@ void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>
     {
         ERR("[Tester]: Generator specific check failed!");
         numOfGeneratorCheckFailed++;
+        currentTestStatus = TestStatus::GeneratorCheckFailed;
         saveTestData(hypothesis, "GENERATOR SPECIFIC CHECK FAILED");
         return;
     }
@@ -226,6 +307,7 @@ void Tester::testOutput(const std::shared_ptr<common::VPA<AutomatonKind::Normal>
         if (hypothesis->checkWord(*testWord) != vpa->checkWord(*testWord))
         {
             numOfFailedTests++;
+            currentTestStatus = TestStatus::ValidationFailed;
             saveFailedTestData(testWord, hypothesis);
             return;
         }
@@ -251,6 +333,7 @@ void Tester::testOutputWithEquivalenceCheck(
     if (*emptinessChecker->check(combinedVpa) != common::Word{})
     {
         numOfFailedTests++;
+        currentTestStatus = TestStatus::ValidationFailed;
     }
 }
 

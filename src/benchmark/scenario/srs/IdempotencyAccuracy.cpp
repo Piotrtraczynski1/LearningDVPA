@@ -4,14 +4,18 @@
 
 namespace benchmark::scenario
 {
-void IdempotencyAccuracy::runSingleIteration()
+std::string IdempotencyAccuracy::getGeneratorName() const
 {
-    dim1Details =
-        Tester{
-            numOfTestsInSingleIteration,
-            std::unique_ptr<generator::Generator>(new generator::srs::IdempotencyGenerator()),
-            parameters, static_cast<uint16_t>(rand())}
-            .run();
+    return "idempotency";
+}
+
+SingleTestResult IdempotencyAccuracy::runSingle(uint32_t seed)
+{
+    auto result =
+        Tester{1, std::make_unique<generator::srs::IdempotencyGenerator>(), parameters, seed}
+            .runSingle();
+    dim1Details += result.status == TestStatus::ValidationFailed;
+    return result;
 }
 
 uint16_t IdempotencyAccuracy::getDim1Details()

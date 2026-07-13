@@ -21,7 +21,6 @@ uint16_t BaseSrsScenario::getNumOfTestsInSingleIteration()
 
 void BaseSrsScenario::prepareNextIterationDim2()
 {
-    std::srand(getSeed());
     parameters.useSrs = true;
 }
 
@@ -38,6 +37,11 @@ std::string BaseSrsScenario::getDim2Name()
 uint16_t BaseSrsScenario::getDim2Details()
 {
     return parameters.useSrs;
+}
+
+const TesterParameters &BaseSrsScenario::getParameters() const
+{
+    return parameters;
 }
 
 void BaseSrsScenario::prepareNextIterationDim1()

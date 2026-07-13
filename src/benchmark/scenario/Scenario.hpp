@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <string>
 
+#include "Tester.hpp"
+
 namespace benchmark::scenario
 {
 class Scenario
@@ -74,6 +76,8 @@ public:
     }
 
     virtual uint16_t getNumOfTestsInSingleIteration() = 0;
-    virtual void runSingleIteration() = 0;
+    virtual const TesterParameters &getParameters() const = 0;
+    virtual std::string getGeneratorName() const = 0;
+    virtual SingleTestResult runSingle(uint32_t seed) = 0;
 };
 } // namespace benchmark::scenario

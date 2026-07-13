@@ -4,14 +4,18 @@
 
 namespace benchmark::scenario
 {
-void CancellationAccuracy::runSingleIteration()
+std::string CancellationAccuracy::getGeneratorName() const
 {
-    dim1Details =
-        Tester{
-            numOfTestsInSingleIteration,
-            std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
-            parameters, static_cast<uint16_t>(rand())}
-            .run();
+    return "cancellation";
+}
+
+SingleTestResult CancellationAccuracy::runSingle(uint32_t seed)
+{
+    auto result =
+        Tester{1, std::make_unique<generator::srs::CancellationGenerator>(), parameters, seed}
+            .runSingle();
+    dim1Details += result.status == TestStatus::ValidationFailed;
+    return result;
 }
 
 uint16_t CancellationAccuracy::getDim1Details()

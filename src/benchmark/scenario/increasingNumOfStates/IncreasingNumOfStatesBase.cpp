@@ -29,13 +29,19 @@ uint16_t IncreasingNumOfStatesBase::getNumOfTestsInSingleIteration()
     return numOfTestsInSingleIteration;
 }
 
-void IncreasingNumOfStatesBase::runSingleIteration()
+const TesterParameters &IncreasingNumOfStatesBase::getParameters() const
 {
-    Tester{
-        numOfTestsInSingleIteration,
-        std::unique_ptr<generator::Generator>(new generator::RandomGenerator()), parameters,
-        static_cast<uint16_t>(rand())}
-        .run();
+    return parameters;
+}
+
+std::string IncreasingNumOfStatesBase::getGeneratorName() const
+{
+    return "random";
+}
+
+SingleTestResult IncreasingNumOfStatesBase::runSingle(uint32_t seed)
+{
+    return Tester{1, std::make_unique<generator::RandomGenerator>(), parameters, seed}.runSingle();
 }
 
 void IncreasingNumOfStatesBase::prepareNextIterationDim1()

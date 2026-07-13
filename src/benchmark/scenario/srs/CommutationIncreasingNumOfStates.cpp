@@ -22,20 +22,24 @@ uint16_t CommutationIncreasingNumOfStates::getDim1Details()
            (parameters.secondDvpaNumOfStates + 1); // Commutative generator increases numOfStates
 }
 
-void CommutationIncreasingNumOfStates::runSingleIteration()
+std::string CommutationIncreasingNumOfStates::getGeneratorName() const
 {
-    Tester{
-        numOfTestsInSingleIteration,
-        std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
-        parameters, static_cast<uint16_t>(rand())}
-        .run();
+    return "commutative";
+}
+
+SingleTestResult CommutationIncreasingNumOfStates::runSingle(uint32_t seed)
+{
+    return Tester{1, std::make_unique<generator::srs::CommutativeGenerator>(), parameters, seed}
+        .runSingle();
 }
 
 void CommutationIncreasingNumOfStates::prepareNextIterationDim1()
 {
     dim1Step++;
     if (dim1Step == numOfIterationsIn1Dim)
+    {
         return;
+    }
     parameters.minNumOfStates = dim1Steps[dim1Step].first;
     parameters.maxNumOfStates = dim1Steps[dim1Step].first;
     parameters.secondDvpaNumOfStates = dim1Steps[dim1Step].second;

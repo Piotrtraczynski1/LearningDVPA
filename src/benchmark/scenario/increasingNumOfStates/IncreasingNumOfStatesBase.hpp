@@ -43,7 +43,9 @@ public:
     std::string getDim1Name() override;
     uint16_t getDim1Details() override;
     uint16_t getNumOfTestsInSingleIteration() override;
-    void runSingleIteration() override;
+    const TesterParameters &getParameters() const override;
+    std::string getGeneratorName() const override;
+    SingleTestResult runSingle(uint32_t seed) override;
     void prepareNextIterationDim1() override;
     void resetDim1() override;
 };

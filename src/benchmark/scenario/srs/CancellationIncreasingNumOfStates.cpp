@@ -14,12 +14,14 @@ uint16_t CancellationIncreasingNumOfStates::getDim1Details()
     return parameters.minNumOfStates * 2; // Cancellation generator increases numOfStates
 }
 
-void CancellationIncreasingNumOfStates::runSingleIteration()
+std::string CancellationIncreasingNumOfStates::getGeneratorName() const
 {
-    Tester{
-        numOfTestsInSingleIteration,
-        std::unique_ptr<generator::Generator>(new generator::srs::CancellationGenerator()),
-        parameters, static_cast<uint16_t>(rand())}
-        .run();
+    return "cancellation";
+}
+
+SingleTestResult CancellationIncreasingNumOfStates::runSingle(uint32_t seed)
+{
+    return Tester{1, std::make_unique<generator::srs::CancellationGenerator>(), parameters, seed}
+        .runSingle();
 }
 } // namespace benchmark::scenario

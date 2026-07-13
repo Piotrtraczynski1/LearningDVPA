@@ -4,14 +4,18 @@
 
 namespace benchmark::scenario
 {
-void CommutationAccuracy::runSingleIteration()
+std::string CommutationAccuracy::getGeneratorName() const
 {
-    dim1Details =
-        Tester{
-            numOfTestsInSingleIteration,
-            std::unique_ptr<generator::Generator>(new generator::srs::CommutativeGenerator()),
-            parameters, static_cast<uint16_t>(rand())}
-            .run();
+    return "commutative";
+}
+
+SingleTestResult CommutationAccuracy::runSingle(uint32_t seed)
+{
+    auto result =
+        Tester{1, std::make_unique<generator::srs::CommutativeGenerator>(), parameters, seed}
+            .runSingle();
+    dim1Details += result.status == TestStatus::ValidationFailed;
+    return result;
 }
 
 uint16_t CommutationAccuracy::getDim1Details()
