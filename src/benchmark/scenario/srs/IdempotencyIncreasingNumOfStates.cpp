@@ -27,7 +27,7 @@ SingleTestResult IdempotencyIncreasingNumOfStates::runSingle(uint32_t seed)
 
 void IdempotencyIncreasingNumOfStates::prepareNextIterationDim1()
 {
-    parameters.minNumOfStates += 2;
-    parameters.maxNumOfStates += 2;
+    parameters.minNumOfStates += 3;
+    parameters.maxNumOfStates += 3;
 }
 } // namespace benchmark::scenario

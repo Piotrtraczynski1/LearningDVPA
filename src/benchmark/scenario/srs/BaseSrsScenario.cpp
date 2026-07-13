@@ -46,8 +46,8 @@ const TesterParameters &BaseSrsScenario::getParameters() const
 
 void BaseSrsScenario::prepareNextIterationDim1()
 {
-    parameters.minNumOfStates += 1;
-    parameters.maxNumOfStates += 1;
+    parameters.minNumOfStates += 3;
+    parameters.maxNumOfStates += 3;
 }
 
 void BaseSrsScenario::resetDim1()
