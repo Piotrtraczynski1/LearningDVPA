@@ -13,3 +13,5 @@ out.txt
 /thesis/main.bbl
 /thesis/main.blg
 src/benchmark/results
+results/.venv
+results/src/__pycache__
