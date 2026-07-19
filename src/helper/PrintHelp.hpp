@@ -20,6 +20,7 @@ Generators:
     sevpa          run tests with SeVPA generator
     mevpa          run tests with MeVPA generator
     ecda           run tests with eCDA generator
+    xml            run tests with XML generator
     commutative    run test with commutative generator
     cancel         run test with cancellation generator
     idempotency    run test with idempotency generator

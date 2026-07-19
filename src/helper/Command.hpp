@@ -12,6 +12,7 @@ enum class Command
     SeVpa,
     MeVpa,
     eCda,
+    Xml,
     Custom,
     Benchmark,
     Help,

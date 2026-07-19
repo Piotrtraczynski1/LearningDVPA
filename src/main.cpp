@@ -80,6 +80,14 @@ void runIdempotencyGenerator(const uint16_t numOfTests, const uint32_t seed)
         .run();
 }
 
+void runXmlGenerator(const uint16_t numOfTests, const uint32_t seed)
+{
+    Tester{
+        numOfTests, std::unique_ptr<generator::Generator>(new generator::srs::XmlGenerator()),
+        XmlTestParameters, seed}
+        .run();
+}
+
 void runBenchmark(const std::string &scenarioName)
 {
     benchmark::BenchmarkRunner{scenarioName}.run();
@@ -115,6 +123,9 @@ int main(int argc, char *argv[])
         break;
     case (helper::Command::eCda):
         runECdaGenerator(numOfTests, seed);
+        break;
+    case (helper::Command::Xml):
+        runXmlGenerator(numOfTests, seed);
         break;
     case (helper::Command::Custom):
         helper::runExample();

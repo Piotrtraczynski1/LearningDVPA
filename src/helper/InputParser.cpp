@@ -26,6 +26,8 @@ Command parseCommand(const std::string &cmd)
         return Command::MeVpa;
     if (cmd == "ecda")
         return Command::eCda;
+    if (cmd == "xml")
+        return Command::Xml;
     if (cmd == "custom")
         return Command::Custom;
     if (cmd == "bench")
@@ -65,7 +67,7 @@ std::tuple<Command, int, uint16_t, std::string> parseInput(int argc, char *argv[
     if (command == Command::Random or command == Command::Commutative or
         command == Command::Cancellation or command == Command::Idempotency or
         command == Command::Cda or command == Command::SeVpa or command == Command::MeVpa or
-        command == Command::eCda)
+        command == Command::eCda or command == Command::Xml)
     {
         if (argc < 4)
         {

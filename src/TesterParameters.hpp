@@ -198,6 +198,26 @@ constexpr TesterParameters ECdaTestParameters{
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
 
+constexpr TesterParameters XmlTestParameters{
+    .minNumOfStates = 17,
+    .maxNumOfStates = 17,
+    .minNumOfCalls = 5,
+    .maxNumOfCalls = 5,
+    .minNumOfLocals = 5,
+    .maxNumOfLocals = 5,
+    .minNumOfReturns = 9,
+    .maxNumOfReturns = 9,
+    .minNumOfStackSymbols = 9,
+    .maxNumOfStackSymbols = 9,
+    .numOfRandomTestingWords = 10000,
+    .maxTestingWordLength = 30,
+    .density = 1,
+    .useSrs = true,
+    .useEquivalenceCheckToValidateOutput = true,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
 #else // RANDOM_EQUIVALENCE_QUERY
 
 constexpr TesterParameters RandomTestParameters{
@@ -352,6 +372,26 @@ constexpr TesterParameters ECdaTestParameters{
     .density = 1,
     .numOfModules = 5,
     .useSrs = true,
+    .savePassedTestData = false,
+    .supervisedMode = false,
+    .supervisedTestMaxDuration = std::chrono::seconds{600}};
+
+constexpr TesterParameters XmlTestParameters{
+    .minNumOfStates = 17,
+    .maxNumOfStates = 17,
+    .minNumOfCalls = 4,
+    .maxNumOfCalls = 4,
+    .minNumOfLocals = 5,
+    .maxNumOfLocals = 5,
+    .minNumOfReturns = 4,
+    .maxNumOfReturns = 4,
+    .minNumOfStackSymbols = 9,
+    .maxNumOfStackSymbols = 9,
+    .numOfRandomTestingWords = 10000,
+    .maxTestingWordLength = 30,
+    .density = 1,
+    .useSrs = true,
+    .useEquivalenceCheckToValidateOutput = true,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};
