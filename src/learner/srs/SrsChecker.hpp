@@ -15,10 +15,17 @@ namespace learner::srs
 {
 class SrsChecker
 {
+    struct ConvertedAlphabet
+    {
+        uint16_t numOfCalls;
+        uint16_t numOfLocals;
+    };
+
     const Srs srs;
     const teacher::Teacher &oracle;
     std::shared_ptr<SpecialSymbolAdder> specialSymbolAdder;
-    std::unordered_map<uint16_t, SrsRule> specialSymbolToRule;
+    std::unordered_map<uint16_t, SrsRule> specialLocalSymbolToRule;
+    std::unordered_map<uint16_t, SrsRule> specialCallSymbolToRule;
     std::unordered_map<common::Word, uint8_t, common::WordHasher> seenWords{};
 
     const uint16_t numOfCalls;
@@ -42,10 +49,11 @@ public:
     common::Word check(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
 
 private:
-    uint16_t buildConvertedAutomata();
-    common::Word checkConfigurationsConsistency(
-        const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
-        const common::Word &lhs, const common::Word &rhs) const;
+    ConvertedAlphabet buildConvertedAutomata();
+    bool addStaticRules(ConvertedAlphabet &alphabet);
+    bool addParameterizedRules(ConvertedAlphabet &alphabet);
+    bool addRule(const SrsRule &rule, ConvertedAlphabet &alphabet);
+    SrsRule instantiateRule(const SrsRuleWithParams &rule, const common::Word &word) const;
 
     void prepareWellMatchedWords(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
 
@@ -63,7 +71,12 @@ private:
         const WellMatchedNode &firstNode, const WellMatchedNode &secondNode);
 
     common::Word checkEquivalence(
-        const std::shared_ptr<ConvertedAutomata> convertedAutomata, const uint16_t specialSymbol);
+        const std::shared_ptr<ConvertedAutomata> convertedAutomata,
+        const ConvertedAlphabet &alphabet);
+    std::pair<common::Word, common::Word> expandCounterexample(const common::Word &word) const;
+    bool appendSpecialRule(
+        const common::Symbol &symbol, common::Word &firstCandidate,
+        common::Word &secondCandidate) const;
     common::Word prepareCounterexample(
         const std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis,
         const common::Word &word);

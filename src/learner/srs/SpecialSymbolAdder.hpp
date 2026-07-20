@@ -19,6 +19,7 @@ public:
     SpecialSymbolAdder(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis);
 
     void addNewRule(const uint16_t specialSymbol, const SrsRule &srsRule);
+    void addNewCallRule(const uint16_t specialSymbol, const SrsRule &srsRule);
 
     std::shared_ptr<ConvertedAutomata> getConvertedAutomata();
 
@@ -26,6 +27,9 @@ private:
     void init(const std::shared_ptr<common::VPA<AutomatonKind::Normal>> &hypothesis);
 
     void addTransitionsForSpecialSymbol(
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> &automaton, const common::Word &word,
+        const uint16_t specialSymbol);
+    void addCallTransitionsForSpecialSymbol(
         std::shared_ptr<common::VPA<AutomatonKind::Normal>> &automaton, const common::Word &word,
         const uint16_t specialSymbol);
 };

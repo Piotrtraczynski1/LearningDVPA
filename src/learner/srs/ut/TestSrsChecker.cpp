@@ -317,6 +317,14 @@ const std::vector<TestSrsCheckerParams> testSrsCheckerParams{
         .acceptingStates = {1, 3, 4},
         .rejectingEmpty = true,
         .acceptingEmpty = true
+    },
+    TestSrsCheckerParams{
+        .srs = Srs{
+            SrsRuleWithParams{
+                .left = {.left = W{C{0}, L{0}}, .takesParams = false},
+                .right = {.left = W{C{0}, L{1}}, .takesParams = false}}
+        },
+        .acceptingStates = {4}
     }
     };
 // clang-format on

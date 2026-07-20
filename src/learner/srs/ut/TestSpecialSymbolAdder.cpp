@@ -84,11 +84,41 @@ public:
         }
     }
 
+    void testCallResult(const ConvertedAutomata &convertedAutomata, SrsRule rule)
+    {
+        const common::Word suffix{ReturnSymbol{0}};
+        for (const auto &prefix : prefixes)
+        {
+            ASSERT_EQ(
+                hypothesis->checkWord(prefix + rule.left + suffix),
+                convertedAutomata.lAutomaton->checkWord(
+                    prefix + common::Word{specialCall} + suffix))
+                << "prefix: " << prefix << ", l = " << rule.left;
+            ASSERT_EQ(
+                hypothesis->checkWord(prefix + rule.right + suffix),
+                convertedAutomata.rAutomaton->checkWord(
+                    prefix + common::Word{specialCall} + suffix))
+                << "prefix: " << prefix << ", r = " << rule.right;
+        }
+
+        const common::Word nestedPrefix{CallSymbol{0}};
+        const common::Word nestedSuffix{ReturnSymbol{0}, ReturnSymbol{0}};
+        ASSERT_EQ(
+            hypothesis->checkWord(nestedPrefix + rule.left + nestedSuffix),
+            convertedAutomata.lAutomaton->checkWord(
+                nestedPrefix + common::Word{specialCall} + nestedSuffix));
+        ASSERT_EQ(
+            hypothesis->checkWord(nestedPrefix + rule.right + nestedSuffix),
+            convertedAutomata.rAutomaton->checkWord(
+                nestedPrefix + common::Word{specialCall} + nestedSuffix));
+    }
+
     std::unique_ptr<common::transition::Transition<AutomatonKind::Normal>> transition;
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis;
 
     const State initialState{0};
     const LocalSymbol specialSymbol{2};
+    const CallSymbol specialCall{1};
     const uint16_t numOfStates{5};
     const std::vector<uint16_t> acceptingStates{0, 2, 4};
 
@@ -119,6 +149,17 @@ TEST_F(TestSpecialSymbolAdder, defaultTest2)
     sut->addNewRule(specialSymbol, rule);
     auto convertedAutomata{sut->getConvertedAutomata()};
     testResult(*convertedAutomata, rule);
+}
+
+TEST_F(TestSpecialSymbolAdder, oneUnmatchedCall)
+{
+    SrsRule rule{
+        .left = common::Word{CallSymbol{0}, LocalSymbol{0}},
+        .right = common::Word{CallSymbol{0}, LocalSymbol{1}}};
+
+    sut->addNewCallRule(specialCall, rule);
+    auto convertedAutomata{sut->getConvertedAutomata()};
+    testCallResult(*convertedAutomata, rule);
 }
 
 } // namespace learner::srs

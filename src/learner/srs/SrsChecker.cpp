@@ -13,6 +13,31 @@
 
 namespace learner::srs
 {
+namespace
+{
+bool hasOneUnmatchedCall(const common::Word &word)
+{
+    uint16_t nesting{0};
+    for (const auto &symbol : word)
+    {
+        if (symbol.index() == common::CallSymbolVariant)
+        {
+            nesting++;
+        }
+        else if (symbol.index() == common::ReturnSymbolVariant)
+        {
+            if (nesting == 0)
+            {
+                return false;
+            }
+            nesting--;
+        }
+    }
+
+    return nesting == 1;
+}
+} // namespace
+
 SrsChecker::SrsChecker(
     const Srs srsArg, const teacher::Teacher &oracleArg, const uint16_t numOfCallsArg,
     const uint16_t numOfReturnArg, const uint16_t numOfLocalsArg,
@@ -33,12 +58,13 @@ common::Word SrsChecker::check(std::shared_ptr<common::VPA<AutomatonKind::Normal
     LOG("[SrsChecker]: check consistency with SRS");
 
     specialSymbolAdder = std::make_shared<SpecialSymbolAdder>(hypothesis);
-    specialSymbolToRule.clear();
+    specialLocalSymbolToRule.clear();
+    specialCallSymbolToRule.clear();
     prepareWellMatchedWords(hypothesis);
-    uint16_t specialSymbol{buildConvertedAutomata()};
+    const ConvertedAlphabet alphabet{buildConvertedAutomata()};
 
     auto convertedAutomata{specialSymbolAdder->getConvertedAutomata()};
-    auto word{checkEquivalence(convertedAutomata, specialSymbol)};
+    auto word{checkEquivalence(convertedAutomata, alphabet)};
 
     if (word != emptyWord and seenWords[word]++ < 5)
     {
@@ -48,32 +74,91 @@ common::Word SrsChecker::check(std::shared_ptr<common::VPA<AutomatonKind::Normal
     return common::Word{};
 }
 
-uint16_t SrsChecker::buildConvertedAutomata()
+SrsChecker::ConvertedAlphabet SrsChecker::buildConvertedAutomata()
 {
-    uint16_t specialSymbol{numOfLocals};
+    ConvertedAlphabet alphabet{.numOfCalls = numOfCalls, .numOfLocals = numOfLocals};
+    if (not addStaticRules(alphabet))
+    {
+        return alphabet;
+    }
 
+    addParameterizedRules(alphabet);
+    return alphabet;
+}
+
+bool SrsChecker::addStaticRules(ConvertedAlphabet &alphabet)
+{
+    for (const auto &rule : srs)
+    {
+        if (rule.left.takesParams or rule.right.takesParams)
+        {
+            continue;
+        }
+
+        if (not addRule(instantiateRule(rule, common::Word{}), alphabet))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool SrsChecker::addParameterizedRules(ConvertedAlphabet &alphabet)
+{
     for (const auto &word : wellMatchedWords)
     {
         for (const auto &rule : srs)
         {
-            SrsRule srsRule{
-                .left = rule.left.left + (rule.left.takesParams ? word : common::Word{}) +
-                        rule.left.right,
-                .right = rule.right.left + (rule.right.takesParams ? word : common::Word{}) +
-                         rule.right.right};
-            specialSymbolAdder->addNewRule(specialSymbol, srsRule);
-            specialSymbolToRule[specialSymbol] = srsRule;
-            specialSymbol++;
-            if (specialSymbol == utils::MaxNumOfLetters)
+            if (not(rule.left.takesParams or rule.right.takesParams))
             {
-                WRN("[SrsChecker]: max number of letters reached! Some Srs Rules will be "
-                    "discarded!");
-                return specialSymbol;
+                continue;
+            }
+
+            if (not addRule(instantiateRule(rule, word), alphabet))
+            {
+                return false;
             }
         }
     }
 
-    return specialSymbol;
+    return true;
+}
+
+bool SrsChecker::addRule(const SrsRule &rule, ConvertedAlphabet &alphabet)
+{
+    if (hasOneUnmatchedCall(rule.left) and hasOneUnmatchedCall(rule.right))
+    {
+        if (alphabet.numOfCalls == utils::MaxNumOfLetters)
+        {
+            WRN("[SrsChecker]: max number of calls reached! Some Srs Rules will be discarded!");
+            return false;
+        }
+
+        specialSymbolAdder->addNewCallRule(alphabet.numOfCalls, rule);
+        specialCallSymbolToRule[alphabet.numOfCalls] = rule;
+        alphabet.numOfCalls++;
+        return true;
+    }
+
+    if (alphabet.numOfLocals == utils::MaxNumOfLetters)
+    {
+        WRN("[SrsChecker]: max number of letters reached! Some Srs Rules will be discarded!");
+        return false;
+    }
+
+    specialSymbolAdder->addNewRule(alphabet.numOfLocals, rule);
+    specialLocalSymbolToRule[alphabet.numOfLocals] = rule;
+    alphabet.numOfLocals++;
+    return true;
+}
+
+SrsRule SrsChecker::instantiateRule(const SrsRuleWithParams &rule, const common::Word &word) const
+{
+    return {
+        .left = rule.left.left + (rule.left.takesParams ? word : common::Word{}) + rule.left.right,
+        .right =
+            rule.right.left + (rule.right.takesParams ? word : common::Word{}) + rule.right.right};
 }
 
 void SrsChecker::prepareWellMatchedWords(
@@ -260,12 +345,13 @@ WellMatchedNode SrsChecker::makeIdentityNode()
 }
 
 common::Word SrsChecker::checkEquivalence(
-    const std::shared_ptr<ConvertedAutomata> convertedAutomata, const uint16_t specialSymbol)
+    const std::shared_ptr<ConvertedAutomata> convertedAutomata, const ConvertedAlphabet &alphabet)
 {
     auto automataCombiner = std::make_shared<teacher::AutomataCombiner<AutomatonKind::Combined>>(
-        convertedAutomata->lAutomaton, numOfCalls, numOfReturns, specialSymbol, numOfStackSymbols);
+        convertedAutomata->lAutomaton, alphabet.numOfCalls, numOfReturns, alphabet.numOfLocals,
+        numOfStackSymbols);
     auto emptinessChecker = std::make_shared<teacher::EmptinessChecker>(
-        numOfCalls, numOfReturns, specialSymbol, numOfStackSymbols);
+        alphabet.numOfCalls, numOfReturns, alphabet.numOfLocals, numOfStackSymbols);
     auto output = teacher::equivalenceCheck(
         automataCombiner, emptinessChecker, convertedAutomata->rAutomaton);
 
@@ -287,33 +373,7 @@ common::Word SrsChecker::prepareCounterexample(
     TIME_MARKER("[SrsChecker]: counterexample found");
     std::cout << "[SrsChecker]: counterexample found: " << word << std::endl;
 
-    common::Word firstCandidate{};
-    common::Word secondCandidate{};
-
-    for (const auto &symbol : word)
-    {
-        if (symbol.index() == common::LocalSymbolVariant)
-        {
-            const auto specialSymbol =
-                static_cast<uint16_t>(std::get<common::symbol::LocalSymbol>(symbol));
-            if (specialSymbol >= numOfLocals)
-            {
-                const auto srsRule = specialSymbolToRule[specialSymbol];
-                firstCandidate += srsRule.left;
-                secondCandidate += srsRule.right;
-            }
-            else
-            {
-                firstCandidate += symbol;
-                secondCandidate += symbol;
-            }
-        }
-        else
-        {
-            firstCandidate += symbol;
-            secondCandidate += symbol;
-        }
-    }
+    const auto [firstCandidate, secondCandidate]{expandCounterexample(word)};
 
     if (oracle.membershipQuery(firstCandidate) != hypothesis->checkWord(firstCandidate))
     {
@@ -321,5 +381,60 @@ common::Word SrsChecker::prepareCounterexample(
     }
 
     return secondCandidate;
+}
+
+std::pair<common::Word, common::Word> SrsChecker::expandCounterexample(
+    const common::Word &word) const
+{
+    common::Word firstCandidate{};
+    common::Word secondCandidate{};
+
+    for (const auto &symbol : word)
+    {
+        if (appendSpecialRule(symbol, firstCandidate, secondCandidate))
+        {
+            continue;
+        }
+
+        firstCandidate += symbol;
+        secondCandidate += symbol;
+    }
+
+    return {firstCandidate, secondCandidate};
+}
+
+bool SrsChecker::appendSpecialRule(
+    const common::Symbol &symbol, common::Word &firstCandidate, common::Word &secondCandidate) const
+{
+    const auto appendRule = [&firstCandidate, &secondCandidate](const SrsRule &rule)
+    {
+        firstCandidate += rule.left;
+        secondCandidate += rule.right;
+    };
+
+    if (symbol.index() == common::LocalSymbolVariant)
+    {
+        const auto specialSymbol{
+            static_cast<uint16_t>(std::get<common::symbol::LocalSymbol>(symbol))};
+        const auto it{specialLocalSymbolToRule.find(specialSymbol)};
+        if (it != specialLocalSymbolToRule.end())
+        {
+            appendRule(it->second);
+            return true;
+        }
+    }
+    else if (symbol.index() == common::CallSymbolVariant)
+    {
+        const auto specialSymbol{
+            static_cast<uint16_t>(std::get<common::symbol::CallSymbol>(symbol))};
+        const auto it{specialCallSymbolToRule.find(specialSymbol)};
+        if (it != specialCallSymbolToRule.end())
+        {
+            appendRule(it->second);
+            return true;
+        }
+    }
+
+    return false;
 }
 } // namespace learner::srs
