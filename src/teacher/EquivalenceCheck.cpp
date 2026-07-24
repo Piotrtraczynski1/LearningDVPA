@@ -18,6 +18,7 @@ std::shared_ptr<common::Word> equivalenceCheck(
 
 #else
 
+#include "utils/Counters.hpp"
 #include <random>
 
 namespace teacher
@@ -73,7 +74,11 @@ std::shared_ptr<common::Word> equivalenceCheck(
         const uint16_t length{static_cast<uint16_t>(rng() % (utils::maxLengthRandomWord + 1))};
         std::shared_ptr<common::Word> testWord{generateRandomWord(length)};
 
-        if (automataCombiner->vpa->checkWord(*testWord) != vpa->checkWord(*testWord))
+        Counters::update("equivalenceQueryTargetMembershipQuery", 1);
+        Counters::update("equivalenceQueryTargetMembershipQuerySymbols", testWord->size());
+        const bool targetAccepts{automataCombiner->vpa->checkWord(*testWord)};
+
+        if (targetAccepts != vpa->checkWord(*testWord))
         {
             return testWord;
         }
