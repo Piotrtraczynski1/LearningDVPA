@@ -37,6 +37,7 @@ struct SingleTestResult
     uint16_t numOfLocals;
     uint16_t numOfReturns;
     uint16_t numOfStackSymbols;
+    uint16_t secondDvpaNumOfStates;
     uint16_t targetNumOfStates;
     uint16_t targetAcceptingStates;
     uint16_t hypothesisNumOfStates;
@@ -104,6 +105,7 @@ private:
     uint16_t numOfLocals;
     uint16_t numOfReturns;
     uint16_t numOfStackSymbols;
+    uint16_t secondDvpaNumOfStates;
 
     std::shared_ptr<teacher::Teacher> teacher;
     std::shared_ptr<learner::Learner> learner;

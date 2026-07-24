@@ -31,7 +31,8 @@ protected:
         .acceptingStatesDensity = 0.3,
         .numOfModules = 5,
         .useSrs = false,
-        .secondDvpaNumOfStates = 2,
+        .minSecondDvpaNumOfStates = 2,
+        .maxSecondDvpaNumOfStates = 2,
         .savePassedTestData = false,
         .supervisedMode = false,
         .supervisedTestMaxDuration = std::chrono::seconds{600}};

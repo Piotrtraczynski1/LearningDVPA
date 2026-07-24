@@ -124,7 +124,7 @@ void BenchmarkRunner::saveResult(
         << "," << result.numOfLocals << "," << result.numOfReturns << ","
         << result.numOfStackSymbols << "," << parameters.density << ","
         << parameters.acceptingStatesDensity << "," << parameters.numOfModules << ","
-        << parameters.secondDvpaNumOfStates << "," << parameters.useSrs << ","
+        << result.secondDvpaNumOfStates << "," << parameters.useSrs << ","
         << parameters.useEquivalenceCheckToValidateOutput << "," << equivalenceQuery.executions
         << "," << Counters::getCounter("equivalenceQuery") << "," << equivalenceQuery.time << ","
         << membershipQuery.executions << "," << Counters::getCounter("membershipQuery") << ","

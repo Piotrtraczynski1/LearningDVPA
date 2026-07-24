@@ -21,7 +21,8 @@ public:
 
         parameters.minNumOfStates = dim1Steps[dim1Step].first;
         parameters.maxNumOfStates = dim1Steps[dim1Step].first;
-        parameters.secondDvpaNumOfStates = dim1Steps[dim1Step].second;
+        parameters.minSecondDvpaNumOfStates = dim1Steps[dim1Step].second;
+        parameters.maxSecondDvpaNumOfStates = dim1Steps[dim1Step].second;
     }
     uint16_t getNumOfIterationsIn1Dim() override;
     uint16_t getDim1Details() override;
