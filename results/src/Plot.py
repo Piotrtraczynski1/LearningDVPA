@@ -38,3 +38,5 @@ class Plot:
         axis.legend()
         figure.tight_layout()
         plt.show()
+       
+    

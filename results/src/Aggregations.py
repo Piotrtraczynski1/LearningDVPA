@@ -1,6 +1,7 @@
 from collections.abc import Collection, Mapping
 
 import pandas as pd
+import numpy as np
 
 
 def _filterRows(
@@ -35,3 +36,10 @@ def successRatioBy(
     data = _filterRows(data, filters)
     passedRows = data[statusColumn] == passedValue
     return passedRows.groupby(data[xColumn]).mean().mul(100).rename("successRatio")
+    
+def printMeanDecrease(
+    path: str
+) -> np.float64:
+    meanEQ = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount")
+    meanDecrease = (meanEQ[0] - meanEQ[1])/meanEQ[0]
+    print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")
