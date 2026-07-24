@@ -9,7 +9,11 @@ class IdempotencyAccuracy : public AccuracyScenarioBase
     uint16_t dim1Details{0};
 
 public:
-    using AccuracyScenarioBase::AccuracyScenarioBase;
+    IdempotencyAccuracy()
+    {
+        parameters.minNumOfStates = 10;
+        parameters.maxNumOfStates = 24;
+    }
 
     uint16_t getDim1Details() override;
     std::string getGeneratorName() const override;
