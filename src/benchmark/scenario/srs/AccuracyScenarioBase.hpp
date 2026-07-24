@@ -15,7 +15,7 @@ class AccuracyScenarioBase : public BaseSrsScenario
     const std::string dim1Name{"numOfFailedTests"};
 
 protected:
-    static constexpr uint16_t numOfTestsInSingleIteration{10};
+    static constexpr uint16_t numOfTestsInSingleIteration{300};
 
 public:
     AccuracyScenarioBase()
