@@ -117,6 +117,7 @@ SingleTestResult Tester::runNextTest()
         .numOfLocals = numOfLocals,
         .numOfReturns = numOfReturns,
         .numOfStackSymbols = numOfStackSymbols,
+        .secondDvpaNumOfStates = secondDvpaNumOfStates,
         .targetNumOfStates = vpa->getNumOfStates(),
         .targetAcceptingStates = countAcceptingStates(vpa),
         .hypothesisNumOfStates = hypothesis ? hypothesis->getNumOfStates() : uint16_t{0},
@@ -178,10 +179,13 @@ void Tester::prepareTest()
         (rng() % (params.maxNumOfReturns - params.minNumOfReturns + 1)) + params.minNumOfReturns;
     numOfStackSymbols = (rng() % (params.maxNumOfStackSymbols - params.minNumOfStackSymbols + 1)) +
                         params.minNumOfStackSymbols;
+    secondDvpaNumOfStates =
+        (rng() % (params.maxSecondDvpaNumOfStates - params.minSecondDvpaNumOfStates + 1)) +
+        params.minSecondDvpaNumOfStates;
 
     generator->setConfig(
         numOfStates, numOfCalls, numOfLocals, numOfReturns, numOfStackSymbols, params.density,
-        params.acceptingStatesDensity, params.numOfModules, params.secondDvpaNumOfStates);
+        params.acceptingStatesDensity, params.numOfModules, secondDvpaNumOfStates);
     vpa = generator->run();
 }
 
@@ -190,6 +194,7 @@ void Tester::printTestDetails(std::ostream &os)
     os << "Prepared test number: " << numOfExecutedTests << "\n numOfStates: " << numOfStates
        << ", numOfCalls: " << numOfCalls << ", numOfLocals: " << numOfLocals
        << ", numOfReturns: " << numOfReturns << ", numOfStackSymbols: " << numOfStackSymbols
+       << ", secondDvpaNumOfStates: " << secondDvpaNumOfStates
        << std::endl;
 }
 

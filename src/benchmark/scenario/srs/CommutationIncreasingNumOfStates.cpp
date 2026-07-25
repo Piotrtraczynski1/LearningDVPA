@@ -19,7 +19,7 @@ uint16_t CommutationIncreasingNumOfStates::getNumOfIterationsIn1Dim()
 uint16_t CommutationIncreasingNumOfStates::getDim1Details()
 {
     return (parameters.minNumOfStates + 1) *
-           (parameters.secondDvpaNumOfStates + 1); // Commutative generator increases numOfStates
+           (parameters.minSecondDvpaNumOfStates + 1); // Commutative generator increases numOfStates
 }
 
 std::string CommutationIncreasingNumOfStates::getGeneratorName() const
@@ -42,7 +42,8 @@ void CommutationIncreasingNumOfStates::prepareNextIterationDim1()
     }
     parameters.minNumOfStates = dim1Steps[dim1Step].first;
     parameters.maxNumOfStates = dim1Steps[dim1Step].first;
-    parameters.secondDvpaNumOfStates = dim1Steps[dim1Step].second;
+    parameters.minSecondDvpaNumOfStates = dim1Steps[dim1Step].second;
+    parameters.maxSecondDvpaNumOfStates = dim1Steps[dim1Step].second;
 }
 
 void CommutationIncreasingNumOfStates::resetDim1()
@@ -50,6 +51,7 @@ void CommutationIncreasingNumOfStates::resetDim1()
     dim1Step = 0;
     parameters.minNumOfStates = dim1Steps[dim1Step].first;
     parameters.maxNumOfStates = dim1Steps[dim1Step].first;
-    parameters.secondDvpaNumOfStates = dim1Steps[dim1Step].second;
+    parameters.minSecondDvpaNumOfStates = dim1Steps[dim1Step].second;
+    parameters.maxSecondDvpaNumOfStates = dim1Steps[dim1Step].second;
 }
 } // namespace benchmark::scenario

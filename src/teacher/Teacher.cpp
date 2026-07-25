@@ -44,7 +44,8 @@ std::shared_ptr<common::Word> Teacher::equivalenceQuery(
     Counters::update("equivalenceQuery", hypothesis->getNumOfStates());
     LOG("[Teacher]: equivalenceQuery hypothesis numOfStates: %u", hypothesis->getNumOfStates());
 
-    auto output = equivalenceCheck(automataCombiner, emptinessChecker, hypothesis);
+    constexpr bool updateCounters{true};
+    auto output = equivalenceCheck(automataCombiner, emptinessChecker, hypothesis, updateCounters);
 
     if (output->size() == 0)
     {

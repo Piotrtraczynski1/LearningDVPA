@@ -16,7 +16,7 @@ class AutomataCombiner
     friend std::shared_ptr<common::Word> equivalenceCheck(
         std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
         std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
-        std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa);
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, bool updateCounters);
 
     const uint16_t numOfCalls;
     const uint16_t numOfReturns;

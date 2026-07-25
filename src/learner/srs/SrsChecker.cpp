@@ -352,8 +352,10 @@ common::Word SrsChecker::checkEquivalence(
         numOfStackSymbols);
     auto emptinessChecker = std::make_shared<teacher::EmptinessChecker>(
         alphabet.numOfCalls, numOfReturns, alphabet.numOfLocals, numOfStackSymbols);
+
+    constexpr bool updateCounters{false};
     auto output = teacher::equivalenceCheck(
-        automataCombiner, emptinessChecker, convertedAutomata->rAutomaton);
+        automataCombiner, emptinessChecker, convertedAutomata->rAutomaton, updateCounters);
 
     common::Symbol leftoverSymbol{common::symbol::ReturnSymbol{numOfReturns}};
     for (uint16_t i = 0; i < output->size(); i++)

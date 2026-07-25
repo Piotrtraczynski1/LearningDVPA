@@ -14,8 +14,9 @@ public:
         parameters.minNumOfStackSymbols = 2;
         parameters.maxNumOfStackSymbols = 2;
         parameters.minNumOfStates = 2;
-        parameters.maxNumOfStates = 5;
-        parameters.secondDvpaNumOfStates = 3;
+        parameters.maxNumOfStates = 6;
+        parameters.minSecondDvpaNumOfStates = 2;
+        parameters.maxSecondDvpaNumOfStates = 5;
     }
 
     uint16_t getDim1Details() override;

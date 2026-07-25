@@ -11,11 +11,11 @@ namespace benchmark::scenario
 {
 class AccuracyScenarioBase : public BaseSrsScenario
 {
-    static constexpr int seed{42};
+    static constexpr int seed{1};
     const std::string dim1Name{"numOfFailedTests"};
 
 protected:
-    static constexpr uint16_t numOfTestsInSingleIteration{10000};
+    static constexpr uint16_t numOfTestsInSingleIteration{2000};
 
 public:
     AccuracyScenarioBase()

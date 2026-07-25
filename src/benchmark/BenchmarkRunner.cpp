@@ -64,6 +64,9 @@ void BenchmarkRunner::run()
                         Counters::reset();
                         const uint32_t seed = static_cast<uint32_t>(scenario->getSeed()) + runIndex;
                         saveResult(out, runIndex, scenario->runSingle(seed));
+                        LOG("iteration3Dim: %u, iteration2Dim: %u, iteration1Dim: %u, runIndex: "
+                            "%u, seed: %u",
+                            iteration3Dim, iteration2Dim, iteration1Dim, runIndex, seed);
                     }
                     scenario->prepareNextIterationDim1();
                 }
@@ -127,7 +130,7 @@ void BenchmarkRunner::saveResult(
         << "," << result.numOfLocals << "," << result.numOfReturns << ","
         << result.numOfStackSymbols << "," << parameters.density << ","
         << parameters.acceptingStatesDensity << "," << parameters.numOfModules << ","
-        << parameters.secondDvpaNumOfStates << "," << parameters.useSrs << ","
+        << result.secondDvpaNumOfStates << "," << parameters.useSrs << ","
         << parameters.useEquivalenceCheckToValidateOutput << "," << equivalenceQuery.executions
         << "," << Counters::getCounter("equivalenceQuery") << "," << equivalenceQuery.time << ","
         << Counters::getCounter("equivalenceQueryTargetMembershipQuery") << ","

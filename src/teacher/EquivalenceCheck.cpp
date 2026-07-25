@@ -8,7 +8,8 @@ namespace teacher
 std::shared_ptr<common::Word> equivalenceCheck(
     std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
     std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa)
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa,
+    [[maybe_unused]] const bool updateCounters)
 {
     auto combinedVpa{automataCombiner->combineVPA(*vpa)};
 
@@ -26,7 +27,7 @@ namespace teacher
 std::shared_ptr<common::Word> equivalenceCheck(
     std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
     [[maybe_unused]] std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa)
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, const bool updateCounters)
 {
     static std::mt19937 rng(utils::equivalenceCheckSeed);
 
@@ -74,8 +75,12 @@ std::shared_ptr<common::Word> equivalenceCheck(
         const uint16_t length{static_cast<uint16_t>(rng() % (utils::maxLengthRandomWord + 1))};
         std::shared_ptr<common::Word> testWord{generateRandomWord(length)};
 
-        Counters::update("equivalenceQueryTargetMembershipQuery", 1);
-        Counters::update("equivalenceQueryTargetMembershipQuerySymbols", testWord->size());
+        if (updateCounters)
+        {
+            Counters::update("equivalenceQueryTargetMembershipQuery", 1);
+            Counters::update("equivalenceQueryTargetMembershipQuerySymbols", testWord->size());
+        }
+
         const bool targetAccepts{automataCombiner->vpa->checkWord(*testWord)};
 
         if (targetAccepts != vpa->checkWord(*testWord))

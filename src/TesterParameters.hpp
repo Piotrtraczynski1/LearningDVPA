@@ -29,7 +29,8 @@ struct TesterParameters
     uint16_t numOfModules{0};
 
     bool useSrs{false};
-    uint16_t secondDvpaNumOfStates{3};
+    uint16_t minSecondDvpaNumOfStates{3};
+    uint16_t maxSecondDvpaNumOfStates{3};
 
     bool useEquivalenceCheckToValidateOutput{false};
     bool savePassedTestData;
@@ -74,7 +75,8 @@ constexpr TesterParameters CommutativeTestParameters{
     .density = 0.8,
     .acceptingStatesDensity = 0.3,
     .useSrs = true,
-    .secondDvpaNumOfStates = 6,
+    .minSecondDvpaNumOfStates = 6,
+    .maxSecondDvpaNumOfStates = 6,
     .savePassedTestData = false,
     .supervisedMode = false,
     .supervisedTestMaxDuration = std::chrono::seconds{600}};

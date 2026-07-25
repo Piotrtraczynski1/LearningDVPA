@@ -13,5 +13,5 @@ namespace teacher
 std::shared_ptr<common::Word> equivalenceCheck(
     std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
     std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa);
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, const bool updateCounters);
 } // namespace teacher
