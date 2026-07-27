@@ -50,12 +50,30 @@ def printMeanAccuracyGain(
     meanAccuracy = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount")
     meanAccuracyGain = (meanEQ[0] - meanEQ[1])/meanEQ[0]
     print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")    
-        
-def printMeanAccuracyGain(
-    path: str
+
+def printAccuracyStats(
+    data: pd.DataFrame,
+    comment: str
 ) -> None:
-    series = pd.read_csv(path).groupby(["useSrs","status"])["runIndex"].count()
+    series = data.groupby(["useSrs","status"])["runIndex"].count()   
     accuracyNoSRS = series[(0,'passed')]/(series[(0,'passed')]+series[(0,'validation_failed')])
     accuracyWithSRS = series[(1,'passed')]/(series[(1,'passed')]+series[(1,'validation_failed')])
-    print(f"Average accurtacy gain {(accuracyWithSRS/accuracyNoSRS)*100:.2f}%")    
+    
+    print(f"Accuracy without SRS {accuracyNoSRS*100:.2f}% and with SRS {accuracyWithSRS*100:.2f}% {comment}")
+    print(f"Average accurtacy gain {((accuracyWithSRS - accuracyNoSRS)/accuracyNoSRS)*100:.2f}% {comment}")    
+    
+        
+def printAccuracy(
+    path: str
+) -> None:
+    data = pd.read_csv(path)
+    dataSmall = data[data["numOfStates"]<=15]
+    dataBig = data[data["numOfStates"]>20]
+    
+    printAccuracyStats(data, " (all automata)")
+    print()
+    printAccuracyStats(dataSmall, " (automata with at most 15 states)")
+    print()
+    printAccuracyStats(dataBig, " (automata with more than 20 states)")
+
 

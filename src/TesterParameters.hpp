@@ -392,7 +392,7 @@ constexpr TesterParameters XmlTestParameters{
     .numOfRandomTestingWords = 10000,
     .maxTestingWordLength = 30,
     .density = 1,
-    .useSrs = true,
+    .useSrs = false,
     .useEquivalenceCheckToValidateOutput = true,
     .savePassedTestData = false,
     .supervisedMode = false,

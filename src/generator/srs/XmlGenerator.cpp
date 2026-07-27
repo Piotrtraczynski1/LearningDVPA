@@ -151,12 +151,12 @@ learner::srs::Srs XmlGenerator::getSrs()
             CallSymbol{0}, LocalSymbol{TagBodyStart}, LocalSymbol{Letter}, ReturnSymbol{0}});
 
     // <a> text </a> --> <a> <a/> </a> (saves 1 query)
-    addRule(
-        common::Word{
-            CallSymbol{0}, LocalSymbol{TagBodyStart}, LocalSymbol{Letter}, ReturnSymbol{0}},
-        common::Word{
-            CallSymbol{0}, LocalSymbol{TagBodyStart}, CallSymbol{0}, ReturnSymbol{0},
-            ReturnSymbol{0}});
+//    addRule(
+//        common::Word{
+//            CallSymbol{0}, LocalSymbol{TagBodyStart}, LocalSymbol{Letter}, ReturnSymbol{0}},
+//        common::Word{
+//            CallSymbol{0}, LocalSymbol{TagBodyStart}, CallSymbol{0}, ReturnSymbol{0},
+//            ReturnSymbol{0}});
 
     return srs;
 }
