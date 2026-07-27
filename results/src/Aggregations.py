@@ -38,11 +38,20 @@ def successRatioBy(
     return passedRows.groupby(data[xColumn]).mean().mul(100).rename("successRatio")
     
 def printMeanDecrease(
-    path: str
+    path: str,
+    filters: Mapping[str, object] | None = None
 ) -> np.float64:
-    meanEQ = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount")
+    meanEQ = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount",filters)
     meanDecrease = (meanEQ[0] - meanEQ[1])/meanEQ[0]
     print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")
+
+def printMeanLearningTimeDecrease(
+    path: str,
+    filters: Mapping[str, object] | None = None
+) -> np.float64:
+    meanTime = meanBy(pd.read_csv(path),"useSrs","learnerTimeUs",filters)
+    meanDecrease = (meanTime[0] - meanTime[1])/meanTime[0]
+    print(f"Average procentage reduction in learning time {meanDecrease*100:.2f}%")
     
 def printMeanAccuracyGain(
     path: str
@@ -75,5 +84,3 @@ def printAccuracy(
     printAccuracyStats(dataSmall, " (automata with at most 15 states)")
     print()
     printAccuracyStats(dataBig, " (automata with more than 20 states)")
-
-
