@@ -43,3 +43,19 @@ def printMeanDecrease(
     meanEQ = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount")
     meanDecrease = (meanEQ[0] - meanEQ[1])/meanEQ[0]
     print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")
+    
+def printMeanAccuracyGain(
+    path: str
+) -> None:
+    meanAccuracy = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount")
+    meanAccuracyGain = (meanEQ[0] - meanEQ[1])/meanEQ[0]
+    print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")    
+        
+def printMeanAccuracyGain(
+    path: str
+) -> None:
+    series = pd.read_csv(path).groupby(["useSrs","status"])["runIndex"].count()
+    accuracyNoSRS = series[(0,'passed')]/(series[(0,'passed')]+series[(0,'validation_failed')])
+    accuracyWithSRS = series[(1,'passed')]/(series[(1,'passed')]+series[(1,'validation_failed')])
+    print(f"Average accurtacy gain {(accuracyWithSRS/accuracyNoSRS)*100:.2f}%")    
+

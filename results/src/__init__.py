@@ -1,4 +1,4 @@
-from .Aggregations import meanBy, successRatioBy, printMeanDecrease
+from .Aggregations import meanBy, successRatioBy, printMeanDecrease, printMeanAccuracyGain
 from .Plot import Plot
 
-__all__ = ["Plot", "meanBy", "successRatioBy","printMeanDecrease"]
+__all__ = ["Plot", "meanBy", "successRatioBy","printMeanDecrease","printMeanAccuracyGain"]
