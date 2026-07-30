@@ -69,7 +69,7 @@ def printAccuracyStats(
     accuracyWithSRS = series[(1,'passed')]/(series[(1,'passed')]+series[(1,'validation_failed')])
     
     print(f"Accuracy without SRS {accuracyNoSRS*100:.2f}% and with SRS {accuracyWithSRS*100:.2f}% {comment}")
-    print(f"Average accurtacy gain {((accuracyWithSRS - accuracyNoSRS)/accuracyNoSRS)*100:.2f}% {comment}")    
+    print(f"Average accuracy gain {((accuracyWithSRS - accuracyNoSRS)/accuracyNoSRS)*100:.2f}% {comment}")
     
         
 def printAccuracy(
