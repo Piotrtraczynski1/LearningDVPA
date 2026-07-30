@@ -2,72 +2,81 @@
 
 ## Description
 
-Implementation of the algorithm described in [this paper](https://drops.dagstuhl.de/storage/00lipics/lipics-vol241-mfcs2022/LIPIcs.MFCS.2022.74/LIPIcs.MFCS.2022.74.pdf).
+This repository implements an active learning algorithm for Deterministic Visibly Pushdown Automata (DVPAs) with accessible stack, as described in [Learning Deterministic Visibly Pushdown Automata Under Accessible Stack](https://drops.dagstuhl.de/storage/00lipics/lipics-vol241-mfcs2022/LIPIcs.MFCS.2022.74/LIPIcs.MFCS.2022.74.pdf). Additionally, the implementation extends the algorithm with an advice mechanism based on SRS, automaton generators, and benchmarking mechanisms.
 
+## Requirements
 
-## Dependencies
+- CMake 3.11 or newer
+- a C++ compiler with C++20 support
+- Git and an Internet connection when building the unit tests for the first time
 
-1. **Google Test**
+## Building
 
-   - Install GTest and required build tools:
-     ```bash
-     sudo apt install gtest
-     sudo apt install build-essential
-     sudo apt install libgtest-dev
-     ```
-   - Clone the GTest repository, build and install it:
-     ```bash
-     git clone https://github.com/google/googletest.git
-     cd googletest/
-     cmake .
-     make
-     sudo make install
-     ```
+Make the build script executable once after cloning the repository:
 
-2. **Clang-Tidy**
+```bash
+chmod +x build.sh
+```
 
-   - Install Clang and Clang-Tidy:
-     ```bash
-     sudo apt install clang
-     sudo apt install clang-tidy
-     ```
-   - To enable Clang-Tidy static analysis in Visual Studio Code, add the following configuration to your `settings.json`:
-     ```json
-     {
-       "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-       "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
-       "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
-       "C_Cpp.codeAnalysis.clangTidy.args": [
-         "--config-file=.clang-tidy"
-       ]
-     }
-     ```
+Build the project from the repository root:
 
-3. **JSON for Modern C++**
-   - Install the `nlohmann-json` library for JSON handling:
-     ```bash
-     sudo apt install nlohmann-json3-dev
-     ```
+```bash
+./build.sh
+```
 
-## `build.sh` script
-- Add execution privileges to script:
-    ```bash
-    chmod +x build.sh
-    ```
+The executable is created at `build/run`.
 
-1. **Project build**
-    - To build the project run
-    ```bash
-    ./build.sh
-    ```
-    The executable file `run` will be placed in the `./build` directory.
+Additional build modes are available:
 
-    - To build and run UTs
-    ```bash
-    ./build.sh test
-    ```
-    - To build and a run single UT
-    ```bash
-    ./build.sh test -t [TEST_NAME]
-    ```
+```bash
+./build.sh -d
+./build.sh -randomEQ
+./build.sh -d -randomEQ
+```
 
+The `-d` option enables additional diagnostic checks and creates `build-debug/run`. The `-randomEQ` option enables random equivalence queries and creates `build-random/run`. When both options are used, the executable is created at `build-debug-random/run`.
+
+## Running
+
+Run the executable from the repository root:
+
+```bash
+./build/run <generator> <seed> <numOfTests>
+./build/run bench <scenario>
+./build/run custom
+./build/run --help
+```
+
+Available generators are `random`, `cda`, `sevpa`, `mevpa`, `ecda`, `xml`, `commutative`, `cancel`, and `idempotency`.
+
+Examples:
+
+```bash
+./build/run random 42 100
+./build/run cda 123 50
+./build/run bench increasing-number-of-states-base
+./build/run custom
+```
+
+Use the executable from the appropriate build directory for diagnostic or random-equivalence-query builds. The available benchmark scenarios are defined in [`src/benchmark/scenario/Scenarios.hpp`](src/benchmark/scenario/Scenarios.hpp).
+
+## Tests
+
+Build and run all unit tests:
+
+```bash
+./build.sh test
+```
+
+Run the tests with diagnostic checks enabled:
+
+```bash
+./build.sh -d test
+```
+
+Build and run one unit test target:
+
+```bash
+./build.sh test -t <TEST_NAME>
+./build.sh -d test -t <TEST_NAME>
+```

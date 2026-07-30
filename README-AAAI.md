@@ -4,81 +4,83 @@
 
 The baseline implements the algorithm described in [this paper](https://drops.dagstuhl.de/storage/00lipics/lipics-vol241-mfcs2022/LIPIcs.MFCS.2022.74/LIPIcs.MFCS.2022.74.pdf). This algorithm is extended with the advice mechanism described in the AAAI submission.
 
+## Requirements
 
-## Installation
+- CMake 3.11 or newer
+- a C++ compiler with C++20 support
+- Git and an Internet connection when building the unit tests for the first time
 
-### Dependencies
+## Building
 
+Make the build script executable once after cloning the repository:
 
-1. **Google Test**
+```bash
+chmod +x build.sh
+```
 
-   - Install GTest and required build tools:
-     ```bash
-     sudo apt install gtest
-     sudo apt install build-essential
-     sudo apt install libgtest-dev
-     ```
-   - Clone the GTest repository, build and install it:
-     ```bash
-     git clone https://github.com/google/googletest.git
-     cd googletest/
-     cmake .
-     make
-     sudo make install
-     ```
+Build the project from the repository root:
 
-2. **Clang-Tidy**
+```bash
+./build.sh
+```
 
-   - Install Clang and Clang-Tidy:
-     ```bash
-     sudo apt install clang
-     sudo apt install clang-tidy
-     ```
-   - To enable Clang-Tidy static analysis in Visual Studio Code, add the following configuration to your `settings.json`:
-     ```json
-     {
-       "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-       "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
-       "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
-       "C_Cpp.codeAnalysis.clangTidy.args": [
-         "--config-file=.clang-tidy"
-       ]
-     }
-     ```
+The executable is created at `build/run`.
 
-3. **JSON for Modern C++**
-   - Install the `nlohmann-json` library for JSON handling:
-     ```bash
-     sudo apt install nlohmann-json3-dev
-     ```
+Additional build modes are available:
 
-### `build.sh` script
-- Add execution privileges to script:
-    ```bash
-    chmod +x build.sh
-    ```
+```bash
+./build.sh -d
+./build.sh -randomEQ
+./build.sh -d -randomEQ
+```
 
-1. **Project build**
-    - To build the project run
-    ```bash
-    ./build.sh
-    ```
-    The executable file `run` will be placed in the `./build` directory.
+The `-d` option enables additional diagnostic checks and creates `build-debug/run`. The `-randomEQ` option enables random equivalence queries and creates `build-random/run`. When both options are used, the executable is created at `build-debug-random/run`.
 
-    - To build the project run with the probabilistic test
-    ```bash
-    ./build.sh -randomEQ
-    ```
-    The executable file `run` will be placed in the `./build-random` directory.
+## Running
 
-    - To build and run UTs
-    ```bash
-    ./build.sh test
-    ```
-    - To build and a run single UT
-    ```bash
-    ./build.sh test -t [TEST_NAME]
-    ```
+Run the executable from the repository root:
+
+```bash
+./build/run <generator> <seed> <numOfTests>
+./build/run bench <scenario>
+./build/run custom
+./build/run --help
+```
+
+Available generators are `random`, `cda`, `sevpa`, `mevpa`, `ecda`, `xml`, `commutative`, `cancel`, and `idempotency`.
+
+Examples:
+
+```bash
+./build/run random 42 100
+./build/run cda 123 50
+./build/run bench increasing-number-of-states-base
+./build/run custom
+```
+
+Use the executable from the appropriate build directory for diagnostic or random-equivalence-query builds. The available benchmark scenarios are defined in [`src/benchmark/scenario/Scenarios.hpp`](src/benchmark/scenario/Scenarios.hpp).
+
+## Tests
+
+Build and run all unit tests:
+
+```bash
+./build.sh test
+```
+
+Run the tests with diagnostic checks enabled:
+
+```bash
+./build.sh -d test
+```
+
+Build and run one unit test target:
+
+```bash
+./build.sh test -t <TEST_NAME>
+./build.sh -d test -t <TEST_NAME>
+```
+
 ## Experiments
 
 ### Parameters
@@ -94,13 +96,25 @@ To change various parameters of test edit `src/TesterParameters.hpp`. Most param
   - density: probability with with each randomly generated transition does not lead to the sink state
   - useSrs: Boolean value whether to use the advice mechanism
   - useEquivalenceCheckToValidateOutput: Boolean value whether the perform the exact equivalence test on the learned automaton. Relevant only in the probabilistic setting. 
-  - savePassedTestData  ??
-  - supervisedMode ??
-  - supervisedTestMaxDuration ??
+  - generator-specifc parameters: numOfModules, minSecondDvpaNumOfStates, maxSecondDvpaNumOfStates
+  - additional debugging and supervision options: savePassedTestData, supervisedMode, supervisedTestMaxDuration
+
+Note: Parameter sets are grouped by generator. Separate parameter sets are defined for builds with and without `-randomEQ`.
 
 ### Benchmarks
 
-??
+The committed benchmark scenarios are registered in [`src/benchmark/scenario/Scenarios.hpp`](src/benchmark/scenario/Scenarios.hpp). The `*-increasing-number-of-states` scenarios provide the data for the exact equivalence query analysis, while the `*-accuracy` scenarios provide the data for the probabilistic equivalence query analysis and require a build with `-randomEQ`.
+
+Run a benchmark with:
+
+```bash
+./build/run bench cancellation-increasing-number-of-states
+./build-random/run bench cancellation-accuracy
+```
+
+Each run writes its output to `src/benchmark/results/<scenario>/runs.csv`. Some data sets used in the notebooks were collected in several batches with different seeds.
+
+The mixed equivalence query data in the notebooks was produced with local scenarios that are not part of the provided source package. The corresponding processed data files are available in `results/data/mixedEq/`, but reproducing or extending the mixed experiments requires changes to the source code.
 
 ### XML
 
