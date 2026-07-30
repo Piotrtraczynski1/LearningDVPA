@@ -1,8 +1,8 @@
-# Learning Deterministic Visibly Pushdown Automata Under Accessible Stack
+# Learning Visibly Pushdown Languages under Rewriting Rules
 
 ## Description
 
-Implementation of the algorithm described in [this paper](https://drops.dagstuhl.de/storage/00lipics/lipics-vol241-mfcs2022/LIPIcs.MFCS.2022.74/LIPIcs.MFCS.2022.74.pdf).
+The baseline implements the algorithm described in [this paper](https://drops.dagstuhl.de/storage/00lipics/lipics-vol241-mfcs2022/LIPIcs.MFCS.2022.74/LIPIcs.MFCS.2022.74.pdf). This algorithm is extended with the advice mechanism described in the AAAI submission.
 
 
 ## Installation
