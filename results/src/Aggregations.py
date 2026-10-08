@@ -41,8 +41,24 @@ def printMeanDecrease(
     path: str,
     filters: Mapping[str, object] | None = None
 ) -> np.float64:
-    meanEQ = meanBy(pd.read_csv(path),"useSrs","equivalenceQueryCount",filters)
+
+    data = pd.read_csv(path)
+    dataSmall = data[data["numOfStates"]<=15]
+    dataBig = data[data["numOfStates"]>20]
+
+    meanEQ = meanBy(data,"useSrs","equivalenceQueryCount",filters)
     meanDecrease = (meanEQ[0] - meanEQ[1])/meanEQ[0]
+    print(f"Number of DVPA {len(pd.read_csv(path))}")
+    print(f"Average number of equivalence queries {meanEQ[0]:.2f} without advice, and {meanEQ[1]:.2f} with advice")
+    print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")
+    
+
+
+    meanEQ = meanBy(dataBig,"useSrs","equivalenceQueryCount",filters)
+    meanDecrease = (meanEQ[0] - meanEQ[1])/meanEQ[0]
+
+    print(f"Number of DVPA {len(dataBig)} with at last 20 states")
+    print(f"Average number of equivalence queries {meanEQ[0]:.2f} without advice, and {meanEQ[1]:.2f} with advice")
     print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")
 
 def printMeanLearningTimeDecrease(
