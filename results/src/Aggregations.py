@@ -48,7 +48,7 @@ def printMeanDecrease(
 
     meanEQ = meanBy(data,"useSrs","equivalenceQueryCount",filters)
     meanDecrease = (meanEQ[0] - meanEQ[1])/meanEQ[0]
-    print(f"Number of DVPA {len(pd.read_csv(path))}")
+    print(f"Number of DVPA {len(data)}")
     print(f"Average number of equivalence queries {meanEQ[0]:.2f} without advice, and {meanEQ[1]:.2f} with advice")
     print(f"Average procentage reduction in equivalence queries {meanDecrease*100:.2f}%")
     
@@ -94,9 +94,18 @@ def printAccuracy(
     data = pd.read_csv(path)
     dataSmall = data[data["numOfStates"]<=15]
     dataBig = data[data["numOfStates"]>20]
+    dataVeryBig = data[data["numOfStates"]==28]
     
+    print(f"Number of DVPA {len(data)}")
     printAccuracyStats(data, " (all automata)")
     print()
+    print(f"Number of DVPA with at most 15 states: {len(dataSmall)}")
     printAccuracyStats(dataSmall, " (automata with at most 15 states)")
     print()
+    print(f"Number of DVPA with more than 20 states: {len(dataBig)}")
     printAccuracyStats(dataBig, " (automata with more than 20 states)")
+    
+    print()
+    print(f"Number of DVPA with more than 28 states: {len(dataVeryBig)}")
+    printAccuracyStats(dataVeryBig, " (automata with 28 states)")
+
