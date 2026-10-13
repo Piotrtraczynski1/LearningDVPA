@@ -10,6 +10,7 @@
 #include "learner/srs/Srs.hpp"
 #include "learner/srs/WellMatchedNode.hpp"
 #include "teacher/Teacher.hpp"
+#include "utils/SrsCheckConfig.hpp"
 
 namespace learner::srs
 {
@@ -32,6 +33,7 @@ class SrsChecker
     const uint16_t numOfReturns;
     const uint16_t numOfLocals;
     const uint16_t numOfStackSymbols;
+    const utils::SrsCheckConfig config;
     uint16_t numOfStates{};
 
     std::vector<common::Word> wellMatchedWords{};
@@ -44,7 +46,7 @@ public:
     SrsChecker(
         const Srs srsArg, const teacher::Teacher &oracleArg, const uint16_t numOfCallsArg,
         const uint16_t numOfReturnArg, const uint16_t numOfLocalsArg,
-        const uint16_t numOfStackSymbolsArg);
+        const uint16_t numOfStackSymbolsArg, utils::SrsCheckConfig configArg = {});
 
     common::Word check(std::shared_ptr<common::VPA<AutomatonKind::Normal>> hypothesis);
 

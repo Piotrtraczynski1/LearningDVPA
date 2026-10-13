@@ -1,7 +1,7 @@
 #include "teacher/EquivalenceCheck.hpp"
 #include "utils/EquivalenceCheckConfig.hpp"
 
-#ifndef RANDOM_EQUIVALENCE_QUERY
+#if !defined(RANDOM_EQUIVALENCE_QUERY) && !defined(MIXED_EQUIVALENCE_QUERY)
 
 namespace teacher
 {
@@ -24,10 +24,10 @@ std::shared_ptr<common::Word> equivalenceCheck(
 
 namespace teacher
 {
-std::shared_ptr<common::Word> equivalenceCheck(
+std::shared_ptr<common::Word> randomEquivalenceCheck(
     std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
-    [[maybe_unused]] std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
-    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, const bool updateCounters)
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, const uint32_t numOfRandomWords,
+    const uint16_t maxLengthRandomWord, const bool updateCounters)
 {
     static std::mt19937 rng(utils::equivalenceCheckSeed);
 
@@ -70,9 +70,9 @@ std::shared_ptr<common::Word> equivalenceCheck(
         return std::make_shared<common::Word>(word);
     };
 
-    for (uint32_t i = 0; i < utils::numOfRandomWords; i++)
+    for (uint32_t i = 0; i < numOfRandomWords; i++)
     {
-        const uint16_t length{static_cast<uint16_t>(rng() % (utils::maxLengthRandomWord + 1))};
+        const uint16_t length{static_cast<uint16_t>(rng() % (maxLengthRandomWord + 1))};
         std::shared_ptr<common::Word> testWord{generateRandomWord(length)};
 
         if (updateCounters)
@@ -90,6 +90,22 @@ std::shared_ptr<common::Word> equivalenceCheck(
     }
 
     return std::make_shared<common::Word>();
+}
+
+std::shared_ptr<common::Word> equivalenceCheck(
+    std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
+    std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
+    std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, const bool updateCounters)
+{
+#ifdef RANDOM_EQUIVALENCE_QUERY
+    return randomEquivalenceCheck(
+        automataCombiner, vpa, utils::numOfRandomWordsForMainEquivalenceCheck,
+        utils::maxLengthRandomWord, updateCounters);
+#else
+    [[maybe_unused]] const auto ignoredUpdateCounters{updateCounters};
+    auto combinedVpa{automataCombiner->combineVPA(*vpa)};
+    return emptinessChecker->check(combinedVpa);
+#endif
 }
 } // namespace teacher
 

@@ -100,7 +100,9 @@ void BenchmarkRunner::writeHeader(std::ofstream &out) const
 {
     out << "scenario,runIndex,seed,generator,numOfStates,numOfCalls,numOfLocals,numOfReturns,"
            "numOfStackSymbols,density,acceptingStatesDensity,numOfModules,secondDvpaNumOfStates,"
-           "useSrs,useEquivalenceCheckToValidateOutput,equivalenceQueryCount,"
+           "useSrs,srsCheckMethod,srsMaxRevealedWellMatchedWords,"
+           "srsMaxWellMatchedWords,srsRandomWordBudget,"
+           "useEquivalenceCheckToValidateOutput,equivalenceQueryCount,"
            "equivalenceQueryHypothesisStatesTotal,equivalenceQueryTimeUs,"
            "equivalenceQueryTargetMembershipQueryCount,"
            "equivalenceQueryTargetMembershipQuerySymbolsTotal,"
@@ -131,6 +133,10 @@ void BenchmarkRunner::saveResult(
         << result.numOfStackSymbols << "," << parameters.density << ","
         << parameters.acceptingStatesDensity << "," << parameters.numOfModules << ","
         << result.secondDvpaNumOfStates << "," << parameters.useSrs << ","
+        << utils::toString(parameters.srsCheckConfig.method) << ","
+        << parameters.srsCheckConfig.maxNumOfRevealedWellMatchedWords << ","
+        << parameters.srsCheckConfig.maxNumOfWellMatchedWords << ","
+        << parameters.srsCheckConfig.numOfRandomWords << ","
         << parameters.useEquivalenceCheckToValidateOutput << "," << equivalenceQuery.executions
         << "," << Counters::getCounter("equivalenceQuery") << "," << equivalenceQuery.time << ","
         << Counters::getCounter("equivalenceQueryTargetMembershipQuery") << ","

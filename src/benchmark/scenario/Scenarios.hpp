@@ -21,6 +21,7 @@
 #include "benchmark/scenario/srs/CancellationAccuracy.hpp"
 #include "benchmark/scenario/srs/CommutationAccuracy.hpp"
 #include "benchmark/scenario/srs/IdempotencyAccuracy.hpp"
+#include "benchmark/scenario/srs/MixedExactSubsetScenario.hpp"
 
 namespace benchmark
 {
@@ -37,7 +38,19 @@ static const std::map<std::string, ScenarioFactory> scenariosRegistry{
     {"idempotency-increasing-number-of-states", [] { return std::make_unique<scenario::IdempotencyIncreasingNumOfStates>(); }},
     {"cancellation-accuracy", [] { return std::make_unique<scenario::CancellationAccuracy>(); }},
     {"commutation-accuracy", [] { return std::make_unique<scenario::CommutationAccuracy>(); }},
-    {"idempotency-accuracy", [] { return std::make_unique<scenario::IdempotencyAccuracy>(); }}
+    {"idempotency-accuracy", [] { return std::make_unique<scenario::IdempotencyAccuracy>(); }},
+    {"cancellation-srs-mixed-exact-subset", [] {
+         return std::make_unique<scenario::MixedExactSubsetScenario>(
+             scenario::MixedSrsGenerator::Cancellation);
+     }},
+    {"commutation-srs-mixed-exact-subset", [] {
+         return std::make_unique<scenario::MixedExactSubsetScenario>(
+             scenario::MixedSrsGenerator::Commutation);
+     }},
+    {"idempotency-srs-mixed-exact-subset", [] {
+         return std::make_unique<scenario::MixedExactSubsetScenario>(
+             scenario::MixedSrsGenerator::Idempotency);
+     }}
 };
 // clang-format on
 

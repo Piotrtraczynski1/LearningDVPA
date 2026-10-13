@@ -3,6 +3,8 @@
 #include <chrono>
 #include <cstdint>
 
+#include "utils/SrsCheckConfig.hpp"
+
 struct TesterParameters
 {
     uint16_t minNumOfStates;
@@ -29,6 +31,7 @@ struct TesterParameters
     uint16_t numOfModules{0};
 
     bool useSrs{false};
+    utils::SrsCheckConfig srsCheckConfig{};
     uint16_t minSecondDvpaNumOfStates{3};
     uint16_t maxSecondDvpaNumOfStates{3};
 

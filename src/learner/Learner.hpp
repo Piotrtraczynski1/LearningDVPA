@@ -10,6 +10,7 @@
 #include "learner/srs/Srs.hpp"
 #include "learner/srs/SrsChecker.hpp"
 #include "teacher/Teacher.hpp"
+#include "utils/SrsCheckConfig.hpp"
 #include "utils/log.hpp"
 
 namespace learner
@@ -33,7 +34,7 @@ class Learner
 public:
     Learner(
         teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL,
-        uint16_t numOfS, srs::Srs srs = {});
+        uint16_t numOfS, srs::Srs srs = {}, utils::SrsCheckConfig srsCheckConfig = {});
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> run();
 
 private:

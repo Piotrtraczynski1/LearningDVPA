@@ -131,7 +131,8 @@ std::shared_ptr<common::VPA<AutomatonKind::Normal>> Tester::runLearner()
         vpa, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols);
     learner::srs::Srs srs = params.useSrs ? generator->getSrs() : learner::srs::Srs{};
     learner = std::make_shared<learner::Learner>(
-        *teacher, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols, srs);
+        *teacher, numOfCalls, numOfReturns, numOfLocals, numOfStackSymbols, srs,
+        params.srsCheckConfig);
 
     return learner->run();
 }

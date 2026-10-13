@@ -18,6 +18,13 @@ class AutomataCombiner
         std::shared_ptr<teacher::EmptinessChecker> emptinessChecker,
         std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, bool updateCounters);
 
+#if defined(RANDOM_EQUIVALENCE_QUERY) || defined(MIXED_EQUIVALENCE_QUERY)
+    friend std::shared_ptr<common::Word> randomEquivalenceCheck(
+        std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
+        std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, uint32_t numOfRandomWords,
+        uint16_t maxLengthRandomWord, bool updateCounters);
+#endif
+
     const uint16_t numOfCalls;
     const uint16_t numOfReturns;
     const uint16_t numOfLocals;

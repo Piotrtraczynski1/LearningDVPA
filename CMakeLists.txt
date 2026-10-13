@@ -9,6 +9,11 @@ set(CMAKE_CXX_STANDARD 20)
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_HARD_DIAGNOSTICS "Enable debug checks" OFF)
 option(RANDOM_EQUIVALENCE_QUERY "Enable random equivalence query" OFF)
+option(MIXED_EQUIVALENCE_QUERY "Use random SRS checks and exact learner equivalence queries" OFF)
+
+if(RANDOM_EQUIVALENCE_QUERY AND MIXED_EQUIVALENCE_QUERY)
+    message(FATAL_ERROR "RANDOM_EQUIVALENCE_QUERY and MIXED_EQUIVALENCE_QUERY cannot both be enabled")
+endif()
 
 if (BUILD_TESTS)
     FetchContent_Declare(
@@ -24,6 +29,10 @@ endif()
 
 if(RANDOM_EQUIVALENCE_QUERY)
     add_compile_definitions(RANDOM_EQUIVALENCE_QUERY)
+endif()
+
+if(MIXED_EQUIVALENCE_QUERY)
+    add_compile_definitions(MIXED_EQUIVALENCE_QUERY)
 endif()
 
 if (ENABLE_HARD_DIAGNOSTICS)

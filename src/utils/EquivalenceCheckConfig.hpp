@@ -1,14 +1,14 @@
 #pragma once
 
-#ifdef RANDOM_EQUIVALENCE_QUERY
-
 #include <cstdint>
 
 namespace utils
 {
 constexpr int equivalenceCheckSeed{1};
-constexpr uint32_t numOfRandomWords{3000000000};
+constexpr uint32_t numOfRandomWordsForMixedSrsCheck{10000};
 constexpr uint16_t maxLengthRandomWord{100};
-} // namespace utils
 
+#ifdef RANDOM_EQUIVALENCE_QUERY
+constexpr uint32_t numOfRandomWordsForMainEquivalenceCheck{3000000000};
 #endif
+} // namespace utils

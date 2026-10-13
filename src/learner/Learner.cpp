@@ -9,13 +9,13 @@ namespace learner
 
 Learner::Learner(
     teacher::Teacher &teacher, uint16_t numOfC, uint16_t numOfR, uint16_t numOfL, uint16_t numOfS,
-    srs::Srs srs)
+    srs::Srs srs, const utils::SrsCheckConfig srsCheckConfig)
     : oracle{teacher}, numOfCalls{numOfC}, numOfReturns{numOfR}, numOfLocals{numOfL},
       numOfStackSymbols{numOfS}, selectors{std::make_shared<Selectors>()},
       testWords{std::make_shared<TestWords>()},
       generator{oracle,       selectors,   testWords,        numOfCalls,
                 numOfReturns, numOfLocals, numOfStackSymbols},
-      srsChecker{srs, teacher, numOfC, numOfR, numOfL, numOfS}
+      srsChecker{srs, teacher, numOfC, numOfR, numOfL, numOfS, srsCheckConfig}
 {
     setInitialState();
 };

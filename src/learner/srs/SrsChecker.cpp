@@ -41,9 +41,9 @@ bool hasOneUnmatchedCall(const common::Word &word)
 SrsChecker::SrsChecker(
     const Srs srsArg, const teacher::Teacher &oracleArg, const uint16_t numOfCallsArg,
     const uint16_t numOfReturnArg, const uint16_t numOfLocalsArg,
-    const uint16_t numOfStackSymbolsArg)
+    const uint16_t numOfStackSymbolsArg, const utils::SrsCheckConfig configArg)
     : srs{srsArg}, oracle{oracleArg}, numOfCalls{numOfCallsArg}, numOfReturns{numOfReturnArg},
-      numOfLocals{numOfLocalsArg}, numOfStackSymbols{numOfStackSymbolsArg}
+      numOfLocals{numOfLocalsArg}, numOfStackSymbols{numOfStackSymbolsArg}, config{configArg}
 {
 }
 
@@ -185,7 +185,7 @@ void SrsChecker::prepareWellMatchedWords(
     }
 
     while (not candidates->empty() and
-           numOfRevealedNodes < utils::MaxNumOfRevealedWellMatchedWordsForSrsCheck)
+           numOfRevealedNodes < config.maxNumOfRevealedWellMatchedWords)
     {
         WellMatchedNode node{candidates->front()};
         candidates->pop();
@@ -288,7 +288,7 @@ bool SrsChecker::tryInsertNode(WellMatchedNode &newNode)
         return false;
     }
 
-    if (nodes.size() < utils::MaxNumOfWellMatchedWordsForSrsCheck)
+    if (nodes.size() < config.maxNumOfWellMatchedWords)
     {
         nodes.push_back(newNode);
         minScore = std::min(minScore, newNode.score);
@@ -354,8 +354,24 @@ common::Word SrsChecker::checkEquivalence(
         alphabet.numOfCalls, numOfReturns, alphabet.numOfLocals, numOfStackSymbols);
 
     constexpr bool updateCounters{false};
-    auto output = teacher::equivalenceCheck(
-        automataCombiner, emptinessChecker, convertedAutomata->rAutomaton, updateCounters);
+    std::shared_ptr<common::Word> output;
+    if (config.method == utils::SrsCheckMethod::Mixed)
+    {
+#if defined(RANDOM_EQUIVALENCE_QUERY) || defined(MIXED_EQUIVALENCE_QUERY)
+        output = teacher::randomEquivalenceCheck(
+            automataCombiner, convertedAutomata->rAutomaton, config.numOfRandomWords,
+            utils::maxLengthRandomWord, updateCounters);
+#else
+        WRN("[SrsChecker]: mixed SRS checking requires -mixedEQ; using combined");
+        output = teacher::equivalenceCheck(
+            automataCombiner, emptinessChecker, convertedAutomata->rAutomaton, updateCounters);
+#endif
+    }
+    else
+    {
+        output = teacher::equivalenceCheck(
+            automataCombiner, emptinessChecker, convertedAutomata->rAutomaton, updateCounters);
+    }
 
     common::Symbol leftoverSymbol{common::symbol::ReturnSymbol{numOfReturns}};
     for (uint16_t i = 0; i < output->size(); i++)

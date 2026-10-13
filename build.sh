@@ -4,24 +4,38 @@ set -euo pipefail
 
 BUILD_DIR="build"
 EXTRA_FLAGS="-DENABLE_HARD_DIAGNOSTICS=OFF"
-RANDOM_EQ_FLAG=""
+EQUIVALENCE_QUERY_FLAG=""
 
-if [[ "${1-}" == "-d" ]]; then
-  EXTRA_FLAGS="-DENABLE_HARD_DIAGNOSTICS=ON"
-  BUILD_DIR="build-debug"
-  shift
-fi
-
-if [[ "${1-}" == "-randomEQ" ]]; then
-  RANDOM_EQ_FLAG="-DRANDOM_EQUIVALENCE_QUERY=ON"
-  BUILD_DIR="${BUILD_DIR}-random"
-  shift
-fi
+while [[ "${1-}" == "-d" || "${1-}" == "-randomEQ" || "${1-}" == "-mixedEQ" ]]; do
+    case "$1" in
+    -d)
+        EXTRA_FLAGS="-DENABLE_HARD_DIAGNOSTICS=ON"
+        BUILD_DIR="build-debug${BUILD_DIR#build}"
+        ;;
+    -randomEQ)
+        if [[ -n "$EQUIVALENCE_QUERY_FLAG" ]]; then
+            echo "Only one of -randomEQ and -mixedEQ may be used."
+            exit 1
+        fi
+        EQUIVALENCE_QUERY_FLAG="-DRANDOM_EQUIVALENCE_QUERY=ON"
+        BUILD_DIR="${BUILD_DIR}-random"
+        ;;
+    -mixedEQ)
+        if [[ -n "$EQUIVALENCE_QUERY_FLAG" ]]; then
+            echo "Only one of -randomEQ and -mixedEQ may be used."
+            exit 1
+        fi
+        EQUIVALENCE_QUERY_FLAG="-DMIXED_EQUIVALENCE_QUERY=ON"
+        BUILD_DIR="${BUILD_DIR}-mixed"
+        ;;
+    esac
+    shift
+done
 
 build_code() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF $EXTRA_FLAGS $RANDOM_EQ_FLAG ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF $EXTRA_FLAGS $EQUIVALENCE_QUERY_FLAG ..
     cmake --build .
     cd ..
 }
@@ -29,7 +43,7 @@ build_code() {
 build_and_run_tests() {
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $EXTRA_FLAGS $EQUIVALENCE_QUERY_FLAG ..
     cmake --build .
     ctest --output-on-failure
     cd ..
@@ -44,7 +58,7 @@ build_and_run_single_test() {
     TEST_NAME="$1"
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
-    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $EXTRA_FLAGS ..
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON $EXTRA_FLAGS $EQUIVALENCE_QUERY_FLAG ..
     cmake --build . --target "$TEST_NAME"
 
     TEST_EXEC=$(find . -type f -name "$TEST_NAME" -perm -111 | head -n1)
