@@ -33,8 +33,8 @@ constexpr uint16_t MaxNumOfAutomatonStates{42};
 constexpr uint16_t MaxNumOfLetters{300};
 constexpr uint16_t MaxNumOfStackSymbols{40};
 
-constexpr uint16_t MaxNumOfRevealedWellMatchedWordsForSrsCheck{5000};
-constexpr uint16_t MaxNumOfWellMatchedWordsForSrsCheck{200};
+constexpr uint16_t MaxNumOfRevealedWellMatchedWordsForSrsCheck{300};
+constexpr uint16_t MaxNumOfWellMatchedWordsForSrsCheck{20};
 
 constexpr uint16_t MaxNumOfCombinedAutomatonStates{
     (MaxNumOfAutomatonStates + 2) * (MaxNumOfAutomatonStates + 1) + 2};

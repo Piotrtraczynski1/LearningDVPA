@@ -24,12 +24,28 @@ std::shared_ptr<common::Word> equivalenceCheck(
 
 namespace teacher
 {
+namespace
+{
+std::mt19937 &randomEquivalenceCheckGenerator()
+{
+    static std::mt19937 rng(utils::equivalenceCheckSeed);
+    return rng;
+}
+} // namespace
+
+#ifdef RANDOM_EQUIVALENCE_QUERY
+void resetRandomEquivalenceCheckGenerator()
+{
+    randomEquivalenceCheckGenerator() = std::mt19937(utils::equivalenceCheckSeed);
+}
+#endif
+
 std::shared_ptr<common::Word> randomEquivalenceCheck(
     std::shared_ptr<teacher::AutomataCombiner<AutomatonKind::Combined>> automataCombiner,
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, const uint32_t numOfRandomWords,
     const uint16_t maxLengthRandomWord, const bool updateCounters)
 {
-    static std::mt19937 rng(utils::equivalenceCheckSeed);
+    auto &rng = randomEquivalenceCheckGenerator();
 
     auto generateRandomWord = [&](const uint16_t length)
     {

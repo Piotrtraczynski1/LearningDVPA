@@ -22,6 +22,7 @@
 #include "benchmark/scenario/srs/CommutationAccuracy.hpp"
 #include "benchmark/scenario/srs/IdempotencyAccuracy.hpp"
 #include "benchmark/scenario/srs/MixedExactSubsetScenario.hpp"
+#include "benchmark/scenario/srs/ProbabilisticSrsReplayScenario.hpp"
 
 namespace benchmark
 {
@@ -50,8 +51,10 @@ static const std::map<std::string, ScenarioFactory> scenariosRegistry{
     {"idempotency-srs-mixed-exact-subset", [] {
          return std::make_unique<scenario::MixedExactSubsetScenario>(
              scenario::MixedSrsGenerator::Idempotency);
-     }}
-};
+     }},
+    {"probabilistic-srs-tuning-replay", [] {
+         return std::make_unique<scenario::ProbabilisticSrsReplayScenario>();
+     }}};
 // clang-format on
 
 } // namespace benchmark

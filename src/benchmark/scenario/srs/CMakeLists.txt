@@ -9,6 +9,7 @@ add_library(srsScenarios STATIC
     CommutationAccuracy.cpp
     IdempotencyAccuracy.cpp
     MixedExactSubsetScenario.cpp
+    ProbabilisticSrsReplayScenario.cpp
 )
 
 target_link_libraries(srsScenarios PRIVATE utils common generator learner teacher)

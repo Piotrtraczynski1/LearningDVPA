@@ -21,4 +21,8 @@ std::shared_ptr<common::Word> randomEquivalenceCheck(
     std::shared_ptr<common::VPA<AutomatonKind::Normal>> vpa, uint32_t numOfRandomWords,
     uint16_t maxLengthRandomWord, bool updateCounters);
 #endif
+
+#ifdef RANDOM_EQUIVALENCE_QUERY
+void resetRandomEquivalenceCheckGenerator();
+#endif
 } // namespace teacher
