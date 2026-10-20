@@ -13,10 +13,10 @@ enum class ReplayGenerator : uint8_t
 };
 
 // Replays the three probabilisticEq accuracy generators with tuned SRS
-// constants and the current mixed checker.
+// constants and the current mixed checker. Cancellation/commutation continue
+// at seed 601; corrected idempotency starts again at seed 1.
 class ProbabilisticSrsReplayScenario : public Scenario
 {
-    static constexpr uint16_t numOfSeeds{600};
     ReplayGenerator generator;
     TesterParameters parameters;
     void configureGenerator();

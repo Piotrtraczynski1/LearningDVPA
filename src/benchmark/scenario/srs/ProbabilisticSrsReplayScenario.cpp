@@ -49,7 +49,7 @@ ProbabilisticSrsReplayScenario::ProbabilisticSrsReplayScenario()
 void ProbabilisticSrsReplayScenario::configureGenerator()
 {
     parameters.srsCheckConfig = {.method = utils::SrsCheckMethod::Mixed};
-    if (generator == ReplayGenerator::Cancellation)
+    // Reset all ranges so idempotency cannot inherit commutation settings.
     {
         parameters.minNumOfStates = 5;
         parameters.maxNumOfStates = 12;
@@ -64,7 +64,7 @@ void ProbabilisticSrsReplayScenario::configureGenerator()
         parameters.minSecondDvpaNumOfStates = 2;
         parameters.maxSecondDvpaNumOfStates = 2;
     }
-    else if (generator == ReplayGenerator::Commutation)
+    if (generator == ReplayGenerator::Commutation)
     {
         parameters.minNumOfStates = 2;
         parameters.maxNumOfStates = 6;
@@ -80,10 +80,22 @@ void ProbabilisticSrsReplayScenario::configureGenerator()
     }
 }
 
-int ProbabilisticSrsReplayScenario::getSeed() { return 1; }
-uint16_t ProbabilisticSrsReplayScenario::getNumOfIterationsIn1Dim() { return 3; }
-std::string ProbabilisticSrsReplayScenario::getDim1Name() { return "generator"; }
-uint16_t ProbabilisticSrsReplayScenario::getDim1Details() { return static_cast<uint16_t>(generator); }
+int ProbabilisticSrsReplayScenario::getSeed()
+{
+    return generator == ReplayGenerator::Idempotency ? 1 : 601;
+}
+uint16_t ProbabilisticSrsReplayScenario::getNumOfIterationsIn1Dim()
+{
+    return 3;
+}
+std::string ProbabilisticSrsReplayScenario::getDim1Name()
+{
+    return "generator";
+}
+uint16_t ProbabilisticSrsReplayScenario::getDim1Details()
+{
+    return static_cast<uint16_t>(generator);
+}
 void ProbabilisticSrsReplayScenario::prepareNextIterationDim1()
 {
     if (generator != ReplayGenerator::Idempotency)
@@ -95,16 +107,25 @@ void ProbabilisticSrsReplayScenario::prepareNextIterationDim1()
         configureGenerator();
     }
 }
-uint16_t ProbabilisticSrsReplayScenario::getNumOfTestsInSingleIteration() { return numOfSeeds; }
-const TesterParameters &ProbabilisticSrsReplayScenario::getParameters() const { return parameters; }
+uint16_t ProbabilisticSrsReplayScenario::getNumOfTestsInSingleIteration()
+{
+    return generator == ReplayGenerator::Idempotency ? 6000 : 5400;
+}
+const TesterParameters &ProbabilisticSrsReplayScenario::getParameters() const
+{
+    return parameters;
+}
 
 std::string ProbabilisticSrsReplayScenario::getGeneratorName() const
 {
     switch (generator)
     {
-    case ReplayGenerator::Cancellation: return "cancellation";
-    case ReplayGenerator::Commutation: return "commutative";
-    case ReplayGenerator::Idempotency: return "idempotency";
+    case ReplayGenerator::Cancellation:
+        return "cancellation";
+    case ReplayGenerator::Commutation:
+        return "commutative";
+    case ReplayGenerator::Idempotency:
+        return "idempotency";
     }
     return "unknown";
 }
@@ -114,11 +135,15 @@ SingleTestResult ProbabilisticSrsReplayScenario::runSingle(const uint32_t seed)
     switch (generator)
     {
     case ReplayGenerator::Cancellation:
-        return Tester{1, std::make_unique<generator::srs::CancellationGenerator>(), parameters, seed}.runSingle();
+        return Tester{
+            1, std::make_unique<generator::srs::CancellationGenerator>(), parameters, seed}
+            .runSingle();
     case ReplayGenerator::Commutation:
-        return Tester{1, std::make_unique<generator::srs::CommutativeGenerator>(), parameters, seed}.runSingle();
+        return Tester{1, std::make_unique<generator::srs::CommutativeGenerator>(), parameters, seed}
+            .runSingle();
     case ReplayGenerator::Idempotency:
-        return Tester{1, std::make_unique<generator::srs::IdempotencyGenerator>(), parameters, seed}.runSingle();
+        return Tester{1, std::make_unique<generator::srs::IdempotencyGenerator>(), parameters, seed}
+            .runSingle();
     }
     std::abort();
 }

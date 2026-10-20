@@ -68,17 +68,26 @@ MixedExactSubsetScenario::MixedExactSubsetScenario(const MixedSrsGenerator gener
 
 int MixedExactSubsetScenario::getSeed()
 {
-    return firstSeed;
+    return currentStep().firstSeed;
 }
 
 uint16_t MixedExactSubsetScenario::getNumOfIterationsIn1Dim()
 {
-    return cancellationSteps.size();
+    switch (generator)
+    {
+    case MixedSrsGenerator::Cancellation:
+        return cancellationSteps.size();
+    case MixedSrsGenerator::Commutation:
+        return commutationSteps.size();
+    case MixedSrsGenerator::Idempotency:
+        return idempotencySteps.size();
+    }
+    return 0;
 }
 
 uint16_t MixedExactSubsetScenario::getNumOfTestsInSingleIteration()
 {
-    return numOfSeeds;
+    return currentStep().numOfSeeds;
 }
 
 std::string MixedExactSubsetScenario::getDim1Name()
@@ -93,7 +102,7 @@ uint16_t MixedExactSubsetScenario::getDim1Details()
 
 void MixedExactSubsetScenario::prepareNextIterationDim1()
 {
-    if (stepIndex + 1 < cancellationSteps.size())
+    if (stepIndex + 1 < getNumOfIterationsIn1Dim())
     {
         stepIndex++;
         applyStep();
@@ -122,16 +131,19 @@ SingleTestResult MixedExactSubsetScenario::runSingle(const uint32_t seed)
     switch (generator)
     {
     case MixedSrsGenerator::Cancellation:
-        result = Tester{1, std::make_unique<generator::srs::CancellationGenerator>(), parameters, seed}
-                     .runSingle();
+        result =
+            Tester{1, std::make_unique<generator::srs::CancellationGenerator>(), parameters, seed}
+                .runSingle();
         break;
     case MixedSrsGenerator::Commutation:
-        result = Tester{1, std::make_unique<generator::srs::CommutativeGenerator>(), parameters, seed}
-                     .runSingle();
+        result =
+            Tester{1, std::make_unique<generator::srs::CommutativeGenerator>(), parameters, seed}
+                .runSingle();
         break;
     case MixedSrsGenerator::Idempotency:
-        result = Tester{1, std::make_unique<generator::srs::IdempotencyGenerator>(), parameters, seed}
-                     .runSingle();
+        result =
+            Tester{1, std::make_unique<generator::srs::IdempotencyGenerator>(), parameters, seed}
+                .runSingle();
         break;
     }
 
